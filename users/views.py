@@ -241,3 +241,30 @@ class SetNewPasswordView(APIView):
         if serializer.is_valid():
             return Response({"message":"비밀번호 재설정 완료"}, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+#비밀번호 변경일시 만료되면 변경
+class ExpiredPasswordChage(APIView):
+    permission_classes = [IsAuthenticated]
+    
+    def get(self, request):
+        user = get_object_or_404(User, id=request.user.id)
+        if user.password_expired == True:
+            return Response({"message":"비밀번호 만료일이 지났습니다. 비밀번호를 변경해주세요."}, status=status.HTTP_200_OK)
+        return Response({"message":"접근 권한 없음"}, status=status.HTTP_403_FORBIDDEN)
+            
+    def post(self, request):
+        user = get_object_or_404(User, id=request.user.id)
+        user.password_expired = False
+        user.last_password_changed = timezone.now()
+        user.save()
+        return Response({"message":"비밀번호 다음에 변경하기"}, status=status.HTTP_200_OK)
+    
+    def put(self, request):
+        user = get_object_or_404(User, id=request.user.id)
+        serializer = ChangePasswordSerializer(user, data=request.data, context={'request': request}) 
+        if serializer.is_valid():
+            serializer.save()
+            user.password_expired = False
+            user.save()
+            return Response({"message":"비밀번호 변경이 완료되었습니다!"} , status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

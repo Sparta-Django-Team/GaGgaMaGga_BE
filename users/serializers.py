@@ -204,7 +204,7 @@ class ChangePasswordSerializer(serializers.ModelSerializer):
         #비밀번호 문자열 동일여부 검사
         if re.search(PASSWORD_PATTERN, str(password)):
             raise serializers.ValidationError(detail={"password":"비밀번호는 3자리 이상 동일한 영문/사용 사용 불가합니다. "})
-
+    
         return data
     
     def update(self, instance, validated_data):

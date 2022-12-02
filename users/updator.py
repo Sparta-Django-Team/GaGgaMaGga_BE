@@ -42,3 +42,7 @@ if user:
         message = {'email_body': delete_email_body, 'to_email': i["email"],'email_subject': delete_email_subject}
         Util.send_email(message)
     user.delete()
+    
+#로그인 비밀번호 변경이 60일이 지났을 경우 passw1ord_expired를 True로 바꿈
+user = User.objects.filter(is_admin=False, last_password_changed__lte=two_months_ago)
+user.update(password_expired=True)
