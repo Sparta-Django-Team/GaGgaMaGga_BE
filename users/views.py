@@ -10,7 +10,6 @@ from django.contrib.auth.hashers import check_password
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from django.utils.http import urlsafe_base64_decode
 from django.utils.encoding import DjangoUnicodeDecodeError, force_str
-from django.conf import settings
 from django.utils import timezone
 
 from drf_yasg.utils import swagger_auto_schema
@@ -33,6 +32,20 @@ class UserView(APIView):
         serializer = SignupSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
+            
+            user = get_object_or_404(User, email=request.data["email"])
+            
+            secured_key = RefreshToken.for_user(user).access_token
+            expired_at = datetime.fromtimestamp(secured_key['exp']).strftime("%Y-%m-%dT%H:%M:%S")
+            
+            ConfirmEmail.objects.create(secured_key=secured_key, expired_at=expired_at, user=user)
+            
+            frontend_site = "127.0.0.1:5500" 
+            absurl = f'http://{frontend_site}/confrim_email.html? secured_key = {str(secured_key)}'
+            email_body = '안녕하세요!' + user.username +"고객님 이메일인증을 하시려면 아래 사이트를 접속해주세요 \n" + absurl
+            message = {'email_body': email_body,'to_email':user.email, 'email_subject':'이메일 인증' }
+            Util.send_email(message)
+            
             return Response({"message":"회원가입이 되었습니다."}, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
@@ -71,8 +84,9 @@ class ConfirmEmailView(APIView):
             if not user.is_confirmed:
                 user.is_confirmed = True
                 user.save()
-            return Response({'message':'성공적으로 인증이 되었습니다'}, status=status.HTTP_200_OK)
-
+                return Response({'message':'성공적으로 인증이 되었습니다'}, status=status.HTTP_200_OK)
+            return Response({'message':'이미 인증이 완료되었습니다.'}, status=status.HTTP_200_OK)
+        
         except jwt.ExpiredSignatureError as identifier:
             return Response({'message':'토큰이 만료되었습니다'}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -165,17 +179,18 @@ class PrivateProfileView(APIView):
 #공개 프로필 
 class PublicProfileView(APIView):
     permission_classes = [IsAuthenticated]
-    
+
     def get(self, request, nickname):
         profile = get_object_or_404(Profile, nickname=nickname)
         serializer = PublicProfileSerializer(profile)
         return Response(serializer.data, status=status.HTTP_200_OK)
-        
+
 class ChangePasswordView(APIView):
     permission_classes = [IsAuthenticated]
 
     #비밀번호 인증
     def post(self, request):
+        print(request.user.id)
         user = get_object_or_404(User, id=request.user.id)
         password = user.password
         if check_password(request.data["password"], password):

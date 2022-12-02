@@ -167,7 +167,7 @@ class Profile(models.Model):
     nickname = models.CharField('닉네임', max_length=10, null=True, unique=True, error_messages={"unique": "이미 사용중인 닉네임 이거나 탈퇴한 닉네임입니다."})
     intro = models.CharField('자기소개', max_length=100, null=True)
 
-    user = models.OneToOneField(User, on_delete=models.CASCADE, verbose_name="회원")
+    user = models.OneToOneField(User, on_delete=models.CASCADE, verbose_name="회원", related_name='user_profile')
 
     followings = models.ManyToManyField('self', symmetrical=False, blank=True, related_name= 'followers')
     def __str__(self):
