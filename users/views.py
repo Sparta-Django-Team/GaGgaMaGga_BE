@@ -212,7 +212,7 @@ class LoginLogListView(APIView):
     permission_classes = [IsAuthenticated]
     
     def get(self, request):
-        logged_in = get_list_or_404(LoggedIn, user=request.user)
+        logged_in = get_list_or_404(LoggedIn, user=request.user)[:10]
         serializer = LoginLogListSerializer(logged_in, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
@@ -221,7 +221,6 @@ class ChangePasswordView(APIView):
 
     #비밀번호 인증
     def post(self, request):
-        print(request.user.id)
         user = get_object_or_404(User, id=request.user.id)
         password = user.password
         if check_password(request.data["password"], password):

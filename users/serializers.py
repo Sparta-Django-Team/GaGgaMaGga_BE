@@ -159,7 +159,7 @@ class ProfileUpdateSerializer(serializers.ModelSerializer):
             #닉네임 유효성 검사
             if re.search(NICKNAME_VALIDATION, str(nickname)) or len(nickname) >10:
                 raise serializers.ValidationError(detail={"nickname":"닉네임은 3자이상 10자 이하로 작성해야하며 특수문자는 포함할 수 없습니다."})
-            print("안녕")
+
             return data
         
         def update(self, instance, validated_data):

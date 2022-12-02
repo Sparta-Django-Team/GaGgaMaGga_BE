@@ -23,7 +23,6 @@ inactivate_email_body = '고객님 안녕하세요. 가까?마까?입니다. 저
 
 if user:
     for i in inactivate_user_email:
-        print(i['email'])
         message = {'email_body': inactivate_email_body, 'to_email': i["email"],'email_subject': inactivate_email_subject}
         Util.send_email(message)
     user.update(withdraw=True)
