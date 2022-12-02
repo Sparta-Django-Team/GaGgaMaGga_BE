@@ -17,7 +17,7 @@ urlpatterns = [
     path('profile/<str:nickname>/', views.PublicProfileView.as_view(), name='public_profile'),
     path('log/', views.LoginLogListView.as_view(), name='login_log'),
     path("kakao/", views.KakaoLogIn.as_view()),
-
+    
     #Password
     path('password-change/', views.ChangePasswordView.as_view(), name='change_password_view'),
     path('password-reset-email/', views.PasswordResetView.as_view(),name="password_reset_email"),
