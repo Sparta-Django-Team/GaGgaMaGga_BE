@@ -126,12 +126,13 @@ class PrivateProfileSerializer(serializers.ModelSerializer):
 
 #공개 프로필 serializer
 class PublicProfileSerializer(serializers.ModelSerializer):
-    #팔로우한 사람들
-    #팔로잉한 사람들
-    #내가 작성한 글 나오게하기
+    #팔로우 닉네임만 보게함
+    followings = serializers.StringRelatedField(many=True)
+    followers = serializers.StringRelatedField(many=True)
+
     class Meta:
         model = Profile
-        fields = ('nickname', 'profile_image', 'intro', )
+        fields = ('nickname', 'profile_image', 'intro', 'followings', 'followers',)
 
 #프로필 편집 serializer
 class ProfileUpdateSerializer(serializers.ModelSerializer):
