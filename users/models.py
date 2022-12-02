@@ -144,3 +144,12 @@ class ManagedUser(models.Model):
     
     def __str__(self):
         return f"[아이디]{self.user.username}"
+
+#로그 기록
+class LoggedIn(models.Model):
+    created_at = models.DateTimeField('로그인 기록', auto_now_add=True)
+    
+    user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name="회원")
+    
+    def __str__(self):
+        return f"[아이디]{self.user.username}[접속 기록]{self.created_at}"
