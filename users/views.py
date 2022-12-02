@@ -18,6 +18,7 @@ from drf_yasg.utils import swagger_auto_schema
 from datetime import datetime
 import jwt
 
+from gaggamagga.settings import get_secret
 from .jwt_claim_serializer import CustomTokenObtainPairSerializer
 from .serializers import (SignupSerializer, PrivateProfileSerializer, PublicProfileSerializer, LogoutSerializer, 
 ProfileUpdateSerializer, ChangePasswordSerializer, SetNewPasswordSerializer, PasswordResetSerializer)
@@ -64,12 +65,11 @@ class ConfirmEmailView(APIView):
     #이메일 인증 확인
     def get(self, request):
         secured_key = request.GET.get('secured_key')
-        
         try:
-            payload = jwt.decode(secured_key, settings.SECRET_KEY)
+            payload = jwt.decode(secured_key, get_secret("SECRET_KEY"), algorithms=['HS256'])
             user = get_object_or_404(User, id=payload['user_id'])
-            if not user.is_confirm:
-                user.is_confirm = True
+            if not user.is_confirmed:
+                user.is_confirmed = True
                 user.save()
             return Response({'message':'성공적으로 인증이 되었습니다'}, status=status.HTTP_200_OK)
 
