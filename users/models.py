@@ -79,3 +79,13 @@ class User(AbstractBaseUser):
     @property
     def is_staff(self):
         return self.is_admin
+    
+#이메일 확인 
+class ConfirmEmail(models.Model):
+    secured_key = models.CharField('시크릿 키', max_length=255, default=0)
+    expired_at = models.DateTimeField('만료일', auto_now_add=True)
+
+    user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name="회원")
+    
+    def __str__(self):
+        return f"[이메일]{self.user.email}"
