@@ -21,7 +21,7 @@ import jwt
 from .jwt_claim_serializer import CustomTokenObtainPairSerializer
 from .serializers import (SignupSerializer, PrivateProfileSerializer, PublicProfileSerializer, LogoutSerializer, 
 ProfileUpdateSerializer, ChangePasswordSerializer, SetNewPasswordSerializer, PasswordResetSerializer)
-from .models import User, ConfirmEmail, ConfirmPhoneNumber
+from .models import User, ConfirmEmail, ConfirmPhoneNumber, Profile
 from .utils import Util
 
 class UserView(APIView):
@@ -153,9 +153,9 @@ class PrivateProfileView(APIView):
 
     #프로필 수정
     def put(self, request):
-        user = get_object_or_404(User, id=request.user.id)
-        if user == request.user:
-            serializer = ProfileUpdateSerializer(user, data=request.data, partial=True)
+        profile = get_object_or_404(Profile, user=request.user)
+        if profile.user == request.user:
+            serializer = ProfileUpdateSerializer(profile, data=request.data, partial=True)
             if serializer.is_valid():
                 serializer.save()
                 return Response({"message":"프로필 수정이 완료되었습니다."} , status=status.HTTP_200_OK)
@@ -166,9 +166,9 @@ class PrivateProfileView(APIView):
 class PublicProfileView(APIView):
     permission_classes = [IsAuthenticated]
     
-    def get(self, request, username):
-        user = get_object_or_404(User, username=username)
-        serializer = PublicProfileSerializer(user)
+    def get(self, request, nickname):
+        profile = get_object_or_404(Profile, nickname=nickname)
+        serializer = PublicProfileSerializer(profile)
         return Response(serializer.data, status=status.HTTP_200_OK)
         
 class ChangePasswordView(APIView):
