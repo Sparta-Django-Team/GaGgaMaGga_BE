@@ -20,7 +20,8 @@ from datetime import datetime
 import jwt
 
 from .jwt_claim_serializer import CustomTokenObtainPairSerializer
-from .serializers import SignupSerializer, ProfileSerializer, LogoutSerializer, ProfileUpdateSerializer
+from .serializers import (SignupSerializer, ProfileSerializer, LogoutSerializer, 
+ProfileUpdateSerializer, ChangePasswordSerializer)
 from .models import User, ConfirmEmail, ConfirmPhoneNumber
 from .utils import Util
 
@@ -162,3 +163,23 @@ class ProfileView(APIView):
                 return Response({"message":"프로필 수정이 완료되었습니다."} , status=status.HTTP_200_OK)
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         return Response({"message":"접근 권한 없음"}, status=status.HTTP_403_FORBIDDEN)
+
+class ChangePasswordView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    #비밀번호 인증
+    def post(self, request):
+        user = get_object_or_404(User, id=request.user.id)
+        password = user.password
+        if check_password(request.data["password"], password):
+            return Response({"message":"인증이 완료되었습니다."}, status=status.HTTP_200_OK)        
+        return Response({"message":"맞는 비밀번호를 적어주세요."}, status=status.HTTP_400_BAD_REQUEST)
+
+    #비밀번호 변경
+    def put(self, request):
+        user = get_object_or_404(User, id=request.user.id)
+        serializer = ChangePasswordSerializer(user, data=request.data, context={'request': request}) 
+        if serializer.is_valid():
+            serializer.save()
+            return Response({"message":"비밀번호 변경이 완료되었습니다! 다시 로그인해주세요."} , status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

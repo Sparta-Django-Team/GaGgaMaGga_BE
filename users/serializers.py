@@ -151,3 +151,48 @@ class ProfileUpdateSerializer(serializers.ModelSerializer):
             
             instance.save()
             return instance
+
+#비밀번호 변경 serializer
+class ChangePasswordSerializer(serializers.ModelSerializer):
+    repassword= serializers.CharField(error_messages={'required':'비밀번호를 입력해주세요.', 'blank':'비밀번호를 입력해주세요.', 'write_only':True})    
+    
+    class Meta:
+        model = User
+        fields = ('password', 'repassword',)
+        extra_kwargs = {'password':{'write_only':True,
+                        'error_messages': {
+                        'required':'비밀번호를 입력해주세요.',
+                        'blank':'비밀번호를 입력해주세요.',}},}
+
+    def validate(self, data):
+        PASSWORD_VALIDATION = r"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[$@$!%*?&])[A-Za-z\d$@$!%*?&]{8,16}"
+        PASSWORD_PATTERN = r"(.)\1+\1"
+        
+        current_password = self.context.get("request").user.password
+        password = data.get('password')
+        repassword = data.get('repassword')
+        
+        #현재 비밀번호와 바꿀 비밀번호 비교
+        if check_password(password, current_password):
+            raise serializers.ValidationError(detail={"password":"현재 사용중인 비밀번호와 동일한 비밀번호는 입력할 수 없습니다."})
+        
+        #비밀번호 일치
+        if password != repassword:
+            raise serializers.ValidationError(detail={"password":"비밀번호가 일치하지 않습니다."})
+        
+        #비밀번호 유효성 검사
+        if not re.search(PASSWORD_VALIDATION, str(password)):
+            raise serializers.ValidationError(detail={"password":"비밀번호는 8자 이상 16자이하의 영문 대/소문자, 숫자, 특수문자 조합이어야 합니다. "})
+        
+        #비밀번호 문자열 동일여부 검사
+        if re.search(PASSWORD_PATTERN, str(password)):
+            raise serializers.ValidationError(detail={"password":"비밀번호는 3자리 이상 동일한 영문/사용 사용 불가합니다. "})
+
+        return data
+    
+    def update(self, instance, validated_data):
+        instance.password = validated_data.get('password', instance.password)
+        instance.set_password(instance.password)
+        instance.save()
+        
+        return instance
