@@ -160,3 +160,15 @@ class OauthId(models.Model):
     provider = models.CharField('구분자', max_length=255)
     
     user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name="회원")
+    
+#프로필
+class Profile(models.Model):
+    profile_image = models.ImageField('프로필 사진', default='default_profile_pic.jpg', upload_to='profile_pics' )
+    nickname = models.CharField('닉네임', max_length=10, null=True, unique=True, error_messages={"unique": "이미 사용중인 닉네임 이거나 탈퇴한 닉네임입니다."})
+    intro = models.CharField('자기소개', max_length=100, null=True)
+
+    user = models.OneToOneField(User, on_delete=models.CASCADE, verbose_name="회원")
+
+    followings = models.ManyToManyField('self', symmetrical=False, blank=True, related_name= 'followers')
+    def __str__(self):
+        return f"[아이디]{self.user.username}[닉네임]{self.nickname}"
