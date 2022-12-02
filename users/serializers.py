@@ -94,6 +94,21 @@ class SignupSerializer(serializers.ModelSerializer):
         Profile.objects.create(user=user)
         return user
 
+#로그아웃 serializer
+class LogoutSerializer(serializers.Serializer):
+    refresh = serializers.CharField()
+
+    def validate(self, attrs):
+        self.token = attrs['refresh']
+        return attrs
+
+    def save(self, **kwargs):
+        try:
+            RefreshToken(self.token).blacklist()
+
+        except TokenError:
+            raise serializers.ValidationError(detail={"만료된 토큰":"유효하지 않거나 만료된 토큰입니다."})
+
 #프로필 serializer
 class ProfileSerializer(serializers.ModelSerializer):
 

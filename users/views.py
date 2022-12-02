@@ -20,7 +20,7 @@ from datetime import datetime
 import jwt
 
 from .jwt_claim_serializer import CustomTokenObtainPairSerializer
-from .serializers import SignupSerializer, ProfileSerializer
+from .serializers import SignupSerializer, ProfileSerializer, LogoutSerializer
 from .models import User, ConfirmEmail, ConfirmPhoneNumber
 from .utils import Util
 
@@ -46,6 +46,17 @@ class UserView(APIView):
 #로그인
 class CustomTokenObtainPairView(TokenObtainPairView):
     serializer_class = CustomTokenObtainPairSerializer
+
+#로그아웃
+class LogoutView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        serializer = LogoutSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response({"message":"로그아웃 성공되었습니다."}, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class ConfirmEmailView(APIView):
     permission_classes = [AllowAny]
@@ -87,6 +98,50 @@ class ReSendEmailView(APIView):
         Util.send_email(message)
         
         return Response({"message":"인증 이메일이 발송되었습니다. 확인부탁드립니다."}, status=status.HTTP_201_CREATED)
+
+#아이디 찾기 휴대폰 sms 발송
+class SendPhoneNumberView(APIView):
+    permission_classes = [AllowAny]
+    
+    def post(self, request):
+        try:
+            phone_number = request.data["phone_number"]
+            
+        except:
+            return Response({'message': '잘못된 요청입니다.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        else:
+            if not User.objects.filter(phone_number=phone_number).exists():
+                return Response({'message': '등록된 휴대폰 번호가 없습니다.'}, status=status.HTTP_400_BAD_REQUEST)
+            
+            user = User.objects.get(phone_number=phone_number)
+            ConfirmPhoneNumber.objects.create(user=user)
+            return Response({'message':'인증번호가 발송되었습니다. 확인부탁드립니다.'}, status=status.HTTP_200_OK)
+
+#아이디 찾기 인증번호 확인
+class ConfirmPhoneNumberView(APIView):
+    permission_classes = [AllowAny]
+    
+    def post(self, request):
+        try:
+            phone_number = request.data['phone_number']
+            auth_number = request.data['auth_number']
+            
+        except:
+            return Response({'message': '잘못된 요청입니다.'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        else:
+            user = get_object_or_404(User, phone_number=phone_number)
+            confirm_phone_number = ConfirmPhoneNumber.objects.filter(user=user).last()
+
+            if confirm_phone_number.expired_at < timezone.now():
+                return Response({'message': '인증 번호 시간이 지났습니다.'}, status=status.HTTP_400_BAD_REQUEST)
+            
+            if confirm_phone_number.auth_number != int(auth_number):
+                return Response({'message': '인증 번호가 틀립니다. 다시 입력해주세요'}, status=status.HTTP_400_BAD_REQUEST)
+            
+            return Response({'message':f'회원님의 아이디는 {user.username}입니다.'}, status=status.HTTP_200_OK)
+
 class ProfileView(APIView):
     permission_classes = [AllowAny]
 
@@ -96,24 +151,3 @@ class ProfileView(APIView):
         user = get_object_or_404(User, id=request.user.id)
         serializer = ProfileSerializer(user)
         return Response(serializer.data, status=status.HTTP_200_OK)
-
-class ReSendEmailView(APIView):
-    permission_classes = [IsAuthenticated]
-    
-    #이메일 재발송
-    def post(self, request):
-        user = get_object_or_404(User, id=request.user.id)
-        
-        secured_key = RefreshToken.for_user(user).access_token
-        expired_at = datetime.fromtimestamp(secured_key['exp']).strftime("%Y-%m-%dT%H:%M:%S")
-        
-        ConfirmEmail.objects.create(secured_key=secured_key, expired_at=expired_at, user=user)
-        
-        frontend_site = "127.0.0.1:5500" 
-        absurl = f'http://{frontend_site}/confrim_email.html?secured_key={str(secured_key)}'
-        email_body = '안녕하세요!' + user.username +"고객님 이메일인증을 하시려면 아래 사이트를 접속해주세요 \n" + absurl
-        message = {'email_body': email_body,'to_email':user.email, 'email_subject':'이메일 인증' }
-        Util.send_email(message)
-        
-        return Response({"message":"인증 이메일이 발송되었습니다. 확인부탁드립니다."}, status=status.HTTP_201_CREATED)
-

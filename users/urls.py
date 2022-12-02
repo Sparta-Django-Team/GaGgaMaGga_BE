@@ -11,4 +11,6 @@ urlpatterns = [
     path('api/token/', views.CustomTokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('profile/', views.ProfileView.as_view(), name='profile'),
+    path('phone-number-send/', views.SendPhoneNumberView.as_view(), name='send_phone_number'),
+    path('phone-number-confirm/', views.ConfirmPhoneNumberView.as_view(), name='confirm_phone_number'),
 ]
