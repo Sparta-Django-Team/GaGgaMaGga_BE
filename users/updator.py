@@ -18,8 +18,8 @@ year_ago = timezone.now() - timezone.timedelta(days=365)
 user = User.objects.filter(is_admin=False, last_login__lte=year_ago)
 
 inactivate_user_email = user.values("email")
-inactivate_email_subject = '가까?마까? 휴면회원 계정 처리 안내'
-inactivate_email_body = '고객님 안녕하세요. 가까?마까?입니다. 저희는 소중한 고객님의 개인정보 보호를 위해 관계 법령에 따라 고객님의 온라인 계정을 별도로 분리 보관할 예정입니다. 휴면계정을 해제하기 위해서는 별도의 인증 동의 절차가 진행될 수 있으므로 편리한 계정 사용이 필요하시다면 지금 바로 가까?마까?를 방문해주세요.'
+inactivate_email_subject = '가까? 마까? 휴면회원 계정 처리 안내'
+inactivate_email_body = '고객님 안녕하세요. 가까? 마까?입니다. 저희는 소중한 고객님의 개인정보 보호를 위해 관계 법령에 따라 고객님의 온라인 계정을 별도로 분리 보관할 예정입니다. 휴면계정을 해제하기 위해서는 별도의 인증 동의 절차가 진행될 수 있으므로 편리한 계정 사용이 필요하시다면 지금 바로 가까? 마까?를 방문해주세요.'
 
 if user:
     for i in inactivate_user_email:
@@ -41,7 +41,7 @@ if user:
         message = {'email_body': delete_email_body, 'to_email': i["email"],'email_subject': delete_email_subject}
         Util.send_email(message)
     user.delete()
-    
+
 #로그인 비밀번호 변경이 60일이 지났을 경우 passw1ord_expired를 True로 바꿈
 user = User.objects.filter(is_admin=False, last_password_changed__lte=two_months_ago)
 user.update(password_expired=True)

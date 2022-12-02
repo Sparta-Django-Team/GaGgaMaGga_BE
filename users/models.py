@@ -122,7 +122,7 @@ class ConfirmPhoneNumber(models.Model):
         data = {
             "type": "SMS",
             "from": f'{get_secret("FROM_PHONE_NUMBER")}',
-            "content": f"[나이사!] 인증 번호 [{self.auth_number}]를 입력해주세요. (5분 제한시간)",
+            "content": f"[가까? 마까?] 인증 번호 [{self.auth_number}]를 입력해주세요. (5분 제한시간)",
             "messages": [{"to": f"{self.user.phone_number}"}],
         }
 
