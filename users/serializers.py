@@ -111,14 +111,24 @@ class LogoutSerializer(serializers.Serializer):
 
 #개인 프로필 serializer
 class PrivateProfileSerializer(serializers.ModelSerializer):
+    nickname = serializers.SerializerMethodField()
+    profile_image = serializers.SerializerMethodField()
+    
+    def get_nickname(self, obj):
+        return obj.profile.nickname
+    
+    def get_profile_image(self, obj):
+        return obj.profile.profile_image.url
 
     class Meta:
-        model = Profile
-        fields = ('nickname', 'profile_image', 'intro', )
+        model = User
+        fields = ('nickname', 'profile_image', 'email', 'username',)
 
 #공개 프로필 serializer
 class PublicProfileSerializer(serializers.ModelSerializer):
-    
+    #팔로우한 사람들
+    #팔로잉한 사람들
+    #내가 작성한 글 나오게하기
     class Meta:
         model = Profile
         fields = ('nickname', 'profile_image', 'intro', )
@@ -149,7 +159,7 @@ class ProfileUpdateSerializer(serializers.ModelSerializer):
             #닉네임 유효성 검사
             if re.search(NICKNAME_VALIDATION, str(nickname)) or len(nickname) >10:
                 raise serializers.ValidationError(detail={"nickname":"닉네임은 3자이상 10자 이하로 작성해야하며 특수문자는 포함할 수 없습니다."})
-
+            print("안녕")
             return data
         
         def update(self, instance, validated_data):

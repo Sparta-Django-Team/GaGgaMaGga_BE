@@ -18,10 +18,11 @@ from drf_yasg.utils import swagger_auto_schema
 from datetime import datetime
 import jwt
 
+from gaggamagga.settings import get_secret
 from .jwt_claim_serializer import CustomTokenObtainPairSerializer
 from .serializers import (SignupSerializer, PrivateProfileSerializer, PublicProfileSerializer, LogoutSerializer, 
 ProfileUpdateSerializer, ChangePasswordSerializer, SetNewPasswordSerializer, PasswordResetSerializer)
-from .models import User, ConfirmEmail, ConfirmPhoneNumber
+from .models import User, ConfirmEmail, ConfirmPhoneNumber, Profile
 from .utils import Util
 
 class UserView(APIView):
@@ -64,12 +65,11 @@ class ConfirmEmailView(APIView):
     #이메일 인증 확인
     def get(self, request):
         secured_key = request.GET.get('secured_key')
-        
         try:
-            payload = jwt.decode(secured_key, settings.SECRET_KEY)
+            payload = jwt.decode(secured_key, get_secret("SECRET_KEY"), algorithms=['HS256'])
             user = get_object_or_404(User, id=payload['user_id'])
-            if not user.is_confirm:
-                user.is_confirm = True
+            if not user.is_confirmed:
+                user.is_confirmed = True
                 user.save()
             return Response({'message':'성공적으로 인증이 되었습니다'}, status=status.HTTP_200_OK)
 
@@ -153,9 +153,9 @@ class PrivateProfileView(APIView):
 
     #프로필 수정
     def put(self, request):
-        user = get_object_or_404(User, id=request.user.id)
-        if user == request.user:
-            serializer = ProfileUpdateSerializer(user, data=request.data, partial=True)
+        profile = get_object_or_404(Profile, user=request.user)
+        if profile.user == request.user:
+            serializer = ProfileUpdateSerializer(profile, data=request.data, partial=True)
             if serializer.is_valid():
                 serializer.save()
                 return Response({"message":"프로필 수정이 완료되었습니다."} , status=status.HTTP_200_OK)
@@ -166,9 +166,9 @@ class PrivateProfileView(APIView):
 class PublicProfileView(APIView):
     permission_classes = [IsAuthenticated]
     
-    def get(self, request, username):
-        user = get_object_or_404(User, username=username)
-        serializer = PublicProfileSerializer(user)
+    def get(self, request, nickname):
+        profile = get_object_or_404(Profile, nickname=nickname)
+        serializer = PublicProfileSerializer(profile)
         return Response(serializer.data, status=status.HTTP_200_OK)
         
 class ChangePasswordView(APIView):
