@@ -137,3 +137,10 @@ class ConfirmPhoneNumber(models.Model):
     
     def __str__(self):
         return f"[휴대폰 번호]{self.user.phone_number}"
+    
+#회원 관리
+class ManagedUser(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name="회원")
+    
+    def __str__(self):
+        return f"[아이디]{self.user.username}"
