@@ -89,3 +89,51 @@ class ConfirmEmail(models.Model):
     
     def __str__(self):
         return f"[이메일]{self.user.email}"
+    
+#휴대폰 번호 확인
+class ConfirmPhoneNumber(models.Model): 
+    auth_number = models.IntegerField('인증 번호', default=0, validators=[MaxValueValidator(9999)])
+    expired_at = models.DateTimeField('만료일',)
+    
+    user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name="회원")
+    
+    def save(self, *args, **kwargs):
+        self.auth_number = randint(1000, 10000)
+        self.expired_at = timezone.now() + timezone.timedelta(minutes=5)
+        super().save(*args, **kwargs)
+        self.send_sms()
+    
+    def send_sms(self):
+        timestamp = str(int(time.time() * 1000))
+        access_key =  get_secret("NAVER_ACCESS_KEY_ID")
+        secret_key = bytes( get_secret("NAVER_SECRET_KEY"), "UTF-8")
+        service_id = get_secret("SERVICE_ID")
+        method = "POST"
+        uri = f"/sms/v2/services/{service_id}/messages"
+        message = method + " " + uri + "\n" + timestamp + "\n" + access_key
+        message = bytes(message, "UTF-8")
+        signing_key = base64.b64encode(
+            hmac.new(secret_key, message, digestmod=hashlib.sha256).digest()
+        )
+        
+        url = f"https://sens.apigw.ntruss.com/sms/v2/services/{service_id}/messages"
+                
+        data = {
+            "type": "SMS",
+            "from": f'{get_secret("FROM_PHONE_NUMBER")}',
+            "content": f"[나이사!] 인증 번호 [{self.auth_number}]를 입력해주세요. (5분 제한시간)",
+            "messages": [{"to": f"{self.user.phone_number}"}],
+        }
+
+        headers = {
+            "Content-Type": "application/json; charset=utf-8",
+            "x-ncp-apigw-timestamp": timestamp,
+            "x-ncp-iam-access-key": access_key,
+            "x-ncp-apigw-signature-v2": signing_key,
+        }
+        
+        requests.post(url, json=data, headers=headers)
+
+    
+    def __str__(self):
+        return f"[휴대폰 번호]{self.user.phone_number}"
