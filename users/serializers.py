@@ -8,7 +8,7 @@ from django.utils.encoding import smart_bytes, force_str
 
 import re
 
-from .models import User, Profile
+from .models import User, Profile, LoggedIn
 from .utils import Util
 
 #회원가입 serializer
@@ -168,6 +168,12 @@ class ProfileUpdateSerializer(serializers.ModelSerializer):
             
             instance.save()
             return instance
+
+#로그인 로그 serializer
+class LoginLogListSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = LoggedIn
+        fields = ('update_ip', 'created_at', )
 
 #비밀번호 변경 serializer
 class ChangePasswordSerializer(serializers.ModelSerializer):

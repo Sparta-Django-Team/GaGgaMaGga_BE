@@ -1,16 +1,19 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework.generics import get_object_or_404
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework_simplejwt.views import TokenViewBase
+from rest_framework_simplejwt.exceptions import TokenError, InvalidToken
+from rest_framework_simplejwt.settings import api_settings
 
 from django.contrib.auth.hashers import check_password
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from django.utils.http import urlsafe_base64_decode
 from django.utils.encoding import DjangoUnicodeDecodeError, force_str
 from django.utils import timezone
+from django.shortcuts import get_list_or_404
 
 from drf_yasg.utils import swagger_auto_schema
 
@@ -20,8 +23,8 @@ import jwt
 from gaggamagga.settings import get_secret
 from .jwt_claim_serializer import CustomTokenObtainPairSerializer
 from .serializers import (SignupSerializer, PrivateProfileSerializer, PublicProfileSerializer, LogoutSerializer, 
-ProfileUpdateSerializer, ChangePasswordSerializer, SetNewPasswordSerializer, PasswordResetSerializer)
-from .models import User, ConfirmEmail, ConfirmPhoneNumber, Profile
+ProfileUpdateSerializer, ChangePasswordSerializer, SetNewPasswordSerializer, PasswordResetSerializer, LoginLogListSerializer)
+from .models import User, ConfirmEmail, ConfirmPhoneNumber, Profile, LoggedIn
 from .utils import Util
 
 class UserView(APIView):
@@ -58,8 +61,27 @@ class UserView(APIView):
         return Response({"message":"접근 권한 없음"}, status=status.HTTP_403_FORBIDDEN)
 
 #로그인
-class CustomTokenObtainPairView(TokenObtainPairView):
+class CustomTokenObtainPairView(TokenViewBase):
+    _serializer_class = api_settings.TOKEN_OBTAIN_SERIALIZER
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        try:
+            serializer.is_valid(raise_exception=True)
+            
+            #로그인 로그 저장
+            user_ip= Util.get_client_ip(request)
+            user = User.objects.get(username=request.data["username"])
+            LoggedIn.objects.create(user=user, created_at=timezone.now(), update_ip=user_ip)
+            
+        except TokenError as e:
+            raise InvalidToken(e.args[0])
+
+        return Response(serializer.validated_data, status=status.HTTP_200_OK)        
+
+class CustomTokenObtainPairView(CustomTokenObtainPairView):
     serializer_class = CustomTokenObtainPairSerializer
+    
 
 #로그아웃
 class LogoutView(APIView):
@@ -183,6 +205,15 @@ class PublicProfileView(APIView):
     def get(self, request, nickname):
         profile = get_object_or_404(Profile, nickname=nickname)
         serializer = PublicProfileSerializer(profile)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+#로그인 로그기록
+class LoginLogListView(APIView):
+    permission_classes = [IsAuthenticated]
+    
+    def get(self, request):
+        logged_in = get_list_or_404(LoggedIn, user=request.user)
+        serializer = LoginLogListSerializer(logged_in, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 class ChangePasswordView(APIView):

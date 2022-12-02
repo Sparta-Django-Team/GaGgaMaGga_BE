@@ -61,6 +61,7 @@ class User(AbstractBaseUser):
     last_password_changed = models.DateTimeField('비밀번호 마지막 변경일', auto_now=True)
     created_at = models.DateTimeField('계정 생성일', auto_now_add=True)
     withdraw_at = models.DateTimeField('계정 탈퇴일', null=True)
+    
 
     objects = UserManager()
 
@@ -147,12 +148,16 @@ class ManagedUser(models.Model):
 
 #로그 기록
 class LoggedIn(models.Model):
+    update_ip = models.GenericIPAddressField('로그인한 IP', null=True)
     created_at = models.DateTimeField('로그인 기록', auto_now_add=True)
     
     user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name="회원")
     
     def __str__(self):
         return f"[아이디]{self.user.username}[접속 기록]{self.created_at}"
+    
+    class Meta:
+        ordering = ['-created_at']
     
 #소셜 로그인
 class OauthId(models.Model):

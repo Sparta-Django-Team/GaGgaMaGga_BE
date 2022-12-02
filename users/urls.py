@@ -15,6 +15,7 @@ urlpatterns = [
     path('phone-number-confirm/', views.ConfirmPhoneNumberView.as_view(), name='confirm_phone_number'),
     path('profile/', views.PrivateProfileView.as_view(), name='private_profile'),
     path('profile/<str:nickname>/', views.PublicProfileView.as_view(), name='public_profile'),
+    path('log/', views.LoginLogListView.as_view(), name='login_log'),
     
     #Password
     path('password-change/', views.ChangePasswordView.as_view(), name='change_password_view'),
@@ -22,4 +23,4 @@ urlpatterns = [
     path('password-reset/<uidb64>/<token>/',views.PasswordTokenCheckView.as_view(), name='password_reset_confirm'),
     path('password-reset-complete/', views.SetNewPasswordView.as_view(), name='password_reset_complete'),
     path('password-expired-change/', views.ExpiredPasswordChage.as_view(), name='password_expired_change'),
-]
+] 
