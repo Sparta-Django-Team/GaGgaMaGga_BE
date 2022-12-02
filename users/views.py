@@ -20,7 +20,7 @@ from datetime import datetime
 import jwt
 
 from .jwt_claim_serializer import CustomTokenObtainPairSerializer
-from .serializers import SignupSerializer, ProfileSerializer, LogoutSerializer
+from .serializers import SignupSerializer, ProfileSerializer, LogoutSerializer, ProfileUpdateSerializer
 from .models import User, ConfirmEmail, ConfirmPhoneNumber
 from .utils import Util
 
@@ -151,3 +151,14 @@ class ProfileView(APIView):
         user = get_object_or_404(User, id=request.user.id)
         serializer = ProfileSerializer(user)
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+    #프로필 수정
+    def put(self, request):
+        user = get_object_or_404(User, id=request.user.id)
+        if user == request.user:
+            serializer = ProfileUpdateSerializer(user, data=request.data, partial=True)
+            if serializer.is_valid():
+                serializer.save()
+                return Response({"message":"프로필 수정이 완료되었습니다."} , status=status.HTTP_200_OK)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        return Response({"message":"접근 권한 없음"}, status=status.HTTP_403_FORBIDDEN)
