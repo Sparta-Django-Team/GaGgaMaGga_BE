@@ -61,6 +61,7 @@ class User(AbstractBaseUser):
     last_password_changed = models.DateTimeField('비밀번호 마지막 변경일', auto_now=True)
     created_at = models.DateTimeField('계정 생성일', auto_now_add=True)
     withdraw_at = models.DateTimeField('계정 탈퇴일', null=True)
+    
 
     objects = UserManager()
 
@@ -121,7 +122,7 @@ class ConfirmPhoneNumber(models.Model):
         data = {
             "type": "SMS",
             "from": f'{get_secret("FROM_PHONE_NUMBER")}',
-            "content": f"[나이사!] 인증 번호 [{self.auth_number}]를 입력해주세요. (5분 제한시간)",
+            "content": f"[가까? 마까?] 인증 번호 [{self.auth_number}]를 입력해주세요. (5분 제한시간)",
             "messages": [{"to": f"{self.user.phone_number}"}],
         }
 
@@ -147,12 +148,16 @@ class ManagedUser(models.Model):
 
 #로그 기록
 class LoggedIn(models.Model):
+    update_ip = models.GenericIPAddressField('로그인한 IP', null=True)
     created_at = models.DateTimeField('로그인 기록', auto_now_add=True)
     
     user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name="회원")
     
     def __str__(self):
         return f"[아이디]{self.user.username}[접속 기록]{self.created_at}"
+    
+    class Meta:
+        ordering = ['-created_at']
     
 #소셜 로그인
 class OauthId(models.Model):
@@ -167,7 +172,7 @@ class Profile(models.Model):
     nickname = models.CharField('닉네임', max_length=10, null=True, unique=True, error_messages={"unique": "이미 사용중인 닉네임 이거나 탈퇴한 닉네임입니다."})
     intro = models.CharField('자기소개', max_length=100, null=True)
 
-    user = models.OneToOneField(User, on_delete=models.CASCADE, verbose_name="회원")
+    user = models.OneToOneField(User, on_delete=models.CASCADE, verbose_name="회원", related_name='user_profile')
 
     followings = models.ManyToManyField('self', symmetrical=False, blank=True, related_name= 'followers')
     def __str__(self):
