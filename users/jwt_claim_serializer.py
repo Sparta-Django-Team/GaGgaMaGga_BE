@@ -8,7 +8,7 @@ from django.contrib.auth.models import update_last_login
 from django.utils.translation import gettext_lazy as _
 from django.utils import timezone
 
-from .models import User, LoggedIn
+from .models import User
 
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
     username_field = get_user_model().USERNAME_FIELD
@@ -77,13 +77,10 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
             #회원 상태 S이면 계정잠금 에러
             if self.is_active == False:
                 raise serializers.ValidationError("계정이 잠금이 되었습니다. 잠시 후 다시 시도해주시길 바랍니다. ")
-        
+            
         #로그인 실패 에러
         if not api_settings.USER_AUTHENTICATION_RULE(self.user):
             raise exceptions.AuthenticationFailed(self.error_messages["no_active_account"],"no_active_account",)
-        
-        #로그인 로그
-        LoggedIn.objects.create(user=self.target_user, created_at=self.now_today_time)
         
         #로그인 토큰 발행
         refresh = self.get_token(self.user)
@@ -101,4 +98,5 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
         token = super().get_token(user)
         token["email"] = user.email
         token["username"] = user.username
+        
         return token

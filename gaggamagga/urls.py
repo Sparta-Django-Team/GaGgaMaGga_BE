@@ -10,9 +10,9 @@ from drf_yasg import openapi
 
 schema_view = get_schema_view(
     openapi.Info(
-        title="가까마까",
+        title="가까? 마까?",
         default_version='v1',
-        description="가까마까 프로젝트 API",
+        description="가까? 마까? 프로젝트 API",
         terms_of_service="https://www.ourapp.com/policies/terms/",
         contact=openapi.Contact(email="wogur981208@gmail.com"),
         license=openapi.License(name="Gaggamagga License"),
