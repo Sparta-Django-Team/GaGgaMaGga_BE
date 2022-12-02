@@ -109,9 +109,16 @@ class LogoutSerializer(serializers.Serializer):
         except TokenError:
             raise serializers.ValidationError(detail={"만료된 토큰":"유효하지 않거나 만료된 토큰입니다."})
 
-#프로필 serializer
-class ProfileSerializer(serializers.ModelSerializer):
+#개인 프로필 serializer
+class PrivateProfileSerializer(serializers.ModelSerializer):
 
+    class Meta:
+        model = Profile
+        fields = ('nickname', 'profile_image', 'intro', )
+
+#공개 프로필 serializer
+class PublicProfileSerializer(serializers.ModelSerializer):
+    
     class Meta:
         model = Profile
         fields = ('nickname', 'profile_image', 'intro', )

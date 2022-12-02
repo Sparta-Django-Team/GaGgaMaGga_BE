@@ -19,7 +19,7 @@ from datetime import datetime
 import jwt
 
 from .jwt_claim_serializer import CustomTokenObtainPairSerializer
-from .serializers import (SignupSerializer, ProfileSerializer, LogoutSerializer, 
+from .serializers import (SignupSerializer, PrivateProfileSerializer, PublicProfileSerializer, LogoutSerializer, 
 ProfileUpdateSerializer, ChangePasswordSerializer, SetNewPasswordSerializer, PasswordResetSerializer)
 from .models import User, ConfirmEmail, ConfirmPhoneNumber
 from .utils import Util
@@ -142,14 +142,13 @@ class ConfirmPhoneNumberView(APIView):
             
             return Response({'message':f'회원님의 아이디는 {user.username}입니다.'}, status=status.HTTP_200_OK)
 
-class ProfileView(APIView):
+class PrivateProfileView(APIView):
     permission_classes = [AllowAny]
 
-    #프로필 
+    #개인 프로필 
     def get(self, request):
-        print(request.META)
         user = get_object_or_404(User, id=request.user.id)
-        serializer = ProfileSerializer(user)
+        serializer = PrivateProfileSerializer(user)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     #프로필 수정
@@ -163,6 +162,15 @@ class ProfileView(APIView):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         return Response({"message":"접근 권한 없음"}, status=status.HTTP_403_FORBIDDEN)
 
+#공개 프로필 
+class PublicProfileView(APIView):
+    permission_classes = [IsAuthenticated]
+    
+    def get(self, request, username):
+        user = get_object_or_404(User, username=username)
+        serializer = PublicProfileSerializer(user)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+        
 class ChangePasswordView(APIView):
     permission_classes = [IsAuthenticated]
 
