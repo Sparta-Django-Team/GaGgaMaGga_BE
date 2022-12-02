@@ -93,10 +93,10 @@ class SignupSerializer(serializers.ModelSerializer):
         
         Profile.objects.create(user=user)
         return user
-    
+
 #프로필 serializer
 class ProfileSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Profile
-        fields = ('nickname', 'profile_image','intro', )
+        fields = ('nickname', 'profile_image', 'intro', )

@@ -34,6 +34,15 @@ class UserView(APIView):
             serializer.save()
             return Response({"message":"회원가입이 되었습니다."}, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+    #회원 비활성화
+    def delete(self, request):
+        user = User.objects.filter(id=request.user.id)
+        if user:
+            user.update(withdraw="True", withdraw_at=str(timezone.now()))
+            return Response({"message":"회원 비활성화가 되었습니다."}, status=status.HTTP_200_OK)
+        return Response({"message":"접근 권한 없음"}, status=status.HTTP_403_FORBIDDEN)
+
 class ProfileView(APIView):
     authentication_classes = (JWTAuthentication,)
     permission_classes = [AllowAny]
