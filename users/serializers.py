@@ -139,7 +139,7 @@ class ProfileUpdateSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Profile
-        fields = ('nickname', 'profile_image', "intro",)
+        fields = ('nickname', 'profile_image', 'intro',)
         extra_kwargs = {
                         'nickname': {
                         'error_messages': {
@@ -152,23 +152,24 @@ class ProfileUpdateSerializer(serializers.ModelSerializer):
                         'blank':'자기소개를 입력해주세요.',}},
                         } 
 
-        def validate(self, data):
-            NICKNAME_VALIDATION = r"^(?=.*[$@$!%*?&]){1,2}"
+    def validate(self, data):
+        NICKNAME_VALIDATION = r'^[A-Za-z0-9]{3,10}$'
+        
+        nickname = data.get('nickname')
+        
+        #닉네임 유효성 검사
+        if not re.search(NICKNAME_VALIDATION, str(nickname)):
+            raise serializers.ValidationError(detail={"nickname":"닉네임은 3자이상 10자 이하로 작성해야하며 특수문자는 포함할 수 없습니다."})
 
-            nickname = data.get('nickname')
+        return data
 
-            #닉네임 유효성 검사
-            if re.search(NICKNAME_VALIDATION, str(nickname)) or len(nickname) >10:
-                raise serializers.ValidationError(detail={"nickname":"닉네임은 3자이상 10자 이하로 작성해야하며 특수문자는 포함할 수 없습니다."})
-
-            return data
-
-        def update(self, instance, validated_data):
-            instance.nickname = validated_data.get('nickname', instance.nickname)
-            instance.profile_image = validated_data.get('profile_image', instance.profile_image)
-
-            instance.save()
-            return instance
+    def update(self, instance, validated_data):
+        instance.nickname = validated_data.get('nickname', instance.nickname)
+        instance.profile_image = validated_data.get('profile_image', instance.profile_image)
+        instance.intro = validated_data.get('intro', instance.intro)
+        
+        instance.save()
+        return instance
 
 #로그인 로그 serializer
 class LoginLogListSerializer(serializers.ModelSerializer):
