@@ -16,6 +16,7 @@ urlpatterns = [
     # Recomment
     path('<int:review_id>/<int:comment_id>/recomments/',views.RecommentView.as_view(), name='recomment_view'),
     path('<int:review_id>/<int:comment_id>/recomments/<int:recomment_id>/',views.RecommentDetailView.as_view(), name='recomment_detail_view'),
+    path('recomments/<int:recomment_id>/like/',views.RecommentLikeView.as_view(), name='recomment_like_view'),
 
 ]
 

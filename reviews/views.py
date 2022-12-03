@@ -57,7 +57,7 @@ class ReviewLikeView(APIView):
         review = get_object_or_404(Review, id=review_id)
         if request.user in review.review_like.all():
             review.review_like.remove(request.user)
-            return Response("리뷰 좋아요취소했습니다.", status=status.HTTP_204_NO_CONTENT)
+            return Response("리뷰 좋아요취소했습니다.", status=status.HTTP_200_OK)
         else:
             review.review_like.add(request.user)
             return Response("리뷰 좋아요했습니다.", status=status.HTTP_200_OK)
@@ -112,7 +112,7 @@ class CommentLikeView(APIView):
         comment = get_object_or_404(Comment, id=comment_id)
         if request.user in comment.comment_like.all():
             comment.comment_like.remove(request.user)
-            return Response("댓글 좋아요취소했습니다.", status=status.HTTP_204_NO_CONTENT)
+            return Response("댓글 좋아요취소했습니다.", status=status.HTTP_200_OK)
         else:
             comment.comment_like.add(request.user)
             return Response("댓글 좋아요했습니다.", status=status.HTTP_200_OK)
@@ -158,3 +158,16 @@ class RecommentDetailView(APIView):
             recomment.delete()
             return Response({"message":"대댓글 삭제 완료"},status=status.HTTP_200_OK)
         return Response({"message":"접근 권한 없음"}, status=status.HTTP_403_FORBIDDEN)
+
+# 대댓글 좋아요
+class RecommentLikeView(APIView):
+    permissions_classes = [IsAuthenticated] 
+
+    def post(self, request, recomment_id):
+        recomment = get_object_or_404(Recomment, id=recomment_id)
+        if request.user in recomment.recomment_like.all():
+            recomment.recomment_like.remove(request.user)
+            return Response("대댓글 좋아요취소했습니다.", status=status.HTTP_200_OK)
+        else:
+            recomment.recomment_like.add(request.user)
+            return Response("대댓글 좋아요했습니다.", status=status.HTTP_200_OK)
