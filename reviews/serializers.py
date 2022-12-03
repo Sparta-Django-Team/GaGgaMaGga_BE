@@ -30,3 +30,8 @@ class ReviewCreateSerializer(serializers.ModelSerializer):
                         'error_messages':{
                         'required':'평점을 입력해주세요',
                         'blank':'평점을 입력해주세요',}},}
+
+class ReviewDetailSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Review
+        fields = ("title", "content","rating_cnt")
