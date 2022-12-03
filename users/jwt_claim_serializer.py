@@ -31,7 +31,7 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
         except KeyError:
             pass
             
-        self.user = authenticate(**authenticate_kwargs)\
+        self.user = authenticate(**authenticate_kwargs)
             
         try:
             username = attrs[self.username_field]
