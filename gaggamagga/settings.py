@@ -2,12 +2,15 @@ from pathlib import Path
 from datetime import timedelta
 import os, json
 from django.core.exceptions import ImproperlyConfigured
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
+
 BASE_DIR = Path(__file__).resolve().parent.parent
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
 # SECURITY WARNING: keep the secret key used in production secret!
 secret_file = os.path.join(BASE_DIR, 'secrets.json')
+
 with open(secret_file, 'r') as f:
     secrets = json.loads(f.read())
 def get_secret(setting, secrets=secrets):
@@ -16,10 +19,14 @@ def get_secret(setting, secrets=secrets):
     except KeyError:
         error_msg = "Set the {} environment variable".format(setting)
         raise ImproperlyConfigured(error_msg)
+    
 SECRET_KEY = get_secret("SECRET_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
+
 DEBUG = True
+
 ALLOWED_HOSTS = []
+
 # Application definition
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -36,10 +43,12 @@ INSTALLED_APPS = [
     'reviews',
     'places',
 ]
+
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
     'rest_framework_simplejwt.authentication.JWTAuthentication',]
 }
+
 SWAGGER_SETTINGS = {
     'SECURITY_DEFINITIONS' :{
         'Bearer':{
@@ -49,6 +58,7 @@ SWAGGER_SETTINGS = {
         }
     }
 }
+
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -59,7 +69,9 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
 ROOT_URLCONF = 'gaggamagga.urls'
+
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
@@ -75,17 +87,21 @@ TEMPLATES = [
         },
     },
 ]
+
 WSGI_APPLICATION = 'gaggamagga.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
+
 # Password validation
 # https://docs.djangoproject.com/en/4.1/ref/settings/#auth-password-validators
+
 AUTH_PASSWORD_VALIDATORS = [
     {
         'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
@@ -100,24 +116,40 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
+
 # Internationalization
 # https://docs.djangoproject.com/en/4.1/topics/i18n/
+
 LANGUAGE_CODE = 'ko-kr'
+
 TIME_ZONE = 'Asia/Seoul'
+
 USE_I18N = True
+
 USE_TZ = False
+
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.1/howto/static-files/
+
 STATIC_URL = 'static/'
+
 STATIC_ROOT = BASE_DIR / "static"
+
 MEDIA_URL='/media/'
+
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
+
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+
 #Auth Settings
 AUTH_USER_MODEL = 'users.User'
 PASSWORD_RESET_TIMEOUT = 3600
+
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=720),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
@@ -144,6 +176,7 @@ SIMPLE_JWT = {
     'SLIDING_TOKEN_LIFETIME': timedelta(minutes=5),
     'SLIDING_TOKEN_REFRESH_LIFETIME': timedelta(days=1),
 }
+
 #EMAIL settings
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = "smtp.gmail.com"
@@ -152,5 +185,6 @@ EMAIL_HOST_USER = get_secret("EMAIL")
 EMAIL_HOST_PASSWORD = get_secret("EMAIL_PASSWORD")
 EMAIL_USE_TLS = True
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+
 #CORS settings
 CORS_ALLOW_ALL_ORIGINS = True
