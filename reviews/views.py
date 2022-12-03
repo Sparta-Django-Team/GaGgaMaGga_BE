@@ -104,6 +104,19 @@ class CommentDetailView(APIView):
             return Response({"message":"댓글 삭제 완료"},status=status.HTTP_200_OK)
         return Response({"message":"접근 권한 없음"}, status=status.HTTP_403_FORBIDDEN)
 
+# 댓글 좋아요
+class CommentLikeView(APIView):
+    permissions_classes = [IsAuthenticated] 
+
+    def post(self, request, comment_id):
+        comment = get_object_or_404(Comment, id=comment_id)
+        if request.user in comment.comment_like.all():
+            comment.comment_like.remove(request.user)
+            return Response("댓글 좋아요취소했습니다.", status=status.HTTP_204_NO_CONTENT)
+        else:
+            comment.comment_like.add(request.user)
+            return Response("댓글 좋아요했습니다.", status=status.HTTP_200_OK)
+
 # 대댓글 
 class RecommentView(APIView):
     permissions_classes = [IsAuthenticated] 

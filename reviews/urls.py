@@ -12,6 +12,7 @@ urlpatterns = [
     # Comment
     path('<int:review_id>/comments/',views.CommentView.as_view(), name='comment_view'),
     path('<int:review_id>/comments/<int:comment_id>/',views.CommentDetailView.as_view(), name='comment_edit_view'),
+    path('comments/<int:comment_id>/like/',views.CommentLikeView.as_view(), name='comment_like_view'),
     # Recomment
     path('<int:review_id>/<int:comment_id>/recomments/',views.RecommentView.as_view(), name='recomment_view'),
     path('<int:review_id>/<int:comment_id>/recomments/<int:recomment_id>/',views.RecommentDetailView.as_view(), name='recomment_detail_view'),
