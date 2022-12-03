@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Review, Comment
+from .models import Review, Comment, Recomment
 
 class ReviewListSerializer(serializers.ModelSerializer):
     user = serializers.SerializerMethodField()
@@ -57,3 +57,21 @@ class CommentCreateSerializer(serializers.ModelSerializer):
         model = Comment
         fields = ("content",)
 
+class RecommentSerializer(serializers.ModelSerializer):
+    user = serializers.SerializerMethodField()
+    like_recomment = serializers.SerializerMethodField()
+
+    def get_user(self, obj):
+        return obj.user.username
+
+    def get_like_recomment(self, obj):
+        return obj.user.username
+
+    class Meta:
+        model = Recomment
+        fields = "__all__"
+
+class RecommentCreateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Recomment
+        fields = ("content",) 
