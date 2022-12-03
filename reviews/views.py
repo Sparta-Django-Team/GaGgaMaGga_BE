@@ -49,6 +49,18 @@ class ReviewDetailView(APIView):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         return Response({"message":"접근 권한 없음"}, status=status.HTTP_403_FORBIDDEN)
 
+# 리뷰 좋아요
+class ReviewLikeView(APIView):
+    permissions_classes = [IsAuthenticated] 
+
+    def post(self, request, review_id):
+        review = get_object_or_404(Review, id=review_id)
+        if request.user in review.review_like.all():
+            review.review_like.remove(request.user)
+            return Response("리뷰 좋아요취소했습니다.", status=status.HTTP_204_NO_CONTENT)
+        else:
+            review.review_like.add(request.user)
+            return Response("리뷰 좋아요했습니다.", status=status.HTTP_200_OK)
 
 # 댓글 
 class CommentView(APIView):
