@@ -41,18 +41,18 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
             
             account_lock_count = self.target_user.account_lock_count
             
-            #로그인 제한 횟수 counting
+            #account_lock_count counting
             if self.user == None:
                 self.target_user.account_lock_count += 1
                 self.target_user.save()
 
-            #로그인 제한 횟수 counting이 5이면 잠금
+            #account_lock_count 4이면 잠금
             if account_lock_count == 4:
                 self.target_user.is_active = False   
                 self.target_user.account_lock_time = timezone.now()
                 self.target_user.save()
                 
-            #회원 상태 S이면 제한 시간 확인 후 N으로 변경
+            #is_active False 제한 시간 확인 후 True
             self.now_today_time = timezone.now()
 
             if self.is_active == False:
@@ -63,7 +63,7 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
                     self.target_user.lock_count = 0
                     self.target_user.save()
 
-            #회원상태 비활성화이면 로그인 시 비활성화 해제
+            #withdraw True이면 로그인 시 False
             if self.withdraw == True:
                 self.target_user.withdraw = False
                 self.target_user.save()
@@ -71,18 +71,17 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
         except:
             pass
         
-        #회원 상태 에러 발생
         if User.objects.filter(username=username).exists():
             
-            #회원 상태 S이면 계정잠금 에러
+            #is_active False 계정잠금 
             if self.is_active == False:
                 raise serializers.ValidationError("계정이 잠금이 되었습니다. 잠시 후 다시 시도해주시길 바랍니다. ")
             
-        #로그인 실패 에러
+        #login error
         if not api_settings.USER_AUTHENTICATION_RULE(self.user):
             raise exceptions.AuthenticationFailed(self.error_messages["no_active_account"],"no_active_account",)
         
-        #로그인 토큰 발행
+        #login token 
         refresh = self.get_token(self.user)
 
         attrs["refresh"] = str(refresh)

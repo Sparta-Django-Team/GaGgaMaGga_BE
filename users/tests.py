@@ -1,5 +1,4 @@
 from django.urls import reverse
-from django.shortcuts import redirect
 from django.utils.http import urlsafe_base64_encode
 from django.utils.encoding import smart_bytes
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
@@ -560,6 +559,7 @@ class SetPasswordAPIViewTestCase(APITestCase):
         )
         self.assertEqual(response.status_code, 400)
     
+    #토큰이 다를 경우
     def test_password_set_password_token_fail(self):
         response = self.client.put(
             path=reverse("password_reset_complete_view"),

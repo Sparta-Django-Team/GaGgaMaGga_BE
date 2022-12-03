@@ -12,8 +12,7 @@ from django.utils import timezone
 from users.models import User
 from users.utils import Util
 
-#회원정보 보유기간이 지나면 회원상태를 비활성화로 만들어주고 메일을 보낸다.
-#리눅스 crontab으로 하루에 한번 씩 자동으로 실행되게 함(서버 배포 이후)
+#회원정보 보유기간이 지나면 withdraw True로 만듬
 year_ago = timezone.now() - timezone.timedelta(days=365)
 user = User.objects.filter(is_admin=False, last_login__lte=year_ago)
 
