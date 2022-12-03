@@ -15,10 +15,10 @@ driver = webdriver.Chrome(ChromeDriverManager().install())
 
 
 # 크롬창 숨기기
-chrome_options = Options()
-chrome_options.add_argument("--headless")
-driver = webdriver.Chrome(ChromeDriverManager().install(), options=chrome_options)  # 드라이버 경로
-
+# chrome_options = Options()
+# chrome_options.add_argument("--headless")
+# driver = webdriver.Chrome(ChromeDriverManager().install(), options=chrome_options)  # 드라이버 경로
+driver = webdriver.Chrome(ChromeDriverManager().install())
 url = 'https://map.naver.com/v5/search'
 driver.get(url)
 key_word = '강남구 치킨'  # 검색어
@@ -77,7 +77,6 @@ place_list = []
 # 시작시간
 start = time.time()
 
-count=0
 
 # 크롤링 (페이지 리스트 만큼)
 for btn in range(len(next_btn))[1:]:  # next_btn[0] = 이전 페이지 버튼 무시 -> [1]부터 시작
@@ -136,9 +135,6 @@ for btn in range(len(next_btn))[1:]:  # next_btn[0] = 이전 페이지 버튼 �
                 pass
 
 
-
-
-
             # -----썸네일 사진 주소-----
             try:
                 thumb_list = driver.find_element(By.CSS_SELECTOR, '.K0PDV').value_of_css_property(
@@ -154,23 +150,21 @@ for btn in range(len(next_btn))[1:]:  # next_btn[0] = 이전 페이지 버튼 �
             # 페이지 전환
             switch_frame('searchIframe')
 
-            # ---- dict에 데이터 집어넣기----
 
-            
+            # ---- list에 데이터 집어넣기----
             new_place = {"model" :"places.place"}
             new_place["fields"] = {}
             new_place["fields"]["place_name"] = store_name
             new_place["fields"]["category"] = store_category
-            new_place["fields"]["place_number"] = store_name
-            new_place["fields"]["rating"] = store_rating
+            new_place["fields"]["place_number"] = store_tel
+            new_place["fields"]["rating"] = float(store_rating)
             new_place["fields"]["place_address"] = store_addr
             new_place["fields"]["place_time"] = store_time
             new_place["fields"]["place_img"] = store_thumb
-            new_place["fields"]["latitude"] = ""
-            new_place["fields"]["longitude"] = ""
-            new_place["fields"]["menu"] = ""
-
-
+            # new_place["fields"]["latitude"] = ""
+            # new_place["fields"]["longitude"] = ""
+            # new_place["fields"]["menu"] = ""
+            place_list.append(new_place)
 
             switch_frame('searchIframe')
             sleep(1)
@@ -178,19 +172,18 @@ for btn in range(len(next_btn))[1:]:  # next_btn[0] = 이전 페이지 버튼 �
         except:
             print('ERROR!' * 3)
 
-        # 다음 페이지 버튼
-        if page[-1]:  # 마지막 매장일 경우 다음버튼 클릭
-            next_btn[-1].click()
-            sleep(2)
-        else:
-            print('페이지 인식 못함')
-            break
-        count +=1
-        print(count)
+    # 다음 페이지 버튼
+    if page[-1]:  # 마지막 매장일 경우 다음버튼 클릭
+        next_btn[-1].click()
+        sleep(2)
+    else:
+        print('페이지 인식 못함')
+        break
+
 
 print('[데이터 수집 완료]\n소요 시간 :', time.time() - start)
 driver.quit()  # 작업이 끝나면 창을닫는다.
 
 # json 파일로 저장
-with open('places/crawling/store_data.json', 'w', encoding='utf-8') as f:
-    json.dump(place_list, f, indent=4, ensure_ascii=False)
+with open('places/crawling/place_data.json', 'w', encoding='UTF-8') as f:
+    json.dump(place_list, f, ensure_ascii=False, indent=4)

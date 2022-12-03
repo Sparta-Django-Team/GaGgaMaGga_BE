@@ -1,9 +1,12 @@
 asgiref==3.5.2
 async-generator==1.10
+async-timeout==4.0.2
 attrs==22.1.0
 beautifulsoup4==4.11.1
 bs4==0.0.1
 certifi==2022.9.24
+channels==4.0.0
+channels-redis==4.0.0
 charset-normalizer==2.1.1
 chromedriver-autoinstaller==0.4.0
 coreapi==2.3.3
@@ -20,6 +23,7 @@ inflection==0.5.1
 itypes==1.2.0
 Jinja2==3.1.2
 MarkupSafe==2.1.1
+msgpack==1.0.4
 outcome==1.2.0
 packaging==21.3
 Pillow==9.3.0
@@ -28,6 +32,7 @@ pyparsing==3.0.9
 PySocks==1.7.1
 python-dotenv==0.21.0
 pytz==2022.6
+redis==4.3.5
 requests==2.28.1
 ruamel.yaml==0.17.21
 ruamel.yaml.clib==0.2.7
