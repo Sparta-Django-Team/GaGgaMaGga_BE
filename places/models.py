@@ -1,5 +1,6 @@
 from django.db import models
 
+from users.models import User
 # Create your models here.
 
 class Place(models.Model):
@@ -14,9 +15,10 @@ class Place(models.Model):
     longitude = models.FloatField('경도', null=True, blank=True)
     munu = models.CharField('메뉴',null=True, blank=True, max_length=255)
 
+    place_bookmark = models.ManyToManyField(User, verbose_name='장소 북마크', related_name="bookmark_place",blank=True)
 
     class Meta:
         db_table = 'places'
 
     def __str__(self):
-        return f'[지역]{self.common_address} [장소명]{self.place_name}'
+        return f'[장소명]{self.place_name}'
