@@ -49,6 +49,18 @@ class ReviewDetailView(APIView):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         return Response({"message":"접근 권한 없음"}, status=status.HTTP_403_FORBIDDEN)
 
+# 리뷰 좋아요
+class ReviewLikeView(APIView):
+    permissions_classes = [IsAuthenticated] 
+
+    def post(self, request, review_id):
+        review = get_object_or_404(Review, id=review_id)
+        if request.user in review.review_like.all():
+            review.review_like.remove(request.user)
+            return Response("리뷰 좋아요취소했습니다.", status=status.HTTP_200_OK)
+        else:
+            review.review_like.add(request.user)
+            return Response("리뷰 좋아요했습니다.", status=status.HTTP_200_OK)
 
 # 댓글 
 class CommentView(APIView):
@@ -92,6 +104,19 @@ class CommentDetailView(APIView):
             return Response({"message":"댓글 삭제 완료"},status=status.HTTP_200_OK)
         return Response({"message":"접근 권한 없음"}, status=status.HTTP_403_FORBIDDEN)
 
+# 댓글 좋아요
+class CommentLikeView(APIView):
+    permissions_classes = [IsAuthenticated] 
+
+    def post(self, request, comment_id):
+        comment = get_object_or_404(Comment, id=comment_id)
+        if request.user in comment.comment_like.all():
+            comment.comment_like.remove(request.user)
+            return Response("댓글 좋아요취소했습니다.", status=status.HTTP_200_OK)
+        else:
+            comment.comment_like.add(request.user)
+            return Response("댓글 좋아요했습니다.", status=status.HTTP_200_OK)
+
 # 대댓글 
 class RecommentView(APIView):
     permissions_classes = [IsAuthenticated] 
@@ -133,3 +158,16 @@ class RecommentDetailView(APIView):
             recomment.delete()
             return Response({"message":"대댓글 삭제 완료"},status=status.HTTP_200_OK)
         return Response({"message":"접근 권한 없음"}, status=status.HTTP_403_FORBIDDEN)
+
+# 대댓글 좋아요
+class RecommentLikeView(APIView):
+    permissions_classes = [IsAuthenticated] 
+
+    def post(self, request, recomment_id):
+        recomment = get_object_or_404(Recomment, id=recomment_id)
+        if request.user in recomment.recomment_like.all():
+            recomment.recomment_like.remove(request.user)
+            return Response("대댓글 좋아요취소했습니다.", status=status.HTTP_200_OK)
+        else:
+            recomment.recomment_like.add(request.user)
+            return Response("대댓글 좋아요했습니다.", status=status.HTTP_200_OK)
