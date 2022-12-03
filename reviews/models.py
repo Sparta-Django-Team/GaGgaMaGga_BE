@@ -35,3 +35,19 @@ class Comment(models.Model):
         
     def __str__(self):
         return f'[작성자]{self.user}, [내용]{self.content}'
+
+class Recomment(models.Model):
+    content = models.TextField('내용', max_length=100)
+    created_at = models.DateTimeField('생성 시간', auto_now_add=True)
+    updated_at = models.DateTimeField('수정 시간', auto_now = True)
+
+    recomment_like = models.ManyToManyField(User, verbose_name='대댓글 좋아요', related_name="like_recomment",blank=True)
+    user = models.ForeignKey(User, verbose_name='작성자', on_delete=models.CASCADE)
+    comment = models.ForeignKey(Comment, verbose_name='댓글', on_delete=models.CASCADE, related_name="recomments")
+
+    class Meta:
+        db_table = 'recomment'
+        ordering = ['-created_at']
+        
+    def __str__(self):
+        return f'[작성자]{self.user}, [내용]{self.content}'
