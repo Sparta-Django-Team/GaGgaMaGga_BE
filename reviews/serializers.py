@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Review
+from .models import Review, Comment
 
 class ReviewListSerializer(serializers.ModelSerializer):
     user = serializers.SerializerMethodField()
@@ -30,3 +30,23 @@ class ReviewCreateSerializer(serializers.ModelSerializer):
                         'error_messages':{
                         'required':'평점을 입력해주세요',
                         'blank':'평점을 입력해주세요',}},}
+
+
+class CommentSerializer(serializers.ModelSerializer):
+    user = serializers.SerializerMethodField()
+    comment_like = serializers.SerializerMethodField()
+
+    def get_user(self, obj):
+        return obj.user.username
+
+    def get_comment_like(self, obj):
+        return obj.user.username
+
+    class Meta:
+        model = Comment
+        fields = "__all__"
+
+class CommentCreateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Comment
+        fields = ("content",)
