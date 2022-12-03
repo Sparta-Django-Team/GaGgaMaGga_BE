@@ -1,7 +1,6 @@
 from django.db import models
 
 from users.models import User
-# Create your models here.
 
 class Place(models.Model):
     place_name = models.CharField('장소명',max_length=50)
