@@ -32,6 +32,12 @@ class ReviewCreateSerializer(serializers.ModelSerializer):
                         'blank':'평점을 입력해주세요',}},}
 
 
+class ReviewDetailSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Review
+        fields = ("title", "content","rating_cnt")
+
+
 class CommentSerializer(serializers.ModelSerializer):
     user = serializers.SerializerMethodField()
     comment_like = serializers.SerializerMethodField()
@@ -50,3 +56,4 @@ class CommentCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Comment
         fields = ("content",)
+
