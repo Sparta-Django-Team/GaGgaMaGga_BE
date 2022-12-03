@@ -1,6 +1,14 @@
 from django.contrib import admin
 
 from .models import Place
-# Register your models here.
+from reviews.models import Review
 
-admin.site.register(Place)
+class ReviewInline(admin.StackedInline):
+    model = Review
+
+class PlacewAdmin(admin.ModelAdmin):
+    inlines = (
+        ReviewInline,
+    )
+    
+admin.site.register(Place, PlacewAdmin)

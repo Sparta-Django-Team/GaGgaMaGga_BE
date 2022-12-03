@@ -21,11 +21,11 @@ urlpatterns = [
     path('phone-number-confirm/', views.ConfirmPhoneNumberView.as_view(), name='confirm_phone_number_view'),
     
     #profile
-    path('profile/', views.PrivateProfileView.as_view(), name='private_profile_view'),
-    path('profile/<str:nickname>/', views.PublicProfileView.as_view(), name='public_profile_view'),
+    path('profiles/', views.PrivateProfileView.as_view(), name='private_profile_view'),
+    path('profiles/<str:nickname>/', views.PublicProfileView.as_view(), name='public_profile_view'),
     
     #log
-    path('log/', views.LoginLogListView.as_view(), name='login_log_view'),
+    path('logs/', views.LoginLogListView.as_view(), name='login_log_view'),
     
     #follow
     path('follow/<str:nickname>/', views.ProcessFollowView.as_view(), name='process_follow_view'),
