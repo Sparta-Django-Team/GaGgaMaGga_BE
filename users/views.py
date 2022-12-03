@@ -219,7 +219,7 @@ class PrivateProfileView(APIView):
     def put(self, request):
         profile = get_object_or_404(Profile, user=request.user)
         if profile.user == request.user:
-            serializer = ProfileUpdateSerializer(profile, data=request.data, partial=True)
+            serializer = ProfileUpdateSerializer(profile, data=request.data)
             if serializer.is_valid():
                 serializer.save()
                 return Response({"message":"프로필 수정이 완료되었습니다."}, status=status.HTTP_200_OK)
@@ -289,7 +289,6 @@ class PasswordResetView(APIView):
 #비밀번호 재설정 토큰 확인
 class PasswordTokenCheckView(APIView):
     permission_classes = [AllowAny]
-    
 
     @swagger_auto_schema(operation_summary="비밀번호 재설정 토큰 확인", 
                     responses={200 : '성공', 401 : '링크 유효하지 않음', 404 : '찾을 수 없음', 500 : '서버 에러'})
@@ -355,7 +354,7 @@ class ExpiredPasswordChage(APIView):
 #팔로우 
 class ProcessFollowView(APIView):
     permission_classes = [IsAuthenticated]
-		
+
     @swagger_auto_schema(operation_summary="팔로우", 
                         responses={ 200 : '성공', 404:'찾을 수 없음', 500:'서버 에러'})
     def post(self, request, nickname):
