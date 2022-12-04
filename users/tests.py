@@ -319,6 +319,46 @@ class UserConfirmEmailAPIViewTest(APITestCase):
         )
         self.assertEqual(response.status_code, 400)
 
+class UserResendEmailAPIViewTest(APITestCase):
+    def setUp(self):
+        self.data = {"username": "test1234", "password":"Test1234!"}
+        User.objects.create_user("test1234","test@test.com", "01012341234","Test1234!")
+    
+    def test_resend_email_success(self):
+        access_token = self.client.post(reverse('token_obtain_pair_view'), self.data).data['access']
+        response = self.client.post(
+            path=reverse("resend_email_view"),
+            HTTP_AUTHORIZATION=f"Bearer {access_token}",
+        )
+        self.assertEqual(response.status_code, 200)
+
+    def test_resend_email_fail(self):
+        response = self.client.post(
+            path=reverse("resend_email_view"),
+        )
+        self.assertEqual(response.status_code, 401)
+        
+# class SendPhoneNumberAPIViewTest(APITestCase):
+'''
+휴대폰 인증번호가 진짜 발송됨으로 주의하기
+'''
+#     def setUp(self):
+#         User.objects.create_user("test1234","test@test.com", "01012341234","Test1234!")
+    
+#     def test_resend_email_success(self):
+#         response = self.client.post(
+#             path=reverse("send_phone_number_view"),
+#             data={"phone_number":"01012341234"}
+#         )
+#         self.assertEqual(response.status_code, 200)
+
+#     def test_resend_email_fail(self):
+#         response = self.client.post(
+#             path=reverse("send_phone_number_view"),
+#             data={"phone_number":"01012341235"}
+#         )
+#         self.assertEqual(response.status_code, 400)
+
 # class UserConfirmPhoneNumberAPIViewTest(APITestCase):
 '''
 휴대폰 인증번호가 진짜 발송됨으로 주의하기
@@ -343,7 +383,6 @@ class UserConfirmEmailAPIViewTest(APITestCase):
 #             data={"phone_number":self.user.phone_number,
 #                 "auth_number":1234}
 #         )
-#         print(response.data)
 #         self.assertEqual(response.status_code, 400)
 
 class ProfileUpdateAPIViewTestCase(APITestCase):

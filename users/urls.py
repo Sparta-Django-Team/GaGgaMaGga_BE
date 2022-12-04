@@ -14,7 +14,7 @@ urlpatterns = [
     
     #email
     path('email-confirm/', views.ConfirmEmailView.as_view(), name='confirm_email_view'),
-    path('email-resend/', views.ReSendEmailView.as_view(), name='reconfirm_email_view'),
+    path('email-resend/', views.ReSendEmailView.as_view(), name='resend_email_view'),
     
     #phone_number
     path('phone-number-send/', views.SendPhoneNumberView.as_view(), name='send_phone_number_view'),
