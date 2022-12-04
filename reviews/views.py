@@ -12,6 +12,8 @@ from places.models import Place
 from reviews.serializers import (ReviewListSerializer, ReviewCreateSerializer, ReviewDetailSerializer, 
 CommentSerializer, CommentCreateSerializer , RecommentSerializer, RecommentCreateSerializer)
 
+from drf_yasg.utils import swagger_auto_schema
+
 #####리뷰#####
 class ReviewListView(APIView):
     permissions_classes = [AllowAny]
@@ -59,6 +61,8 @@ class ReviewDetailView(APIView):
 class ReviewLikeView(APIView):
     permissions_classes = [IsAuthenticated] 
 
+    @swagger_auto_schema(operation_summary="리뷰 좋아요",  
+                    responses={200 : '성공', 404 : '찾을 수 없음', 500 : '서버 에러'})
     def post(self, request, review_id):
         review = get_object_or_404(Review, id=review_id)
         if request.user in review.review_like.all():
@@ -73,6 +77,8 @@ class CommentListView(APIView):
     permissions_classes = [IsAuthenticated] 
 
     # 댓글 조회
+    @swagger_auto_schema(operation_summary="댓글 조회",
+                    responses={200 : '성공', 404 : '찾을 수 없음', 500 : '서버 에러'})
     def get(self, request, review_id):
         review = get_object_or_404(Review, id=review_id)
         comments = review.review_comments.all()
@@ -80,6 +86,9 @@ class CommentListView(APIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     # 댓글 작성
+    @swagger_auto_schema(request_body=CommentCreateSerializer,
+                    operation_summary="댓글 작성",
+                    responses={201 : '성공', 400:'인풋값 에러', 500 : '서버 에러'})
     def post(self, request, review_id):
         serializer = CommentCreateSerializer(data=request.data)
         if serializer.is_valid():
@@ -89,8 +98,11 @@ class CommentListView(APIView):
 
 class CommentDetailView(APIView):
     permissions_classes = [IsAuthenticated] 
-
+    
     # 댓글 수정
+    @swagger_auto_schema(request_body=CommentCreateSerializer, 
+                        operation_summary="댓글 수정", 
+                        responses={ 200 : '성공', 400:'인풋값 에러', 403:'접근 권한 없음', 404:'찾을 수 없음', 500:'서버 에러'})
     def put(self, request, review_id, comment_id):
         comment = get_object_or_404(Comment, id=comment_id)
         if request.user == comment.author:
@@ -102,6 +114,8 @@ class CommentDetailView(APIView):
         return Response({"message":"접근 권한 없음"}, status=status.HTTP_403_FORBIDDEN)
 
     # 댓글 삭제
+    @swagger_auto_schema(operation_summary="댓글 삭제", 
+                        responses={ 200 : '성공', 403:'접근 권한 없음', 404:'찾을 수 없음', 500:'서버 에러'})
     def delete(self, request, review_id, comment_id):
         comment = get_object_or_404(Comment, id=comment_id)
         if request.user == comment.author:
@@ -113,6 +127,8 @@ class CommentDetailView(APIView):
 class CommentLikeView(APIView):
     permissions_classes = [IsAuthenticated] 
 
+    @swagger_auto_schema(operation_summary="댓글 좋아요",  
+                    responses={200 : '성공', 404 : '찾을 수 없음', 500 : '서버 에러'})
     def post(self, request, comment_id):
         comment = get_object_or_404(Comment, id=comment_id)
         if request.user in comment.comment_like.all():
@@ -127,6 +143,8 @@ class RecommentListView(APIView):
     permissions_classes = [IsAuthenticated] 
 
     # 대댓글 조회
+    @swagger_auto_schema(operation_summary="대댓글 조회",
+                    responses={200 : '성공', 404 : '찾을 수 없음', 500 : '서버 에러'})
     def get(self, request, review_id, comment_id):
         comment = get_object_or_404(Comment, id=comment_id)
         recomments = comment.comment_recomments.all()
@@ -134,6 +152,9 @@ class RecommentListView(APIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
     
     # 대댓글 작성
+    @swagger_auto_schema(request_body=RecommentCreateSerializer,
+                    operation_summary="대댓글 작성",
+                    responses={201 : '성공', 400:'인풋값 에러', 500 : '서버 에러'})
     def post(self, request, review_id, comment_id):
         serializer = RecommentCreateSerializer(data=request.data)
         if serializer.is_valid():
@@ -145,6 +166,9 @@ class RecommentDetailView(APIView):
     permissions_classes = [IsAuthenticated] 
 
     # 대댓글 수정
+    @swagger_auto_schema(request_body=RecommentCreateSerializer, 
+                        operation_summary="대댓글 수정", 
+                        responses={ 200 : '성공', 400:'인풋값 에러', 403:'접근 권한 없음', 404:'찾을 수 없음', 500:'서버 에러'})
     def put(self, request, review_id, comment_id, recomment_id):
         recomment = get_object_or_404(Recomment, id=recomment_id)
         if request.user == recomment.author:
@@ -156,6 +180,8 @@ class RecommentDetailView(APIView):
         return Response({"message":"접근 권한 없음"}, status=status.HTTP_403_FORBIDDEN)
 
     # 대댓글 삭제
+    @swagger_auto_schema(operation_summary="대댓글 삭제", 
+                        responses={ 200 : '성공', 403:'접근 권한 없음', 404:'찾을 수 없음', 500:'서버 에러'})
     def delete(self, request, review_id, comment_id, recomment_id):
         recomment = get_object_or_404(Recomment, id=recomment_id)
         if request.user == recomment.author:
@@ -167,6 +193,8 @@ class RecommentDetailView(APIView):
 class RecommentLikeView(APIView):
     permissions_classes = [IsAuthenticated] 
 
+    @swagger_auto_schema(operation_summary="대댓글 좋아요",  
+                    responses={200 : '성공', 404 : '찾을 수 없음', 500 : '서버 에러'})
     def post(self, request, recomment_id):
         recomment = get_object_or_404(Recomment, id=recomment_id)
         if request.user in recomment.recomment_like.all():
