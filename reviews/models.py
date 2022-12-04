@@ -58,3 +58,31 @@ class Recomment(models.Model):
         
     def __str__(self):
         return f'[후기 제목]{self.comment.review.title}, [대댓글 작성자]{self.author}, [대댓글 내용]{self.content}'
+
+class Report(models.Model):
+    REPORT_CATEGORY = (
+        ('욕설이 들어갔어요.', '욕설이 들어갔어요.'),
+        ('성적인 발언이 들어갔어요', '성적인 발언이 들어갔어요.'),
+        ('정치적 요소가 들어갔어요', '정치적 요소가 들어갔어요.'),
+        ('관계 없는 내용이예요.', '관계 없는 내용이예요.'),
+        ('도배된 내용이예요.', '도배된 내용이예요.'),
+        ('광고성이 포함된 글이예요', '광고성이 포함된 글이예요'),
+        ('기타', '기타'),
+    )
+    
+    category = models.CharField('신고 카테고리', max_length=30, choices=REPORT_CATEGORY)
+    content = models.TextField('신고 내용', max_length=500, blank=True)
+    created_at = models.DateTimeField('생성 시간', auto_now_add=True)
+    
+    author = models.ForeignKey(User, verbose_name='작성자', on_delete=models.CASCADE)
+    comment = models.ForeignKey(Comment, verbose_name='댓글', on_delete=models.CASCADE, null=True)
+    recomment = models.ForeignKey(Recomment, verbose_name='대댓글', on_delete=models.CASCADE, null=True)
+    review = models.ForeignKey(Review, verbose_name='후기', on_delete=models.CASCADE, null=True)
+
+    class Meta:
+        db_table='reports'
+        ordering = ['created_at']
+
+    def __str__(self):
+        return f'[작성자] {self.author}, [신고 카테고리]{self.category}, [신고 내용]{self.content}'
+

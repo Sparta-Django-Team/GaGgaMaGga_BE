@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Review, Comment, Recomment
+from .models import Review, Comment, Recomment, Report
 
 class CommentInline(admin.StackedInline):
     model = Comment
@@ -20,3 +20,4 @@ class CommentAdmin(admin.ModelAdmin):
 admin.site.register(Review, ReviewAdmin)
 admin.site.register(Comment, CommentAdmin)
 admin.site.register(Recomment)
+admin.site.register(Report)

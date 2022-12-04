@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from .models import Review, Comment, Recomment
+from .models import Review, Comment, Recomment, Report
 
 class ReviewListSerializer(serializers.ModelSerializer):
     nickname = serializers.SerializerMethodField()
@@ -57,7 +57,7 @@ class ReviewDetailSerializer(serializers.ModelSerializer):
     def get_profile_image(self, obj):
         return obj.author.user_profile.profile_image.url
 
-    def get_place(self, obj):
+    def get_place_name(self, obj):
         return obj.place.place_name
         
     def get_review_like_count(self, obj):
@@ -89,7 +89,7 @@ class RecommentSerializer(serializers.ModelSerializer):
 class RecommentCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Recomment
-        fields = ("content",)
+        fields = ('content',)
         extra_kwargs = {'content':{
                         'error_messages': {
                         'required':'내용을 입력해주세요.',
@@ -121,8 +121,22 @@ class CommentSerializer(serializers.ModelSerializer):
 class CommentCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Comment
-        fields = ("content",)
+        fields = ('content',)
         extra_kwargs = {'content':{
                         'error_messages': {
                         'required':'내용을 입력해주세요.',
                         'blank':'내용을 입력해주세요.',}},}
+        
+class ReportSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Report
+        fields = ('content', 'category', )
+        extra_kwargs = {'content':{
+                        'error_messages': {
+                        'required':'내용을 입력해주세요.',
+                        'blank':'내용을 입력해주세요.',}},
+                        
+                        'category':{
+                        'error_messages':{
+                        'required':'카테고리를 선택해주세요.',
+                        'blank':'카테고리를 선택해주세요.',}}}

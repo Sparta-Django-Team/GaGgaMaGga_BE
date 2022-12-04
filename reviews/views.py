@@ -6,11 +6,11 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 
 from django.shortcuts import get_list_or_404
 
-from reviews.models import Review, Comment, Recomment
+from .models import Review, Comment, Recomment, Report
 from places.models import Place
 
-from reviews.serializers import (ReviewListSerializer, ReviewCreateSerializer, ReviewDetailSerializer, 
-CommentSerializer, CommentCreateSerializer , RecommentSerializer, RecommentCreateSerializer)
+from .serializers import (ReviewListSerializer, ReviewCreateSerializer, ReviewDetailSerializer, 
+CommentSerializer, CommentCreateSerializer , RecommentSerializer, RecommentCreateSerializer, ReportSerializer)
 
 from drf_yasg.utils import swagger_auto_schema
 
@@ -56,6 +56,22 @@ class ReviewDetailView(APIView):
                 return Response(serializer.data, status=status.HTTP_200_OK)
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         return Response({"message":"접근 권한 없음"}, status=status.HTTP_403_FORBIDDEN)
+
+    #리뷰 신고
+    @swagger_auto_schema(request_body=ReportSerializer, 
+                operation_summary="리뷰 신고", 
+                responses={ 200 : '성공', 208 : '중복 데이터', 404:'인풋값 에러',  500:'서버 에러'})
+    def post(self, request, review_id):
+        try :
+            Report.objects.get(author=request.user.id, review=review_id)
+            return Response({"message":"이미 신고를 한 후기입니다."}, status=status.HTTP_208_ALREADY_REPORTED)
+        
+        except Report.DoesNotExist:
+            serializer = ReportSerializer(data=request.data)
+            if serializer.is_valid():
+                serializer.save(author=request.user, review_id=review_id)
+                return Response({"message":"신고가 완료되었습니다."}, status=status.HTTP_200_OK)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 # 리뷰 좋아요
 class ReviewLikeView(APIView):
@@ -122,6 +138,22 @@ class CommentDetailView(APIView):
             comment.delete()
             return Response({"message":"댓글 삭제 완료"},status=status.HTTP_200_OK)
         return Response({"message":"접근 권한 없음"}, status=status.HTTP_403_FORBIDDEN)
+    
+    #댓글 신고
+    @swagger_auto_schema(request_body=ReportSerializer, 
+                    operation_summary="댓글 신고", 
+                    responses={ 200 : '성공', 208 : '중복 데이터', 404:'인풋값 에러',  500:'서버 에러'})
+    def post(self, request, review_id, comment_id):
+        try :
+            Report.objects.get(author=request.user.id, comment=comment_id)
+            return Response({"message":"이미 신고를 한 후기입니다."}, status=status.HTTP_208_ALREADY_REPORTED)
+        
+        except Report.DoesNotExist:
+            serializer = ReportSerializer(data=request.data)
+            if serializer.is_valid():
+                serializer.save(author=request.user, comment=comment_id)
+                return Response({"message":"신고가 완료되었습니다."}, status=status.HTTP_200_OK)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 # 댓글 좋아요
 class CommentLikeView(APIView):
@@ -188,6 +220,22 @@ class RecommentDetailView(APIView):
             recomment.delete()
             return Response({"message":"대댓글 삭제 완료"},status=status.HTTP_200_OK)
         return Response({"message":"접근 권한 없음"}, status=status.HTTP_403_FORBIDDEN)
+    
+    #대댓글 신고
+    @swagger_auto_schema(request_body=ReportSerializer, 
+            operation_summary="대댓글 신고", 
+            responses={ 200 : '성공', 208 : '중복 데이터', 404:'인풋값 에러',  500:'서버 에러'})
+    def post(self, request,review_id, comment_id, recomment_id):
+        try :
+            Report.objects.get(author=request.user.id, recomment=recomment_id)
+            return Response({"message":"이미 신고를 한 후기입니다."}, status=status.HTTP_208_ALREADY_REPORTED)
+        
+        except Report.DoesNotExist:
+            serializer = ReportSerializer(data=request.data)
+            if serializer.is_valid():
+                serializer.save(author=request.user, recomment=recomment_id)
+                return Response({"message":"신고가 완료되었습니다."}, status=status.HTTP_200_OK)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 # 대댓글 좋아요
 class RecommentLikeView(APIView):
@@ -203,3 +251,4 @@ class RecommentLikeView(APIView):
         else:
             recomment.recomment_like.add(request.user)
             return Response("대댓글 좋아요했습니다.", status=status.HTTP_200_OK)
+        
