@@ -6,11 +6,15 @@ from rest_framework.generics import get_object_or_404
 
 from .models import Place
 
+from drf_yasg.utils import swagger_auto_schema
+
 ##### 장소 #####
 class PlaceBookmarkView(APIView):
     permissions_classes = [IsAuthenticated] 
 
     # 장소 북마크
+    @swagger_auto_schema(operation_summary="장소 북마크",  
+                responses={200 : '성공', 404 : '찾을 수 없음', 500 : '서버 에러'})
     def post(self, request, place_id):
         place = get_object_or_404(Place, id=place_id)
         if request.user in place.place_bookmark.all():
