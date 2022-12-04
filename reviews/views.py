@@ -12,6 +12,8 @@ from places.models import Place
 from reviews.serializers import (ReviewListSerializer, ReviewCreateSerializer, ReviewDetailSerializer, 
 CommentSerializer, CommentCreateSerializer , RecommentSerializer, RecommentCreateSerializer)
 
+from drf_yasg.utils import swagger_auto_schema
+
 #####리뷰#####
 class ReviewListView(APIView):
     permissions_classes = [AllowAny]
@@ -59,6 +61,8 @@ class ReviewDetailView(APIView):
 class ReviewLikeView(APIView):
     permissions_classes = [IsAuthenticated] 
 
+    @swagger_auto_schema(operation_summary="리뷰 좋아요",  
+                    responses={200 : '성공', 404 : '찾을 수 없음', 500 : '서버 에러'})
     def post(self, request, review_id):
         review = get_object_or_404(Review, id=review_id)
         if request.user in review.review_like.all():
@@ -89,7 +93,7 @@ class CommentListView(APIView):
 
 class CommentDetailView(APIView):
     permissions_classes = [IsAuthenticated] 
-
+    
     # 댓글 수정
     def put(self, request, review_id, comment_id):
         comment = get_object_or_404(Comment, id=comment_id)
@@ -113,6 +117,8 @@ class CommentDetailView(APIView):
 class CommentLikeView(APIView):
     permissions_classes = [IsAuthenticated] 
 
+    @swagger_auto_schema(operation_summary="댓글 좋아요",  
+                    responses={200 : '성공', 404 : '찾을 수 없음', 500 : '서버 에러'})
     def post(self, request, comment_id):
         comment = get_object_or_404(Comment, id=comment_id)
         if request.user in comment.comment_like.all():
@@ -167,6 +173,8 @@ class RecommentDetailView(APIView):
 class RecommentLikeView(APIView):
     permissions_classes = [IsAuthenticated] 
 
+    @swagger_auto_schema(operation_summary="대댓글 좋아요",  
+                    responses={200 : '성공', 404 : '찾을 수 없음', 500 : '서버 에러'})
     def post(self, request, recomment_id):
         recomment = get_object_or_404(Recomment, id=recomment_id)
         if request.user in recomment.recomment_like.all():
