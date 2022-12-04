@@ -28,7 +28,7 @@ class ReviewCreateSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Review
-        fields = ("title", "content", "rating_cnt",)
+        fields = ('title', 'content', 'rating_cnt', 'review_image_one', 'review_image_two', 'review_image_three', )
         extra_kwargs = {
                         'title':{
                         'error_messages':{

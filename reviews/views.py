@@ -14,7 +14,12 @@ CommentSerializer, CommentCreateSerializer , RecommentSerializer, RecommentCreat
 
 #####리뷰#####
 class ReviewListView(APIView):
-    permissions_classes = [AllowAny] 
+    permissions_classes = [AllowAny]
+    
+    def get_permissions(self):
+        if self.request.POST:
+            return [IsAuthenticated(),]
+        return super(ReviewListView, self).get_permissions()
 
     #장소 리뷰 리스트
     def get(self, request, place_id):
@@ -24,13 +29,11 @@ class ReviewListView(APIView):
 
     #리뷰 작성
     def post(self, request, place_id):
-        if request.user:
-            serializer = ReviewCreateSerializer(data=request.data)
-            if serializer.is_valid():
-                serializer.save(author=request.user, place_id=place_id)
-                return Response(serializer.data, status=status.HTTP_201_CREATED)
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-        return Response({"message":"로그인이 필요합니다."}, status=status.HTTP_401_UNAUTHORIZED)
+        serializer = ReviewCreateSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save(author=request.user, place_id=place_id)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class ReviewDetailView(APIView):
     permissions_classes = [IsAuthenticated]
