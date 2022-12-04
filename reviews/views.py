@@ -77,6 +77,8 @@ class CommentListView(APIView):
     permissions_classes = [IsAuthenticated] 
 
     # 댓글 조회
+    @swagger_auto_schema(operation_summary="댓글 조회",
+                    responses={200 : '성공', 404 : '찾을 수 없음', 500 : '서버 에러'})
     def get(self, request, review_id):
         review = get_object_or_404(Review, id=review_id)
         comments = review.review_comments.all()
@@ -84,6 +86,9 @@ class CommentListView(APIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     # 댓글 작성
+    @swagger_auto_schema(request_body=CommentCreateSerializer,
+                    operation_summary="댓글 작성",
+                    responses={201 : '성공', 400:'인풋값 에러', 500 : '서버 에러'})
     def post(self, request, review_id):
         serializer = CommentCreateSerializer(data=request.data)
         if serializer.is_valid():
@@ -95,6 +100,9 @@ class CommentDetailView(APIView):
     permissions_classes = [IsAuthenticated] 
     
     # 댓글 수정
+    @swagger_auto_schema(request_body=CommentCreateSerializer, 
+                        operation_summary="댓글 수정", 
+                        responses={ 200 : '성공', 400:'인풋값 에러', 403:'접근 권한 없음', 404:'찾을 수 없음', 500:'서버 에러'})
     def put(self, request, review_id, comment_id):
         comment = get_object_or_404(Comment, id=comment_id)
         if request.user == comment.author:
@@ -106,6 +114,8 @@ class CommentDetailView(APIView):
         return Response({"message":"접근 권한 없음"}, status=status.HTTP_403_FORBIDDEN)
 
     # 댓글 삭제
+    @swagger_auto_schema(operation_summary="댓글 삭제", 
+                        responses={ 200 : '성공', 403:'접근 권한 없음', 404:'찾을 수 없음', 500:'서버 에러'})
     def delete(self, request, review_id, comment_id):
         comment = get_object_or_404(Comment, id=comment_id)
         if request.user == comment.author:
