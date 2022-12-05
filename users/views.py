@@ -208,8 +208,8 @@ class PrivateProfileView(APIView):
     @swagger_auto_schema(operation_summary="개인 프로필", 
                     responses={200 : '성공',  404 : '찾을 수 없음', 500 : '서버 에러'}) 
     def get(self, request):
-        user = get_object_or_404(User, id=request.user.id)
-        serializer = PrivateProfileSerializer(user)
+        profile = get_object_or_404(Profile, user=request.user)
+        serializer = PrivateProfileSerializer(profile)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     #프로필 수정

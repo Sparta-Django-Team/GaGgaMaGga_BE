@@ -385,7 +385,22 @@ class UserResendEmailAPIViewTest(APITestCase):
 #         )
 #         self.assertEqual(response.status_code, 400)
 
-class ProfileUpdateAPIViewTestCase(APITestCase):
+class PrivateProfileAPIViewTestCase(APITestCase):
+    def setUp(self):
+        self.data = {"username": "test12341", "password":"Test1234!"}
+        self.user = User.objects.create_user("test12341","test1@test.com", "01012351234","Test1234!")
+        Profile.objects.create(user=self.user, nickname="test", intro='test')
+    
+    #개인 프로필
+    def test_private_profile_get_success(self):
+        access_token = self.client.post(reverse('token_obtain_pair_view'), self.data).data['access']
+        response = self.client.get(
+            path=reverse("private_profile_view"),
+            HTTP_AUTHORIZATION=f"Bearer {access_token}",
+        )
+        self.assertEqual(response.status_code, 200)
+
+class PrivateProfileAPIViewTestCase(APITestCase):
     def setUp(self):
         self.data = {"username": "test12341", "password":"Test1234!"}
         self.user1 = User.objects.create_user("test12341","test1@test.com", "01012351234","Test1234!")
@@ -423,6 +438,37 @@ class ProfileUpdateAPIViewTestCase(APITestCase):
             data={"nickname":"test1", "intro":"testtest"} 
         )
         self.assertEqual(response.status_code, 400)
+
+class PublicProfileAPIViewTestCase(APITestCase):
+    def setUp(self):
+        self.data = {"username": "test1234", "password":"Test1234!"}
+        self.user1 = User.objects.create_user("test12341","test1@test.com", "01012351234","Test1234!")
+        self.user2 = User.objects.create_user("test1234","test@test.com", "01012341234","Test1234!")
+        
+        self.profile1 = Profile.objects.create(user=self.user1, nickname="test", intro='test')
+    
+    #공개 프로필
+    def test_public_profile_get_success(self):
+        access_token = self.client.post(reverse('token_obtain_pair_view'), self.data).data['access']
+        response = self.client.get(
+            path=reverse("public_profile_view", kwargs={"nickname":"test"}),
+            HTTP_AUTHORIZATION=f"Bearer {access_token}",
+        )
+        self.assertEqual(response.status_code, 200)
+
+class LoginLogListAPIViewTestCase(APITestCase):
+    def setUp(self):
+        self.data = {"username": "test1234", "password":"Test1234!"}
+        self.user = User.objects.create_user("test1234","test1@test.com", "01012351234","Test1234!")
+
+    #로그인 기록
+    def test_login_log_get_success(self):
+        access_token = self.client.post(reverse('token_obtain_pair_view'), self.data).data['access']
+        response = self.client.get(
+            path=reverse("login_log_view"),
+            HTTP_AUTHORIZATION=f"Bearer {access_token}",
+        )
+        self.assertEqual(response.status_code, 200)
 
 class ChangePasswordAPIViewTestCase(APITestCase):
     def setUp(self):
