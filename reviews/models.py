@@ -25,6 +25,10 @@ class Review(models.Model):
     def __str__(self):
         return f'[작성자]{self.author}, [제목]{self.title}'
 
+# class Like_Count(models.Model):
+#     Review = models.ForeignKey(Review,on_delete=models.CASCADE)
+#     User = models.ForeignKey(User,on_delete=models.CASCADE)
+
 class Comment(models.Model):
     content = models.TextField('내용', max_length=100)
     created_at = models.DateTimeField('생성 시간', auto_now_add=True)
