@@ -79,6 +79,5 @@ class UserAdmin(BaseUserAdmin):
 
 admin.site.register(OauthId)
 admin.site.register(LoggedIn)
-admin.site.register(ManagedUser)
 admin.site.register(User, UserAdmin)
 admin.site.unregister(Group)

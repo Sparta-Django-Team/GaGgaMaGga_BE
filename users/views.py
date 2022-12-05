@@ -379,14 +379,6 @@ def kakao_social_login(request):
 
 class KakaoLogIn(APIView):
 
-    #카카오 로그인 테스트를 위한 redirect
-    # def get(self, request):
-    #     kakao_id = get_secret("SOCIAL_AUTH_KAKAO_CLIENT_ID")
-    #     redirect_uri = 'http://127.0.0.1:8000/social/kakao'
-    #     return redirect(
-    #         f'https://kauth.kakao.com/oauth/authorize?client_id={kakao_id}&redirect_uri={redirect_uri}&response_type=code'
-    #     )
-    
     def post(self, request):
         try:
             code = request.data.get("code")
