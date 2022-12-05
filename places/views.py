@@ -17,3 +17,20 @@ class PlaceLocationSelectView(APIView):
         serializer = PlaceLocationSelectSerializer(place, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
+
+### Recommend Place ###
+class RecommendPlaceView(APIView):
+    permission_classes = [IsAuthenticated]
+    def get(self, request):
+        place = get_object_or_404(Place)
+        serializer = PlaceLocationSelectSerializer(place, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+### Place Detail ###
+class PlaceDetailView(APIView):
+    permission_classes = [IsAuthenticated]
+    def get(self, request):
+        place = get_object_or_404(Place)
+        serializer = PlaceLocationSelectSerializer(place, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
