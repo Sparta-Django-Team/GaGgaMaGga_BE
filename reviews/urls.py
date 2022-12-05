@@ -7,6 +7,7 @@ urlpatterns = [
     path('<int:place_id>/', views.ReviewListView.as_view(), name='review_list_view'),
     path('details/<int:review_id>/',views.ReviewDetailView.as_view(), name='review_detail_view'),
     path('<int:review_id>/likes/',views.ReviewLikeView.as_view(), name='review_like_view'),
+    path('review_rank/',views.ReviewRankView.as_view(), name='reveiw_rank_view'),
 
     # Comment
     path('<int:review_id>/comments/',views.CommentListView.as_view(), name='comment_list_view'),
