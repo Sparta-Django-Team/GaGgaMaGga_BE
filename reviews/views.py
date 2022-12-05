@@ -14,7 +14,30 @@ CommentSerializer, CommentCreateSerializer , RecommentSerializer, RecommentCreat
 
 from drf_yasg.utils import swagger_auto_schema
 
+
 #####리뷰#####
+class ReviewRankView(APIView):
+    permissions_classes = [AllowAny]
+    @swagger_auto_schema(operation_summary="전체 리뷰 조회",
+                    responses={200 : '성공', 404 : '찾을 수 없음', 500 : '서버 에러'})
+    #리뷰전체리스트
+    def get(self, request):
+
+        #최신순
+        recent_review = Review.objects.all().order_by('-created_at')
+
+        #좋아요순
+        like_count_review = Review.objects.annotate(num_likes=Count('review_like')).order_by('-num_likes','-created_at')
+
+        recent_review_serializer = ReviewListSerializer(recent_review, many=True).data
+        like_count_review_serializer = ReviewListSerializer(like_count_review, many=True).data
+        
+        review = {
+            "recent_review": recent_review_serializer,
+            "like_count_review": like_count_review_serializer
+        }
+        return Response(review, status=status.HTTP_200_OK)
+
 class ReviewListView(APIView):
     permissions_classes = [AllowAny]
     
@@ -32,7 +55,7 @@ class ReviewListView(APIView):
         recent_review = Review.objects.filter(place_id=place_id).order_by('-created_at')
 
         #좋아요순
-        like_count_review = Review.objects.annotate(num_likes=Count('review_like')).order_by('-num_likes')
+        like_count_review = Review.objects.filter(place_id=place_id).annotate(num_likes=Count('review_like')).order_by('-num_likes','-created_at')
 
         recent_review_serializer = ReviewListSerializer(recent_review, many=True).data
         like_count_review_serializer = ReviewListSerializer(like_count_review, many=True).data
@@ -104,20 +127,6 @@ class ReviewDetailView(APIView):
                 serializer.save(author=request.user, review_id=review_id)
                 return Response({"message":"신고가 완료되었습니다."}, status=status.HTTP_200_OK)
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-class ReviewRankView(APIView):
-    permissions_classes = [AllowAny]
-    @swagger_auto_schema(operation_summary="전체 리뷰 조회",
-                    responses={200 : '성공', 404 : '찾을 수 없음', 500 : '서버 에러'})
-    #리뷰전체리스트
-    def get(self, request):
-        recent_review = Review.objects.all().order_by('-created_at')
-        recent_review_serializer = ReviewListSerializer(recent_review, many=True).data
-        review = {
-            "recent_review": recent_review_serializer,
-        }
-        return Response(review, status=status.HTTP_200_OK)
-
 
 # 리뷰 좋아요
 class ReviewLikeView(APIView):
