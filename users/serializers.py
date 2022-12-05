@@ -111,17 +111,17 @@ class LogoutSerializer(serializers.Serializer):
 
 #개인 프로필 serializer
 class PrivateProfileSerializer(serializers.ModelSerializer):
-    nickname = serializers.SerializerMethodField()
-    profile_image = serializers.SerializerMethodField()
+    email = serializers.SerializerMethodField()
+    username = serializers.SerializerMethodField()
 
-    def get_nickname(self, obj):
-        return obj.profile.nickname
+    def get_email(self, obj):
+        return obj.user.email
 
-    def get_profile_image(self, obj):
-        return obj.profile.profile_image.url
+    def get_username(self, obj):
+        return obj.user.username
 
     class Meta:
-        model = User
+        model = Profile
         fields = ('nickname', 'profile_image', 'email', 'username',)
 
 #공개 프로필 serializer
