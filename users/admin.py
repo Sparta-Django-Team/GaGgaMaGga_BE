@@ -5,7 +5,7 @@ from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.contrib.auth.forms import ReadOnlyPasswordHashField
 from django.core.exceptions import ValidationError
 
-from .models import User, ConfirmEmail, ConfirmPhoneNumber, LoggedIn, Profile, ManagedUser, OauthId
+from .models import User, ConfirmEmail, ConfirmPhoneNumber, LoggedIn, Profile, OauthId
 
 class UserCreationForm(forms.ModelForm):
     password1 = forms.CharField(label='비밀번호', widget=forms.PasswordInput)

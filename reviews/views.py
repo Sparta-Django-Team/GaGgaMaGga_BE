@@ -4,7 +4,6 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated, AllowAny
 
-from django.shortcuts import get_list_or_404
 from django.db.models import Count
 
 from .models import Review, Comment, Recomment, Report
@@ -20,7 +19,7 @@ class ReviewRankView(APIView):
     permissions_classes = [AllowAny]
     @swagger_auto_schema(operation_summary="전체 리뷰 조회",
                     responses={200 : '성공', 404 : '찾을 수 없음', 500 : '서버 에러'})
-    #리뷰전체리스트
+    #리뷰 전체 리스트
     def get(self, request):
 
         #최신순
@@ -142,6 +141,7 @@ class ReviewLikeView(APIView):
         else:
             review.review_like.add(request.user)
             return Response({"message":"리뷰 좋아요를 했습니다."}, status=status.HTTP_200_OK)
+
 #####댓글#####
 class CommentListView(APIView):
     permissions_classes = [IsAuthenticated] 
@@ -305,4 +305,3 @@ class RecommentLikeView(APIView):
         else:
             recomment.recomment_like.add(request.user)
             return Response("대댓글 좋아요했습니다.", status=status.HTTP_200_OK)
-        
