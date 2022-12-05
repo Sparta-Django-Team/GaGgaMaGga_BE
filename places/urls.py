@@ -1,7 +1,7 @@
 from django.urls import path
 
-from .views import PlaceLocationSelectView, RecommendPlaceView, PlaceDetailView
+from . import views
 
 urlpatterns = [
-    path('', PlaceLocationSelectView.as_view(), name="place_location"),
+    path('<int:place_id>/bookmarks/',views.PlaceBookmarkView.as_view(), name='place_bookmark_view'),
 ]

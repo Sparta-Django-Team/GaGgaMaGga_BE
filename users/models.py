@@ -47,7 +47,6 @@ class UserManager(BaseUserManager):
         return user
 
 class User(AbstractBaseUser):
-    
     username = models.CharField('아이디', max_length=15, unique=True, error_messages={"unique": "이미 사용중인 아이디 이거나 탈퇴한 아이디입니다."})
     email = models.EmailField('이메일', max_length=255, unique=True, error_messages={"unique": "이미 사용중인 이메일 이거나 탈퇴한 이메일입니다."})
     phone_number = models.CharField('휴대폰 번호', max_length = 11, blank=True)
@@ -61,6 +60,7 @@ class User(AbstractBaseUser):
     last_password_changed = models.DateTimeField('비밀번호 마지막 변경일', auto_now=True)
     created_at = models.DateTimeField('계정 생성일', auto_now_add=True)
     withdraw_at = models.DateTimeField('계정 탈퇴일', null=True)
+    
 
     objects = UserManager()
 
@@ -117,11 +117,11 @@ class ConfirmPhoneNumber(models.Model):
         )
         
         url = f"https://sens.apigw.ntruss.com/sms/v2/services/{service_id}/messages"
-                
+        
         data = {
             "type": "SMS",
             "from": f'{get_secret("FROM_PHONE_NUMBER")}',
-            "content": f"[나이사!] 인증 번호 [{self.auth_number}]를 입력해주세요. (5분 제한시간)",
+            "content": f"[가까? 마까?] 인증 번호 [{self.auth_number}]를 입력해주세요. (5분 제한시간)",
             "messages": [{"to": f"{self.user.phone_number}"}],
         }
 
@@ -134,41 +134,46 @@ class ConfirmPhoneNumber(models.Model):
         
         requests.post(url, json=data, headers=headers)
 
-    
+
     def __str__(self):
         return f"[휴대폰 번호]{self.user.phone_number}"
-    
+
 #회원 관리
 class ManagedUser(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name="회원")
-    
+
     def __str__(self):
         return f"[아이디]{self.user.username}"
 
 #로그 기록
 class LoggedIn(models.Model):
+    update_ip = models.GenericIPAddressField('로그인한 IP', null=True)
     created_at = models.DateTimeField('로그인 기록', auto_now_add=True)
-    
+
     user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name="회원")
-    
+
     def __str__(self):
         return f"[아이디]{self.user.username}[접속 기록]{self.created_at}"
-    
+
+    class Meta:
+        ordering = ['-created_at']
+
 #소셜 로그인
 class OauthId(models.Model):
     access_token = models.CharField('토큰', max_length=255)
     provider = models.CharField('구분자', max_length=255)
-    
+
     user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name="회원")
-    
+
 #프로필
 class Profile(models.Model):
     profile_image = models.ImageField('프로필 사진', default='default_profile_pic.jpg', upload_to='profile_pics' )
     nickname = models.CharField('닉네임', max_length=10, null=True, unique=True, error_messages={"unique": "이미 사용중인 닉네임 이거나 탈퇴한 닉네임입니다."})
     intro = models.CharField('자기소개', max_length=100, null=True)
 
-    user = models.OneToOneField(User, on_delete=models.CASCADE, verbose_name="회원")
+    user = models.OneToOneField(User, on_delete=models.CASCADE, verbose_name="회원", related_name='user_profile')
 
     followings = models.ManyToManyField('self', symmetrical=False, blank=True, related_name= 'followers')
     def __str__(self):
         return f"[아이디]{self.user.username}[닉네임]{self.nickname}"
+    
