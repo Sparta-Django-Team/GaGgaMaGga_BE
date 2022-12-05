@@ -57,6 +57,14 @@ class ReviewDetailView(APIView):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         return Response({"message":"접근 권한 없음"}, status=status.HTTP_403_FORBIDDEN)
 
+    #리뷰 삭제
+    def delete(self, request, review_id):
+        review = get_object_or_404(Review, id=review_id)
+        if request.user == review.author:
+            review.delete()
+            return Response({"message":"리뷰 삭제"}, status=status.HTTP_200_OK)
+        return Response({"message":"접근 권한 없음"}, status=status.HTTP_403_FORBIDDEN) 
+
     #리뷰 신고
     @swagger_auto_schema(request_body=ReportSerializer, 
                 operation_summary="리뷰 신고", 
