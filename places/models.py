@@ -9,14 +9,12 @@ class PlaceQerySet(models.QuerySet) :
         qs = self.filter(lookup)
         return qs
 
-
 class PlaceManager(models.Manager) :
     def get_queryset(self, *args, **kwargs) :
         return PlaceQerySet(self.model, using=self._db)
 
     def search(self, query, user=None) :
         return self.get_queryset().search(query)
-
 
 class Place(models.Model):
     place_name = models.CharField('장소명',max_length=50)

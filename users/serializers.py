@@ -132,6 +132,7 @@ class PublicProfileSerializer(serializers.ModelSerializer):
     followings = serializers.StringRelatedField(many=True)
     followers = serializers.StringRelatedField(many=True)
     review_set = ReviewListSerializer(many=True, source='user.review_set')
+
     class Meta:
         model = Profile
         fields = ('nickname', 'profile_image', 'intro', 'followings', 'followers','review_set',)
