@@ -37,10 +37,17 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    
+    # third party api services
+    'algoliasearch_django',
+    
+    # thrid party packages
     'rest_framework',
     'rest_framework_simplejwt.token_blacklist',
     'drf_yasg',
     'corsheaders',
+    
+    # internal apps
     'users',
     'reviews',
     'places',
@@ -191,3 +198,10 @@ DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
 #CORS settings
 CORS_ALLOW_ALL_ORIGINS = True
+
+# 검색 엔진 ALGOLIA
+ALGOLIA = {
+    'APPLICATION_ID': get_secret("SEARCH_ID"),
+    'API_KEY': get_secret("SEARCH_KEY"),
+    'INDEX_PREFIX' : 'cfe'
+}
