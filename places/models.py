@@ -34,6 +34,7 @@ class Place(models.Model):
 
     class Meta:
         db_table = 'places'
+        ordering = ['rating']
 
     def __str__(self):
         return f'[장소명]{self.place_name}'

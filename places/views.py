@@ -17,7 +17,38 @@ from . import client
 
 from gaggamagga.permissions import IsAdmin
 from .models import Place
-from .serializers import PlaceLocationSelectSerializer, PlaceSerializer, PlaceCreateSerializer
+from .serializers import PlaceSelectSerializer, PlaceSerializer, PlaceCreateSerializer
+
+
+FOOD_CATEGORY = (
+        ('분식', '분식'),
+        ('한식', '한식'),
+        ('돼지고기구이', '돼지고기구이'),
+        ('치킨,닭강정', '치킨,닭강정'),
+        ('햄버거', '햄버거'),
+        ('피자', '피자'),
+        ('중식당', '중식당'),
+        ('일식당', '일식당'),
+        ('양식', '양식'),
+        ('태국음식', '태국음식'),
+        ('인도음식', '인도음식'),
+        ('베트남음식', '베트남음식'),
+
+    )
+
+
+class PlaceSelectView(APIView):
+    permission_class = [IsAuthenticated]
+
+    #맛집 취향 선택
+    def get(self, request):
+        place = []
+        for i in range(len(FOOD_CATEGORY)):
+            pick = Place.objects.filter(category=FOOD_CATEGORY[i][1]).order_by('-rating')[0]
+            place.append(pick)
+        serializer = PlaceSelectSerializer(place, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
 
 ##### 장소 #####
 class PlaceListView(APIView):
