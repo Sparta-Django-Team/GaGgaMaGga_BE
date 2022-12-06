@@ -7,7 +7,7 @@ class GenericAPIException(APIException):
     def __init__(self, status_code, detail=None, code=None):
         self.status_code=status_code
         super().__init__(detail=detail, code=code)
-        
+
 class IsAdmin(BasePermission):
     """
     admin 사용자는 모든request 가능,
@@ -19,7 +19,7 @@ class IsAdmin(BasePermission):
 
     def has_permission(self, request, view):
         user = request.user
-        
+
         if request.method in self.SAFE_METHODS:
             return True
 
@@ -28,10 +28,10 @@ class IsAdmin(BasePermission):
                 'detail': "관리자만 접근이 가능합니다."
             }
             raise GenericAPIException(status_code=status.HTTP_403_FORBIDDEN, detail=response)
-        
+
         if user.is_admin:
             return True
-        
+
         if (user.is_anonymous or user.is_authenticated) and request.method in self.SAFE_METHODS:
             return True
 
