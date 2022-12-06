@@ -19,6 +19,8 @@ from gaggamagga.permissions import IsAdmin
 from .models import Place
 from .serializers import PlaceSelectSerializer, PlaceSerializer, PlaceCreateSerializer
 
+from .rcm_places import rcm_place
+
 
 FOOD_CATEGORY = (
         ('F1', '분식'),
@@ -53,10 +55,22 @@ class PlaceSelectView(APIView):
 class PlaceListView(APIView):
     permission_classes = [IsAdmin]
 
+    # #맛집 리스트
+    # def get(self, request):
+    #     place = Place.objects.all()
+    #     serializer = PlaceSerializer(place, many=True)
+    #     return Response(serializer.data, status=status.HTTP_200_OK)
+
+
     #맛집 리스트
     def get(self, request):
-        place = Place.objects.all()
+        
+        place_list = rcm_place(user_id = request.user.id)
+
+        place = Place.objects.filter(id__in=[1,2,3,4,5])
+
         serializer = PlaceSerializer(place, many=True)
+        # return Response(place_list)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     #맛집 생성
