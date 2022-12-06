@@ -5,7 +5,8 @@ from users.models import User
 
 class PlaceQerySet(models.QuerySet) :
     def search(self, query) :
-        lookup = Q(place_name__contains=query) | Q(category__contains=query) | Q(place_address__contains=query) | Q(place_number__contains=query)
+        lookup = (Q(place_name__contains=query) | Q(category__contains=query) 
+        | Q(place_address__contains=query) | Q(place_number__contains=query))
         qs = self.filter(lookup)
         return qs
 

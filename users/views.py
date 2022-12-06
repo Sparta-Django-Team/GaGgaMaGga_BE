@@ -369,6 +369,7 @@ class ProcessFollowView(APIView):
 
 #카카오 로그인
 class KakaoLogIn(APIView):
+    permission_classes = [AllowAny]
 
     def post(self, request):
         try:

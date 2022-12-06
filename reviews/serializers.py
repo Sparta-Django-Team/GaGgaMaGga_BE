@@ -39,28 +39,6 @@ class ReviewCreateSerializer(serializers.ModelSerializer):
                         'required':'평점을 입력해주세요',
                         'blank':'평점을 입력해주세요',}},}
 
-class ReviewDetailSerializer(serializers.ModelSerializer):
-    nickname = serializers.SerializerMethodField()
-    profile_image = serializers.SerializerMethodField()
-    place_name = serializers.SerializerMethodField()
-    review_like_count = serializers.SerializerMethodField()
-
-    def get_nickname(self, obj):
-        return obj.author.user_profile.nickname
-
-    def get_profile_image(self, obj):
-        return obj.author.user_profile.profile_image.url
-
-    def get_place_name(self, obj):
-        return obj.place.place_name
-        
-    def get_review_like_count(self, obj):
-        return obj.review_like.count()
-
-    class Meta:
-        model = Review
-        fields = ('content', 'review_image_one', 'review_image_two', 'review_image_three', 'created_at', 'updated_at', 'rating_cnt', 'review_like', 'review_like_count', 'nickname', 'profile_image', 'place_name', )
-
 
 class RecommentSerializer(serializers.ModelSerializer):
     nickname = serializers.SerializerMethodField()
@@ -111,6 +89,31 @@ class CommentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Comment
         fields = ('content', 'created_at', 'updated_at', 'comment_like', 'review_content', 'nickname', 'profile_image', 'comment_like_count','comment_recomments',)
+
+class ReviewDetailSerializer(serializers.ModelSerializer):
+    nickname = serializers.SerializerMethodField()
+    profile_image = serializers.SerializerMethodField()
+    place_name = serializers.SerializerMethodField()
+    review_like_count = serializers.SerializerMethodField()
+    review_comments = CommentSerializer(many=True)
+
+    def get_nickname(self, obj):
+        return obj.author.user_profile.nickname
+
+    def get_profile_image(self, obj):
+        return obj.author.user_profile.profile_image.url
+
+    def get_place_name(self, obj):
+        return obj.place.place_name
+        
+    def get_review_like_count(self, obj):
+        return obj.review_like.count()
+
+    class Meta:
+        model = Review
+        fields = ('content', 'review_image_one', 'review_image_two', 'review_image_three', 'created_at', 'updated_at', 'rating_cnt', 'review_like', 'review_like_count', 'nickname', 'profile_image', 'place_name','review_comments' )
+
+
 
 class CommentCreateSerializer(serializers.ModelSerializer):
     class Meta:

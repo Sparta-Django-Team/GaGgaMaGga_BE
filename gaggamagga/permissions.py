@@ -8,7 +8,7 @@ class GenericAPIException(APIException):
         self.status_code=status_code
         super().__init__(detail=detail, code=code)
 
-class IsAdmin(BasePermission):
+class IsAdminOrOntherReadOnly(BasePermission):
     """
     admin 사용자는 모든request 가능,
     비로그인, 로그인한 사람은 조회만 가능
