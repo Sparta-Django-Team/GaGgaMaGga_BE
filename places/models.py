@@ -1,7 +1,7 @@
 from django.db import models
-from users.models import User
-from django.db .models import Q
+from django.db.models import Q
 
+from users.models import User
 
 class PlaceQerySet(models.QuerySet) :
     def search(self, query) :

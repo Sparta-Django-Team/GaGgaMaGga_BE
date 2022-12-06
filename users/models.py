@@ -169,4 +169,3 @@ class Profile(models.Model):
     followings = models.ManyToManyField('self', symmetrical=False, blank=True, related_name= 'followers')
     def __str__(self):
         return f"[아이디]{self.user.username}[닉네임]{self.nickname}"
-    

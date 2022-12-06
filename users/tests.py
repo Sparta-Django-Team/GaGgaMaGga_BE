@@ -124,7 +124,7 @@ class UserSignupAPIViewTestCase(APITestCase):
         response = self.client.post(url, user_data)
         self.assertEqual(response.status_code, 400)
     
-        #회원가입 실패(아이디 중복)
+    #회원가입 실패(아이디 중복)
     def test_signup_phone_number_unique_fail(self):
         User.objects.create_user("test1234","test@test.com", "01012341234","Test1234!")
         url = reverse("user_view")
@@ -568,7 +568,6 @@ class PasswordResetAPIViewTestCase(APITestCase):
     def setUp(self):
         User.objects.create_user("test12341","test1@test.com", "01012351234","Test1234!")
     
-    
     def test_password_reset_email_success(self):
         response = self.client.post(
             path=reverse("password_reset_email_view"),
@@ -605,7 +604,6 @@ class PasswordTokenCheckAPIViewTestCase(APITestCase):
         self.user = User.objects.create_user("test12341","test1@test.com", "01012351234","Test1234!")
         self.uidb64 = urlsafe_base64_encode(smart_bytes(self.user.id)) 
         self.token = PasswordResetTokenGenerator().make_token(self.user)
-        
 
     #비밀번호 토큰 인증 성공
     def test_password_token_check_success(self):

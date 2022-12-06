@@ -4,11 +4,13 @@ from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.generics import get_object_or_404
 from rest_framework import generics
+
+from drf_yasg.utils import swagger_auto_schema
+
 from places .models import Place
 from places.serializers import PlaceSerializer
 from . import client
 
-from drf_yasg.utils import swagger_auto_schema
 
 ##### 장소 #####
 class PlaceBookmarkView(APIView):
@@ -26,7 +28,6 @@ class PlaceBookmarkView(APIView):
             place.place_bookmark.add(request.user)
             return Response({"message":"북마크를 했습니다."}, status=status.HTTP_200_OK)
 
-
 class SearchListView(generics.GenericAPIView) :
     def get(self, request, *args, **wsargs) :
         query = request.GET.get('q')
@@ -34,7 +35,6 @@ class SearchListView(generics.GenericAPIView) :
             return Response('', status=status.HTTP_400_BAD_REQUEST)
         results = client.perform_search(query)
         return Response(results)
-
 
 class SearchListOldView(generics.ListAPIView) :
     queryset = Place.objects.all()
