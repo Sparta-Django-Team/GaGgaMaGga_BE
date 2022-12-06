@@ -303,8 +303,7 @@ class UserLoginLogoutAPIViewTestCase(APITestCase):
 
 class UserConfirmEmailAPIViewTest(APITestCase):
     def setUp(self):
-        User.objects.create_user("test1234","test@test.com", "01012341234","Test1234!")
-        self.user = User.objects.get(email="test@test.com")
+        self.user = User.objects.create_user("test1234","test@test.com", "01012341234","Test1234!")
         self.secured_key_data = RefreshToken.for_user(self.user).access_token
     
     def test_confirm_email_success(self):
@@ -364,8 +363,7 @@ class UserResendEmailAPIViewTest(APITestCase):
 휴대폰 인증번호가 진짜 발송됨으로 주의하기
 '''
 #     def setUp(self):
-#         User.objects.create_user("test1234","test@test.com", "00000000000","Test1234!")
-#         self.user = User.objects.get(email="test@test.com")
+#         self.user = User.objects.create_user("test1234","test@test.com", "00000000000","Test1234!")
 #         self.confirm_phone_number_data = ConfirmPhoneNumber.objects.create(user=self.user)
         
         
@@ -604,9 +602,7 @@ class PasswordResetAPIViewTestCase(APITestCase):
 
 class PasswordTokenCheckAPIViewTestCase(APITestCase):
     def setUp(self):
-        User.objects.create_user("test12341","test1@test.com", "01012351234","Test1234!")
-        
-        self.user = User.objects.get(email="test1@test.com")
+        self.user = User.objects.create_user("test12341","test1@test.com", "01012351234","Test1234!")
         self.uidb64 = urlsafe_base64_encode(smart_bytes(self.user.id)) 
         self.token = PasswordResetTokenGenerator().make_token(self.user)
         
@@ -626,9 +622,7 @@ class PasswordTokenCheckAPIViewTestCase(APITestCase):
 
 class SetPasswordAPIViewTestCase(APITestCase):
     def setUp(self):
-        User.objects.create_user("test12341","test1@test.com", "01012351234","Test1234!")
-        
-        self.user = User.objects.get(email="test1@test.com")
+        self.user = User.objects.create_user("test12341","test1@test.com", "01012351234","Test1234!")
         self.uidb64 = urlsafe_base64_encode(smart_bytes(self.user.id)) 
         self.token = PasswordResetTokenGenerator().make_token(self.user)
         
@@ -641,7 +635,7 @@ class SetPasswordAPIViewTestCase(APITestCase):
         self.assertEqual(response.status_code, 200)
     
     #비밀번호 변경 실패(비밀번호 빈칸)
-    def test_password_selt_password_blank_fail(self):
+    def test_password_set_password_blank_fail(self):
         response = self.client.put(
             path=reverse("password_reset_complete_view"),
             data={"password":"", "repassword":"Test1234!!", "uidb64":self.uidb64, "token": self.token} 
@@ -687,6 +681,91 @@ class SetPasswordAPIViewTestCase(APITestCase):
             data={"password":"Test1234!!", "repassword":"Test1234!!", "uidb64":self.uidb64, "token": "1234"} 
         )
         self.assertEqual(response.status_code, 401)
+
+class ExpiredPasswordChageAPIView(APITestCase):
+    def setUp(self):
+        self.user = User.objects.create_user("test12341","test1@test.com", "01012351234","Test1234!")
+        
+        self.user.password_expired = True
+        self.user.save()
+        
+        self.data = {"username": "test12341", "password":"Test1234!"}
+        
+    def test_expired_password_get_success(self):
+        access_token = self.client.post(reverse('token_obtain_pair_view'), self.data).data['access']
+        response = self.client.get(
+            path=reverse("password_expired_change_view"),
+            HTTP_AUTHORIZATION=f"Bearer {access_token}",
+        )
+        self.assertEqual(response.status_code, 200)
+        
+    def test_expired_password_post_success(self):
+        access_token = self.client.post(reverse('token_obtain_pair_view'), self.data).data['access']
+        response = self.client.post(
+            path=reverse("password_expired_change_view"),
+            HTTP_AUTHORIZATION=f"Bearer {access_token}",
+        )
+        self.assertEqual(response.status_code, 200)
+        
+    #비밀번호 변경 성공
+    def test_expired_password_put_success(self):
+        access_token = self.client.post(reverse('token_obtain_pair_view'), self.data).data['access']
+        response = self.client.put(
+            path=reverse("password_expired_change_view"),
+            HTTP_AUTHORIZATION=f"Bearer {access_token}",
+            data={"password":"Test1234!!", "repassword":"Test1234!!"} 
+        )
+        self.assertEqual(response.status_code, 200)
+    
+    #비밀번호 변경 실패(비밀번호 빈칸)
+    def test_expired_password_put_blank_fail(self):
+        access_token = self.client.post(reverse('token_obtain_pair_view'), self.data).data['access']
+        response = self.client.put(
+            path=reverse("password_expired_change_view"),
+            HTTP_AUTHORIZATION=f"Bearer {access_token}",
+            data={"password":"", "repassword":"Test1234!!"} 
+        )
+        self.assertEqual(response.status_code, 400)
+
+    #비밀번호 변경 실패(비밀번호 확인 빈칸)
+    def test_expired_password_put_confirm_blank_fail(self):
+        access_token = self.client.post(reverse('token_obtain_pair_view'), self.data).data['access']
+        response = self.client.put(
+            path=reverse("password_expired_change_view"),
+            HTTP_AUTHORIZATION=f"Bearer {access_token}",
+            data={"password":"Test1234!!", "repassword":""} 
+        )
+        self.assertEqual(response.status_code, 400)
+        
+    #비밀번호 변경 실패(비밀번호 유효성검사(simple))
+    def test_expired_password_put_validation_fail(self):
+        access_token = self.client.post(reverse('token_obtain_pair_view'), self.data).data['access']
+        response = self.client.put(
+            path=reverse("password_expired_change_view"),
+            HTTP_AUTHORIZATION=f"Bearer {access_token}",
+            data={"password":"Test1234", "repassword":"Test1234"} 
+        )
+        self.assertEqual(response.status_code, 400)
+        
+    #비밀번호 변경 실패(비밀번호 유효성검사(동일))
+    def test_expired_password_put_validation_same_fail(self):
+        access_token = self.client.post(reverse('token_obtain_pair_view'), self.data).data['access']
+        response = self.client.put(
+            path=reverse("password_expired_change_view"),
+            HTTP_AUTHORIZATION=f"Bearer {access_token}",
+            data={"password":"Test111!", "repassword":"Test111!"} 
+        )
+        self.assertEqual(response.status_code, 400)
+    
+    #비밀번호 변경 실패(비밀번호, 비밀번호 확인 일치 )
+    def test_expired_password_put_same_fail(self):
+        access_token = self.client.post(reverse('token_obtain_pair_view'), self.data).data['access']
+        response = self.client.put(
+            path=reverse("password_expired_change_view"),
+            HTTP_AUTHORIZATION=f"Bearer {access_token}",
+            data={"password":"Test1234!!", "repassword":"Test1234!"} 
+        )
+        self.assertEqual(response.status_code, 400)
 
 class FollowAPIViewTestCase(APITestCase):
     def setUp(self):
