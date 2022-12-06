@@ -10,7 +10,7 @@ class PlaceQerySet(models.QuerySet) :
         return qs
 
 
-class PlaceManage(models.Manager) :
+class PlaceManager(models.Manager) :
     def get_queryset(self, *args, **kwargs) :
         return PlaceQerySet(self.model, using=self._db)
 
@@ -32,7 +32,7 @@ class Place(models.Model):
 
     place_bookmark = models.ManyToManyField(User, verbose_name='장소 북마크', related_name="bookmark_place",blank=True)
     
-    objects = PlaceManage()
+    objects = PlaceManager()
 
     class Meta:
         db_table = 'places'
