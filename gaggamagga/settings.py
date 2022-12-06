@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'users',
     'reviews',
     'places',
+    'search',
 ]
 
 REST_FRAMEWORK = {
