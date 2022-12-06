@@ -566,6 +566,42 @@ class ChangePasswordAPIViewTestCase(APITestCase):
         )
         self.assertEqual(response.status_code, 400)
 
+class PasswordResetAPIViewTestCase(APITestCase):
+    def setUp(self):
+        User.objects.create_user("test12341","test1@test.com", "01012351234","Test1234!")
+    
+    
+    def test_password_reset_email_success(self):
+        response = self.client.post(
+            path=reverse("password_reset_email_view"),
+            data={"email":"test1@test.com"} 
+        )
+        self.assertEqual(response.status_code, 200)
+    
+    #존재하지 않는 이메일전송
+    def test_password_reset_email_fail(self):
+        response = self.client.post(
+            path=reverse("password_reset_email_view"),
+            data={"email":"test2@test.com"} 
+        )
+        self.assertEqual(response.status_code, 400)
+        
+    #형식에 맞지 않는 이메일전송
+    def test_password_reset_email_invalid_fail(self):
+        response = self.client.post(
+            path=reverse("password_reset_email_view"),
+            data={"email":"test2"} 
+        )
+        self.assertEqual(response.status_code, 400)
+        
+    #이메일 빈칸일 때 이메일 전송
+    def test_password_reset_email_blank_fail(self):
+        response = self.client.post(
+            path=reverse("password_reset_email_view"),
+            data={"email":""} 
+        )
+        self.assertEqual(response.status_code, 400)
+
 class PasswordTokenCheckAPIViewTestCase(APITestCase):
     def setUp(self):
         User.objects.create_user("test12341","test1@test.com", "01012351234","Test1234!")
@@ -651,3 +687,28 @@ class SetPasswordAPIViewTestCase(APITestCase):
             data={"password":"Test1234!!", "repassword":"Test1234!!", "uidb64":self.uidb64, "token": "1234"} 
         )
         self.assertEqual(response.status_code, 401)
+
+class FollowAPIViewTestCase(APITestCase):
+    def setUp(self):
+        self.user1 = User.objects.create_user("test12341","test1@test.com", "01012351234","Test1234!")
+        self.user2 = User.objects.create_user("test12342","test2@test.com", "01012351235","Test1234!")
+
+        self.profile1 = Profile.objects.create(user=self.user1, nickname="test", intro='test')
+        self.profile2 = Profile.objects.create(user=self.user2, nickname="test1", intro="test")
+        
+        self.user = {"username": "test12341", "password":"Test1234!"}
+        
+    def test_follow_success(self):
+        access_token = self.client.post(reverse('token_obtain_pair_view'), self.user).data['access']
+        response_case_1 = self.client.post(
+            path=reverse("process_follow_view", kwargs={"nickname":"test1"}),
+            HTTP_AUTHORIZATION=f"Bearer {access_token}",
+        )
+        
+        self.assertEqual(response_case_1.status_code, 200)
+        
+        response_case_2 = self.client.post(
+            path=reverse("process_follow_view", kwargs={"nickname":"test1"}),
+            HTTP_AUTHORIZATION=f"Bearer {access_token}",
+        )
+        self.assertEqual(response_case_2.status_code, 200)
