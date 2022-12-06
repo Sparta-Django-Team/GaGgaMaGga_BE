@@ -14,3 +14,7 @@ class PlaceIndex(AlgoliaIndex):
         'place_number',
         'place_img'
     ]
+    
+    settings = {
+        'searchableAttributes' : ["plaece_name", "catergory", "rating", "palce_address", "place_number"]
+    }
