@@ -5,7 +5,6 @@ from users.models import User
 from places.models import Place
 
 class Review(models.Model):
-    title = models.CharField('제목', max_length=50)
     content = models.TextField('내용', max_length=500)
     review_image_one = models.ImageField('이미지 1', upload_to='review_pics', blank=True)
     review_image_two = models.ImageField('이미지 2', upload_to='review_pics', blank=True)
@@ -23,7 +22,7 @@ class Review(models.Model):
         db_table = 'review'
 
     def __str__(self):
-        return f'[작성자]{self.author}, [제목]{self.title}'
+        return f'[작성자]{self.author}, [내용]{self.content}'
 
 class Comment(models.Model):
     content = models.TextField('내용', max_length=100)
@@ -40,7 +39,7 @@ class Comment(models.Model):
         ordering = ['-created_at']
         
     def __str__(self):
-        return f'[후기 제목]{self.review.title}, [댓글 작성자]{self.author}, [댓글 내용]{self.content}'
+        return f'[후기 내용]{self.review.content}, [댓글 작성자]{self.author}, [댓글 내용]{self.content}'
 
 class Recomment(models.Model):
     content = models.TextField('내용', max_length=100)
@@ -57,7 +56,7 @@ class Recomment(models.Model):
         ordering = ['-created_at']
         
     def __str__(self):
-        return f'[후기 제목]{self.comment.review.title}, [대댓글 작성자]{self.author}, [대댓글 내용]{self.content}'
+        return f'[후기 내용]{self.comment.review.content}, [대댓글 작성자]{self.author}, [대댓글 내용]{self.content}'
 
 class Report(models.Model):
     REPORT_CATEGORY = (

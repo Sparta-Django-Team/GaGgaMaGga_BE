@@ -7,7 +7,7 @@ class GenericAPIException(APIException):
     def __init__(self, status_code, detail=None, code=None):
         self.status_code=status_code
         super().__init__(detail=detail, code=code)
-        
+
 class IsAdmin(BasePermission):
     """
     admin 사용자는 모든request 가능,
@@ -18,7 +18,6 @@ class IsAdmin(BasePermission):
 
     def has_permission(self, request, view):
         user = request.user
-        print("----------------------------")
         if request.method in self.SAFE_METHODS:
             return True
 
@@ -30,7 +29,7 @@ class IsAdmin(BasePermission):
         
         if user.is_admin and user.is_authenticated:
             return True
-        
+
         if (user.is_anonymous or user.is_authenticated) and request.method in self.SAFE_METHODS:
             return True
 

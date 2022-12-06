@@ -6,8 +6,14 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.generics import get_object_or_404
+from rest_framework import generics
 
 from drf_yasg.utils import swagger_auto_schema
+
+from places .models import Place
+from places.serializers import PlaceSerializer
+from . import client
+
 
 from gaggamagga.permissions import IsAdmin
 from .models import Place
@@ -89,3 +95,23 @@ class RecommendPlaceView(APIView):
         place = get_list_or_404(Place)
         serializer = PlaceLocationSelectSerializer(place, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+class SearchListView(generics.GenericAPIView) :
+    def get(self, request, *args, **wsargs) :
+        query = request.GET.get('q')
+        if not query :
+            return Response('', status=status.HTTP_400_BAD_REQUEST)
+        results = client.perform_search(query)
+        return Response(results)
+
+class SearchListOldView(generics.ListAPIView) :
+    queryset = Place.objects.all()
+    serializer_class = PlaceSerializer
+
+    def get_queryset(self, *args, **kwargs) :
+        qs = super().get_queryset(*args, **kwargs)
+        q = self.request.GET.get('q')
+        results = Place.objects.none()
+        if q is not None:
+            results = qs.search(q)
+        return results

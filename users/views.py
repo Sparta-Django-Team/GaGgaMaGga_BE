@@ -13,7 +13,7 @@ from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from django.utils.http import urlsafe_base64_decode
 from django.utils.encoding import DjangoUnicodeDecodeError, force_str
 from django.utils import timezone
-from django.shortcuts import get_list_or_404, redirect
+from django.shortcuts import get_list_or_404
 
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
@@ -208,8 +208,8 @@ class PrivateProfileView(APIView):
     @swagger_auto_schema(operation_summary="개인 프로필", 
                     responses={200 : '성공',  404 : '찾을 수 없음', 500 : '서버 에러'}) 
     def get(self, request):
-        user = get_object_or_404(User, id=request.user.id)
-        serializer = PrivateProfileSerializer(user)
+        profile = get_object_or_404(Profile, user=request.user)
+        serializer = PrivateProfileSerializer(profile)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     #프로필 수정
@@ -367,40 +367,25 @@ class ProcessFollowView(APIView):
             you.followers.add(me)
             return Response({"message":"팔로우를 취소했습니다."}, status=status.HTTP_200_OK)
 
-#카카오 인가코드 받기
-def kakao_social_login(request):
-
-    if request.method == 'GET':
-        kakao_id = '8d5aa745f342bec2de9e1f3be94c1f5f'
-        redirect_uri = 'http://127.0.0.1:8000/account/login/kakao/callback'
-        return redirect(
-            f'https://kauth.kakao.com/oauth/authorize?client_id={kakao_id}&redirect_uri={redirect_uri}&response_type=code'
-        )
-
+#카카오 로그인
 class KakaoLogIn(APIView):
 
-    #카카오 로그인 테스트를 위한 redirect
-    # def get(self, request):
-    #     kakao_id = get_secret("SOCIAL_AUTH_KAKAO_CLIENT_ID")
-    #     redirect_uri = 'http://127.0.0.1:8000/social/kakao'
-    #     return redirect(
-    #         f'https://kauth.kakao.com/oauth/authorize?client_id={kakao_id}&redirect_uri={redirect_uri}&response_type=code'
-    #     )
-    
     def post(self, request):
         try:
-            code = request.data.get("code")
+            code = request.data.get('code')
+            
             access_token = requests.post(
                 "https://kauth.kakao.com/oauth/token",
                 headers={"Content-Type": "application/x-www-form-urlencoded"},
                 data={
                     "grant_type": "authorization_code",
-                    "client_id": "c5bb5c91097a64c87764fb24b99fe88d",
-                    "redirect_uri": "http://127.0.0.1:8000/social/kakao",
+                    "client_id": "d7803b6c144bfb2dc3ce3e1dc7028d8a",
+                    "redirect_uri": "http://127.0.0.1:5500/login.html",
                     "code": code,
                 },
             )
             access_token = access_token.json().get("access_token")
+            
             user_data = requests.get(
                 "https://kapi.kakao.com/v2/user/me",
                 headers={
@@ -408,29 +393,37 @@ class KakaoLogIn(APIView):
                     "Content-type": "application/x-www-form-urlencoded;charset=utf-8",
                 },
             )
+            
             user_data = user_data.json()
-            kakao_account = user_data.get("kakao_account")
-            profile = kakao_account.get("profile")
             
-        #     #로그인
-        #     try:
-        #         #경우의 수 생각
-        #         #기존에 가입 된 유저와 쿼리해서 존재하면서, OauthId에도 존재하면 로그인 
-        #         #소셜계정이 카카오가 아닌 다른 소셜계정으로 가입한 유저일 때 
-        #         #동일한 이메일의 유저가 있지만 social계정이 아닐 때
-        #         #유저가 존재하지 않으면 가입시키고 로그인 시키기
-        #         OauthId.objects.create(provider="kakao", access_token=access_token)
+            kakao_email = user_data.get('kakao_account')['email']
+            kakao_nickname = user_data.get('properties')['nickname']
+            kakao_profile_image = user_data.get('properties')['profile_image']
+            
+            try:
+                user = User.objects.get(email=kakao_email)
+                social_user = OauthId.objects.filter(user=user).first()
+                if social_user:
+                    if social_user.provider !="kakao":
+                        return Response({"error":"카카오로 가입한 유저가 아닙니다."}, status=status.HTTP_400_BAD_REQUEST)
+                    
+                    refresh = RefreshToken.for_user(user)
+                    return Response({'refresh': str(refresh), 'access':str(refresh.access_token)}, status=status.HTTP_200_OK)
                 
-        #         user = User.objects.get(email=kakao_account.get("email"))
-        #         return Response(status=status.HTTP_200_OK)
-            
-        #     #유저가 존재하지 않으면?
-        #     except User.DoesNotExist:
-        #         user = User.objects.create(email=kakao_account.get("email"),username=profile.get("nickname"))
-        #         profile = Profile.objects.create(profile=profile.get("profile_image_url"), nickname=profile.get("nickname"), user=user)
-        #         user.set_unusable_password()
-        #         user.save()
-        #         return Response(status=status.HTTP_200_OK)
+                if social_user is None:
+                    return Response({"error":"이메일이 존재하지만 , 소셜유저가 아닙니다"}, status=status.HTTP_400_BAD_REQUEST)
+                
+            except User.DoesNotExist:
+                new_user = User.objects.create(username=kakao_nickname, email=kakao_email)
+                new_user.set_unusable_password()
+                new_user.save()
+                
+                Profile.objects.create(nickname=kakao_nickname, profile_image=kakao_profile_image, user=new_user)
+                OauthId.objects.create(provider="kakao", access_token=access_token, user=new_user)
+                
+                refresh = RefreshToken.for_user(new_user)
+                
+                return Response({'refresh': str(refresh), 'access':str(refresh.access_token)}, status=status.HTTP_200_OK)
             
         except Exception:
             return Response(status=status.HTTP_400_BAD_REQUEST)

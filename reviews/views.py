@@ -4,17 +4,39 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated, AllowAny
 
-from django.shortcuts import get_list_or_404
+from django.db.models import Count
 
 from .models import Review, Comment, Recomment, Report
-from places.models import Place
 
 from .serializers import (ReviewListSerializer, ReviewCreateSerializer, ReviewDetailSerializer, 
 CommentSerializer, CommentCreateSerializer , RecommentSerializer, RecommentCreateSerializer, ReportSerializer)
 
 from drf_yasg.utils import swagger_auto_schema
 
+
 #####리뷰#####
+class ReviewRankView(APIView):
+    permissions_classes = [AllowAny]
+    @swagger_auto_schema(operation_summary="전체 리뷰 조회",
+                    responses={200 : '성공', 404 : '찾을 수 없음', 500 : '서버 에러'})
+    #리뷰 전체 리스트
+    def get(self, request):
+
+        #최신순
+        recent_review = Review.objects.all().order_by('-created_at')
+
+        #좋아요순
+        like_count_review = Review.objects.annotate(num_likes=Count('review_like')).order_by('-num_likes','-created_at')
+
+        recent_review_serializer = ReviewListSerializer(recent_review, many=True).data
+        like_count_review_serializer = ReviewListSerializer(like_count_review, many=True).data
+        
+        review = {
+            "recent_review": recent_review_serializer,
+            "like_count_review": like_count_review_serializer
+        }
+        return Response(review, status=status.HTTP_200_OK)
+
 class ReviewListView(APIView):
     permissions_classes = [AllowAny]
     
@@ -24,12 +46,29 @@ class ReviewListView(APIView):
         return super(ReviewListView, self).get_permissions()
 
     #장소 리뷰 리스트
+    @swagger_auto_schema(operation_summary="리뷰 조회",
+                    responses={200 : '성공', 404 : '찾을 수 없음', 500 : '서버 에러'})
     def get(self, request, place_id):
-        review = get_list_or_404(Review, place_id=place_id)
-        serializer = ReviewListSerializer(review, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+
+        #최신순
+        recent_review = Review.objects.filter(place_id=place_id).order_by('-created_at')
+
+        #좋아요순
+        like_count_review = Review.objects.filter(place_id=place_id).annotate(num_likes=Count('review_like')).order_by('-num_likes','-created_at')
+
+        recent_review_serializer = ReviewListSerializer(recent_review, many=True).data
+        like_count_review_serializer = ReviewListSerializer(like_count_review, many=True).data
+
+        review = {
+            "recent_review": recent_review_serializer,
+            "like_count_review": like_count_review_serializer
+        }
+        return Response(review, status=status.HTTP_200_OK)
 
     #리뷰 작성
+    @swagger_auto_schema(request_body=ReviewCreateSerializer,
+                    operation_summary="리뷰 작성",
+                    responses={201 : '성공', 400:'인풋값 에러', 500 : '서버 에러'})
     def post(self, request, place_id):
         serializer = ReviewCreateSerializer(data=request.data)
         if serializer.is_valid():
@@ -41,12 +80,17 @@ class ReviewDetailView(APIView):
     permissions_classes = [IsAuthenticated]
 
     #리뷰 상세 페이지
+    @swagger_auto_schema(operation_summary="리뷰 상세 조회",
+                    responses={200 : '성공', 404 : '찾을 수 없음', 500 : '서버 에러'})
     def get(self, request, review_id):
         review = get_object_or_404(Review, id=review_id)
         serializer = ReviewDetailSerializer(review)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     #리뷰 수정
+    @swagger_auto_schema(request_body=ReviewCreateSerializer,
+                    operation_summary="리뷰 작성",
+                    responses={201 : '성공', 400:'인풋값 에러', 500 : '서버 에러'})
     def put(self, request, review_id):
         review = get_object_or_404(Review, id=review_id)
         if request.user == review.author:
@@ -56,6 +100,16 @@ class ReviewDetailView(APIView):
                 return Response(serializer.data, status=status.HTTP_200_OK)
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         return Response({"message":"접근 권한 없음"}, status=status.HTTP_403_FORBIDDEN)
+
+    #리뷰 삭제
+    @swagger_auto_schema(operation_summary="리뷰 삭제", 
+                    responses={201 : '성공', 403:'접근 권한 없음', 404:'찾을 수 없음', 500 : '서버 에러'})
+    def delete(self, request, review_id):
+        review = get_object_or_404(Review, id=review_id)
+        if request.user == review.author:
+            review.delete()
+            return Response({"message":"리뷰 삭제"}, status=status.HTTP_200_OK)
+        return Response({"message":"접근 권한 없음"}, status=status.HTTP_403_FORBIDDEN) 
 
     #리뷰 신고
     @swagger_auto_schema(request_body=ReportSerializer, 
@@ -251,4 +305,3 @@ class RecommentLikeView(APIView):
         else:
             recomment.recomment_like.add(request.user)
             return Response("대댓글 좋아요했습니다.", status=status.HTTP_200_OK)
-        

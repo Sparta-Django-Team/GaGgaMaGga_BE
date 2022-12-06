@@ -1,6 +1,20 @@
 from django.db import models
+from django.db.models import Q
 
 from users.models import User
+
+class PlaceQerySet(models.QuerySet) :
+    def search(self, query) :
+        lookup = Q(place_name__contains=query) | Q(category__contains=query) | Q(place_address__contains=query) | Q(place_number__contains=query)
+        qs = self.filter(lookup)
+        return qs
+
+class PlaceManager(models.Manager) :
+    def get_queryset(self, *args, **kwargs) :
+        return PlaceQerySet(self.model, using=self._db)
+
+    def search(self, query, user=None) :
+        return self.get_queryset().search(query)
 
 class Place(models.Model):
     place_name = models.CharField('장소명',max_length=50)
@@ -12,13 +26,11 @@ class Place(models.Model):
     place_img = models.TextField('장소 이미지')
     latitude = models.IntegerField('위도',null=True, blank=True)
     longitude = models.IntegerField('경도',null=True, blank=True)
-    # menu = models.CharField('메뉴',null=True, blank=True, max_length=200)
-    score_taste = models.IntegerField('맛',null=True, blank=True)
-    score_service = models.IntegerField('서비스',null=True, blank=True)
-    score_cleanliness = models.IntegerField('청결도',null=True, blank=True)
     hit = models.PositiveIntegerField('조회수', default=0)
 
     place_bookmark = models.ManyToManyField(User, verbose_name='장소 북마크', related_name="bookmark_place",blank=True)
+    
+    objects = PlaceManager()
 
     class Meta:
         db_table = 'places'
