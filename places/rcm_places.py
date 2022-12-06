@@ -18,23 +18,21 @@ django.setup()
 from reviews.models import Review
 from places.models import Place
 
-places = pd.DataFrame(list(Place.objects.values()))
-reviews = pd.DataFrame(list(Review.objects.values()))
-places.rename(columns={'id':'place_id'}, inplace=True)
+def rcm_place(user_id):
+    places = pd.DataFrame(list(Place.objects.values()))
+    reviews = pd.DataFrame(list(Review.objects.values()))
+    places.rename(columns={'id':'place_id'}, inplace=True)
 
-place_ratings = pd.merge(places, reviews, on='place_id')
-review_user = place_ratings.pivot_table('rating_cnt', index='author_id', columns='place_id')
-review_user = review_user.fillna(3)
+    place_ratings = pd.merge(places, reviews, on='place_id')
+    review_user = place_ratings.pivot_table('rating_cnt', index='author_id', columns='place_id')
+    review_user = review_user.fillna(3)
 
-user_sim_np = cosine_similarity(review_user, review_user)
-user_sim_df = pd.DataFrame(user_sim_np, index=review_user.index, columns=review_user.index)
-print(user_sim_df.head)
+    user_sim_np = cosine_similarity(review_user, review_user)
+    user_sim_df = pd.DataFrame(user_sim_np, index=review_user.index, columns=review_user.index)
+    print(user_sim_df.head)
+    print(user_sim_df[user_id].sort_values(ascending=False)[:])
 
+    picked_user = user_sim_df[user_id].sort_values(ascending=False)[:].index[1]
 
-print(user_sim_df[1].sort_values(ascending=False)[:10])
-
-
-picked_user = user_sim_df[1].sort_values(ascending=False)[:10].index[1]
-
-result = review_user.query(f"author_id == {picked_user}").sort_values(ascending=False, by=picked_user, axis=1).transpose()[:10]
-print(result)
+    result = review_user.query(f"author_id == {picked_user}").sort_values(ascending=False, by=picked_user, axis=1).transpose()[:50]
+    print(result)
