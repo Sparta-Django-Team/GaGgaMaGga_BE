@@ -15,21 +15,26 @@ from places.serializers import PlaceSerializer
 from . import client
 
 
-from gaggamagga.permissions import IsAdmin
+from gaggamagga.permissions import IsAdminOrOntherReadOnly
 from .models import Place
 from .serializers import PlaceLocationSelectSerializer, PlaceSerializer, PlaceCreateSerializer
 
 ##### 장소 #####
 class PlaceListView(APIView):
-    permission_classes = [IsAdmin]
+    permission_classes = [IsAdminOrOntherReadOnly]
 
-    #맛집 리스트
+    #맛집 전체 리스트
+    @swagger_auto_schema(operation_summary="맛집 전체 리스트",
+                    responses={200 : '성공', 500 : '서버 에러'})
     def get(self, request):
         place = Place.objects.all()
         serializer = PlaceSerializer(place, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     #맛집 생성
+    @swagger_auto_schema(request_body=PlaceCreateSerializer, 
+                    operation_summary="맛집 생성",
+                    responses={200 : '성공', 400 : '인풋값 에러', 500 : '서버 에러'})
     def post(self, request):
         serializer = PlaceCreateSerializer(data=request.data)
         if serializer.is_valid():
@@ -38,9 +43,11 @@ class PlaceListView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class PlaceDetailView(APIView):
-    permission_classes = [IsAdmin]
+    permission_classes = [IsAdminOrOntherReadOnly]
 
     #맛집 상세 페이지
+    @swagger_auto_schema(operation_summary="맛집 상세 페이지",
+                    responses={200 : '성공', 404 : '찾을 수 없음', 500 : '서버 에러'})
     def get(self, request, place_id):
         place = get_object_or_404(Place, id=place_id)
         place.hit_count
@@ -48,6 +55,9 @@ class PlaceDetailView(APIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     #맛집 수정
+    @swagger_auto_schema(request_body=PlaceCreateSerializer, 
+                    operation_summary="맛집 수정",
+                    responses={200 : '성공', 400 : '인풋값 에러', 404: '찾을 수 없음' ,500 : '서버 에러'})
     def put(self, request, place_id):
         place = get_object_or_404(Place, id=place_id)
         serializer = PlaceCreateSerializer(place, data=request.data, partial=True)
@@ -57,13 +67,15 @@ class PlaceDetailView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     #맛집 삭제
+    @swagger_auto_schema(operation_summary="맛집 삭제",
+                    responses={200 : '성공', 404 : '찾을 수 없음', 500 : '서버 에러'})
     def delete(self, request, place_id):
         place = get_object_or_404(Place, id=place_id)
         place.delete()
         return Response({"message":"맛집 삭제 완료"},status=status.HTTP_200_OK)
 
 class PlaceBookmarkView(APIView):
-    permissions_classes = [IsAuthenticated] 
+    permission_classes = [IsAuthenticated] 
 
     # 장소 북마크
     @swagger_auto_schema(operation_summary="장소 북마크",  

@@ -16,7 +16,8 @@ from drf_yasg.utils import swagger_auto_schema
 
 #####리뷰#####
 class ReviewRankView(APIView):
-    permissions_classes = [AllowAny]
+    permission_classes = [AllowAny]
+    
     @swagger_auto_schema(operation_summary="전체 리뷰 조회",
                     responses={200 : '성공', 404 : '찾을 수 없음', 500 : '서버 에러'})
     #리뷰 전체 리스트
@@ -38,7 +39,7 @@ class ReviewRankView(APIView):
         return Response(review, status=status.HTTP_200_OK)
 
 class ReviewListView(APIView):
-    permissions_classes = [AllowAny]
+    permission_classes = [AllowAny]
     
     def get_permissions(self):
         if self.request.POST:
@@ -77,7 +78,7 @@ class ReviewListView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class ReviewDetailView(APIView):
-    permissions_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated]
 
     #리뷰 상세 페이지
     @swagger_auto_schema(operation_summary="리뷰 상세 조회",
@@ -129,7 +130,7 @@ class ReviewDetailView(APIView):
 
 # 리뷰 좋아요
 class ReviewLikeView(APIView):
-    permissions_classes = [IsAuthenticated] 
+    permission_classes = [IsAuthenticated] 
 
     @swagger_auto_schema(operation_summary="리뷰 좋아요",  
                     responses={200 : '성공', 404 : '찾을 수 없음', 500 : '서버 에러'})
@@ -144,7 +145,7 @@ class ReviewLikeView(APIView):
 
 #####댓글#####
 class CommentListView(APIView):
-    permissions_classes = [IsAuthenticated] 
+    permission_classes = [IsAuthenticated] 
 
     # 댓글 조회
     @swagger_auto_schema(operation_summary="댓글 조회",
@@ -167,7 +168,7 @@ class CommentListView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class CommentDetailView(APIView):
-    permissions_classes = [IsAuthenticated] 
+    permission_classes = [IsAuthenticated] 
     
     # 댓글 수정
     @swagger_auto_schema(request_body=CommentCreateSerializer, 
@@ -211,7 +212,7 @@ class CommentDetailView(APIView):
 
 # 댓글 좋아요
 class CommentLikeView(APIView):
-    permissions_classes = [IsAuthenticated] 
+    permission_classes = [IsAuthenticated] 
 
     @swagger_auto_schema(operation_summary="댓글 좋아요",  
                     responses={200 : '성공', 404 : '찾을 수 없음', 500 : '서버 에러'})
@@ -226,7 +227,7 @@ class CommentLikeView(APIView):
 
 #####대댓글##### 
 class RecommentListView(APIView):
-    permissions_classes = [IsAuthenticated] 
+    permission_classes = [IsAuthenticated] 
 
     # 대댓글 조회
     @swagger_auto_schema(operation_summary="대댓글 조회",
@@ -249,7 +250,7 @@ class RecommentListView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class RecommentDetailView(APIView):
-    permissions_classes = [IsAuthenticated] 
+    permission_classes = [IsAuthenticated] 
 
     # 대댓글 수정
     @swagger_auto_schema(request_body=RecommentCreateSerializer, 
@@ -293,7 +294,7 @@ class RecommentDetailView(APIView):
 
 # 대댓글 좋아요
 class RecommentLikeView(APIView):
-    permissions_classes = [IsAuthenticated] 
+    permission_classes = [IsAuthenticated] 
 
     @swagger_auto_schema(operation_summary="대댓글 좋아요",  
                     responses={200 : '성공', 404 : '찾을 수 없음', 500 : '서버 에러'})
