@@ -9,7 +9,7 @@ class PlaceSelectSerializer(serializers.ModelSerializer):
 class PlaceSerializer(serializers.ModelSerializer):
     class Meta:
         model = Place
-        fields = ('place_name', 'category', 'rating', 'place_address', 'place_number', 'place_time', 'place_img', 'latitude', 'longitude', 'hits',)
+        fields = ('place_name', 'category', 'rating', 'place_address', 'place_number', 'place_time', 'place_img', 'latitude', 'longitude', 'hit',)
 
 class PlaceCreateSerializer(serializers.ModelSerializer):
     class Meta:

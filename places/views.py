@@ -54,14 +54,10 @@ class PlaceListView(APIView):
     @swagger_auto_schema(operation_summary="맛집 전체 리스트",
                     responses={200 : '성공', 500 : '서버 에러'})
     #맛집 리스트
-    def get(self, request):
-        
-        place_list = rcm_place(user_id = request.user.id)
-
-        place = Place.objects.filter(id__in=[1,2,3,4,5])
-
+    def get(self, request, place_id):
+        place_list = rcm_place(user_id = request.user.id, picked_place_id=place_id)
+        place = Place.objects.filter(id__in=place_list)
         serializer = PlaceSerializer(place, many=True)
-        # return Response(place_list)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     #맛집 생성

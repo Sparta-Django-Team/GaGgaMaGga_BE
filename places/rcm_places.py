@@ -40,4 +40,8 @@ def rcm_place(user_id, picked_place_id):
 
     picked_user = user_sim_df[user_id].sort_values(ascending=False)[:].index[1]
     result = review_user.query(f"author_id == {picked_user}").sort_values(ascending=False, by=picked_user, axis=1)
-    return result
+
+    result_list = []
+    for column in result:
+        result_list.append(column)
+    return result_list
