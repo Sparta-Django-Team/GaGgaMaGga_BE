@@ -24,10 +24,6 @@ conn.close()
 print(data_df)
 
 
-
-
-
-
 # new_list = []
 # for i in range(301):
 #     new_data = {"model":"places.place"}

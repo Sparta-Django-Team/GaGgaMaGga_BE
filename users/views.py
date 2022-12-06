@@ -8,6 +8,7 @@ from rest_framework_simplejwt.views import TokenViewBase
 from rest_framework_simplejwt.exceptions import TokenError, InvalidToken
 from rest_framework_simplejwt.settings import api_settings
 
+from django.shortcuts import redirect
 from django.contrib.auth.hashers import check_password
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from django.utils.http import urlsafe_base64_decode
@@ -368,20 +369,19 @@ class ProcessFollowView(APIView):
             return Response({"message":"팔로우를 취소했습니다."}, status=status.HTTP_200_OK)
 
 #카카오 로그인
-class KakaoLogIn(APIView):
+class KakaoLoginView(APIView):
     permission_classes = [AllowAny]
 
     def post(self, request):
         try:
             code = request.data.get('code')
-            
             access_token = requests.post(
                 "https://kauth.kakao.com/oauth/token",
                 headers={"Content-Type": "application/x-www-form-urlencoded"},
                 data={
                     "grant_type": "authorization_code",
-                    "client_id": "d7803b6c144bfb2dc3ce3e1dc7028d8a",
-                    "redirect_uri": "http://127.0.0.1:5500/login.html",
+                    "client_id": get_secret("SOCIAL_AUTH_KAKAO_CLIENT_ID"),
+                    "redirect_uri": "http://127.0.0.1:5501",
                     "code": code,
                 },
             )
