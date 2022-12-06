@@ -60,7 +60,6 @@ class User(AbstractBaseUser):
     last_password_changed = models.DateTimeField('비밀번호 마지막 변경일', auto_now=True)
     created_at = models.DateTimeField('계정 생성일', auto_now_add=True)
     withdraw_at = models.DateTimeField('계정 탈퇴일', null=True)
-    
 
     objects = UserManager()
 
@@ -167,6 +166,6 @@ class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, verbose_name="회원", related_name='user_profile')
 
     followings = models.ManyToManyField('self', symmetrical=False, blank=True, related_name= 'followers')
+    
     def __str__(self):
         return f"[아이디]{self.user.username}[닉네임]{self.nickname}"
-    

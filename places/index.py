@@ -3,7 +3,6 @@ from algoliasearch_django.decorators import register
 
 from .models import Place
 
-
 @register(Place)
 class PlaceIndex(AlgoliaIndex):
     fields = [
@@ -14,7 +13,7 @@ class PlaceIndex(AlgoliaIndex):
         'place_number',
         'place_img'
     ]
-    
+
     settings = {
         'searchableAttributes' : ["plaece_name", "catergory", "rating", "palce_address", "place_number"]
     }

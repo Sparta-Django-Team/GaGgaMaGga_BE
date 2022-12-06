@@ -13,7 +13,7 @@ from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from django.utils.http import urlsafe_base64_decode
 from django.utils.encoding import DjangoUnicodeDecodeError, force_str
 from django.utils import timezone
-from django.shortcuts import get_list_or_404, redirect
+from django.shortcuts import get_list_or_404
 
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
@@ -369,6 +369,7 @@ class ProcessFollowView(APIView):
 
 #카카오 로그인
 class KakaoLogIn(APIView):
+    permission_classes = [AllowAny]
 
     def post(self, request):
         try:

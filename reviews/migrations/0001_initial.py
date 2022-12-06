@@ -11,24 +11,106 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
-        ('places', '0001_initial'),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
+        ("places", "0001_initial"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='Comment',
+            name="Comment",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('content', models.TextField(max_length=100, verbose_name='내용')),
-                ('created_at', models.DateTimeField(auto_now_add=True, verbose_name='생성 시간')),
-                ('updated_at', models.DateTimeField(auto_now=True, verbose_name='수정 시간')),
-                ('author', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL, verbose_name='작성자')),
-                ('comment_like', models.ManyToManyField(blank=True, related_name='like_comment', to=settings.AUTH_USER_MODEL, verbose_name='댓글 좋아요')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("content", models.TextField(max_length=100, verbose_name="내용")),
+                (
+                    "created_at",
+                    models.DateTimeField(auto_now_add=True, verbose_name="생성 시간"),
+                ),
+                (
+                    "updated_at",
+                    models.DateTimeField(auto_now=True, verbose_name="수정 시간"),
+                ),
+                (
+                    "author",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to=settings.AUTH_USER_MODEL,
+                        verbose_name="작성자",
+                    ),
+                ),
+                (
+                    "comment_like",
+                    models.ManyToManyField(
+                        blank=True,
+                        related_name="like_comment",
+                        to=settings.AUTH_USER_MODEL,
+                        verbose_name="댓글 좋아요",
+                    ),
+                ),
             ],
             options={
-                'db_table': 'review_comment',
-                'ordering': ['-created_at'],
+                "db_table": "review_comment",
+                "ordering": ["-created_at"],
+            },
+        ),
+        migrations.CreateModel(
+            name="Recomment",
+            fields=[
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("content", models.TextField(max_length=100, verbose_name="내용")),
+                (
+                    "created_at",
+                    models.DateTimeField(auto_now_add=True, verbose_name="생성 시간"),
+                ),
+                (
+                    "updated_at",
+                    models.DateTimeField(auto_now=True, verbose_name="수정 시간"),
+                ),
+                (
+                    "author",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to=settings.AUTH_USER_MODEL,
+                        verbose_name="작성자",
+                    ),
+                ),
+                (
+                    "comment",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="comment_recomments",
+                        to="reviews.comment",
+                        verbose_name="댓글",
+                    ),
+                ),
+                (
+                    "recomment_like",
+                    models.ManyToManyField(
+                        blank=True,
+                        related_name="like_recomment",
+                        to=settings.AUTH_USER_MODEL,
+                        verbose_name="대댓글 좋아요",
+                    ),
+                ),
+            ],
+            options={
+                "db_table": "review_recomment",
+                "ordering": ["-created_at"],
             },
         ),
         migrations.CreateModel(
@@ -63,7 +145,7 @@ class Migration(migrations.Migration):
                 ('review_like', models.ManyToManyField(blank=True, related_name='like_review', to=settings.AUTH_USER_MODEL, verbose_name='후기 좋아요')),
             ],
             options={
-                'db_table': 'review',
+                "db_table": "review",
             },
         ),
         migrations.CreateModel(
@@ -84,8 +166,13 @@ class Migration(migrations.Migration):
             },
         ),
         migrations.AddField(
-            model_name='comment',
-            name='review',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='review_comments', to='reviews.review', verbose_name='후기'),
+            model_name="comment",
+            name="review",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="review_comments",
+                to="reviews.review",
+                verbose_name="후기",
+            ),
         ),
     ]

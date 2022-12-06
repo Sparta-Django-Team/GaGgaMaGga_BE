@@ -50,4 +50,5 @@ tzdata==2022.7
 uritemplate==4.1.1
 urllib3==1.26.13
 webdriver-manager==3.8.5
+
 wsproto==1.2.0

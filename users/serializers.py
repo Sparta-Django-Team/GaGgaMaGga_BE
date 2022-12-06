@@ -11,6 +11,8 @@ import re
 from .models import User, Profile, LoggedIn
 from .utils import Util
 
+from reviews.serializers import ReviewListSerializer
+
 #회원가입 serializer
 class SignupSerializer(serializers.ModelSerializer):
     repassword= serializers.CharField(error_messages={'required':'비밀번호를 입력해주세요.', 'blank':'비밀번호를 입력해주세요.', 'write_only':True})    
@@ -129,10 +131,11 @@ class PublicProfileSerializer(serializers.ModelSerializer):
     #팔로우 닉네임만 보게함
     followings = serializers.StringRelatedField(many=True)
     followers = serializers.StringRelatedField(many=True)
+    review_set = ReviewListSerializer(many=True, source='user.review_set')
 
     class Meta:
         model = Profile
-        fields = ('nickname', 'profile_image', 'intro', 'followings', 'followers',)
+        fields = ('nickname', 'profile_image', 'intro', 'followings', 'followers','review_set',)
 
 #프로필 편집 serializer
 class ProfileUpdateSerializer(serializers.ModelSerializer):
