@@ -97,5 +97,6 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
         token = super().get_token(user)
         token["email"] = user.email
         token["username"] = user.username
+        token["password_expired"] = user.password_expired
         
         return token
