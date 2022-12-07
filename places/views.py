@@ -12,17 +12,79 @@ from drf_yasg.utils import swagger_auto_schema
 from gaggamagga.permissions import IsAdminOrOntherReadOnly
 from . import client
 from .models import Place
-from .serializers import PlaceLocationSelectSerializer, PlaceSerializer, PlaceCreateSerializer
+from .serializers import PlaceSelectSerializer, PlaceSerializer, PlaceCreateSerializer
+
+from .rcm_places import rcm_place_user, rcm_place_new_user
+
+from django.db.models import Case, Q, When
+
+CHOICE_CATEGORY = (
+        ('1', '분식'),
+        ('2', '한식'),
+        ('3', '돼지고기구이'),
+        ('4', '치킨,닭강정'),
+        ('5', '햄버거'),
+        ('6', '피자'),
+        ('7', '중식당'),
+        ('8', '일식당'),
+        ('9', '양식'),
+        ('10', '태국음식'),
+        ('11', '인도음식'),
+        ('12', '베트남음식'),
+        ('13', '강남'),
+
+    )
+
+##### 취향 선택 #####
+class PlaceSelectView(APIView):
+    #맛집 취향 선택(리뷰가 없거나, 비로그인 계정일 경우)
+    def get(self, request, choice_no):
+        place_list = []
+        # 지역 선택일 경우
+        if choice_no > 12:
+            place_list = []
+            for i in range(0, 12):
+                pick = Place.objects.filter(place_address__contains=CHOICE_CATEGORY[choice_no-1][1],category=CHOICE_CATEGORY[i][1]).first()
+                place_list.append(pick.id)
+            preserved = Case(*[When(pk=pk, then=pos) for pos, pk in enumerate(place_list)])
+            place = Place.objects.filter(id__in=place_list).order_by(preserved)
+            serializer = PlaceSelectSerializer(place, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        # 음식 선택일 경우
+        else:
+            place_list = []
+            pick = Place.objects.filter(category=CHOICE_CATEGORY[choice_no-1][1])[0:12]
+            print(pick)
+            serializer = PlaceSelectSerializer(pick, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+##### 장소(리뷰가 없거나, 비로그인 계정일 경우) #####
+class NewUserPlaceListView(APIView):
+    #맛집 전체 리스트
+    @swagger_auto_schema(operation_summary="맛집 전체 리스트",
+                    responses={200 : '성공', 500 : '서버 에러'})
+    #맛집 리스트 추천
+    def get(self, request, cate_id):
+        place_list = rcm_place_new_user(cate_id=cate_id)
+        preserved = Case(*[When(pk=pk, then=pos) for pos, pk in enumerate(place_list)])
+        place = Place.objects.filter(id__in=place_list).order_by(preserved)
+        serializer = PlaceSerializer(place, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
 
 ##### 장소 #####
-class PlaceListView(APIView):
+class UserPlaceListView(APIView):
     permission_classes = [IsAdminOrOntherReadOnly]
 
     #맛집 전체 리스트
     @swagger_auto_schema(operation_summary="맛집 전체 리스트",
                     responses={200 : '성공', 500 : '서버 에러'})
+    #맛집 리스트 추천
     def get(self, request):
-        place = Place.objects.all()
+        place_list = rcm_place_user(user_id = request.user.id)
+        preserved = Case(*[When(pk=pk, then=pos) for pos, pk in enumerate(place_list)])
+        place = Place.objects.filter(id__in=place_list).order_by(preserved)
         serializer = PlaceSerializer(place, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
@@ -36,6 +98,7 @@ class PlaceListView(APIView):
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 class PlaceDetailView(APIView):
     permission_classes = [IsAdminOrOntherReadOnly]
@@ -83,22 +146,6 @@ class PlaceBookmarkView(APIView):
         else:
             place.place_bookmark.add(request.user)
             return Response({"message":"북마크를 했습니다."}, status=status.HTTP_200_OK)
-
-class PlaceLocationSelectView(APIView):
-    permission_classes = [IsAuthenticated]
-
-    def get(self, request):
-        place = get_list_or_404(Place)
-        serializer = PlaceLocationSelectSerializer(place, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
-
-class RecommendPlaceView(APIView):
-    permission_classes = [IsAuthenticated]
-
-    def get(self, request):
-        place = get_list_or_404(Place)
-        serializer = PlaceLocationSelectSerializer(place, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
 
 class SearchListView(generics.GenericAPIView):
     def get(self, request, *args, **wsargs):

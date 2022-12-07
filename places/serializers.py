@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from .models import Place
 
-class PlaceLocationSelectSerializer(serializers.ModelSerializer):
+class PlaceSelectSerializer(serializers.ModelSerializer):
     class Meta:
         model = Place
         fields = '__all__'
@@ -9,7 +9,7 @@ class PlaceLocationSelectSerializer(serializers.ModelSerializer):
 class PlaceSerializer(serializers.ModelSerializer):
     class Meta:
         model = Place
-        fields = ('place_name', 'category', 'rating', 'place_address', 'place_number', 'place_time', 'place_img', 'latitude', 'longitude', 'hits',)
+        fields = ('place_name', 'category', 'rating', 'place_address', 'place_number', 'place_time', 'place_img', 'latitude', 'longitude', 'hit',)
 
 class PlaceCreateSerializer(serializers.ModelSerializer):
     class Meta:
