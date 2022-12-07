@@ -209,6 +209,62 @@ class UserSignupAPIViewTestCase(APITestCase):
         response = self.client.post(url, user_data)
         self.assertEqual(response.status_code, 400)
 
+class UserUpdateAPIViewTestCase(APITestCase):
+    def setUp(self):
+        self.data = {"username": "test1234", "password":"Test1234!"}
+        self.user1 = User.objects.create_user("test1234","test@test.com", "01012341234","Test1234!")
+        self.user2 = User.objects.create_user("test12345","test1@test.com", "01012351234","Test1234!")
+    
+    #회원정보 수정 성공
+    def test_user_update_success(self):
+        access_token = self.client.post(reverse('token_obtain_pair_view'), self.data).data['access']
+        response = self.client.put(
+            path=reverse("user_view"),
+            HTTP_AUTHORIZATION=f"Bearer {access_token}",
+            data={"email":"test2@test.com", "phone_number":"01098765432"}
+        )
+        self.assertEqual(response.status_code, 200)
+        
+    #회원정보 수정 실패(이메일 빈칸)
+    def test_user_update_email_blank_fail(self):
+        access_token = self.client.post(reverse('token_obtain_pair_view'), self.data).data['access']
+        response = self.client.put(
+            path=reverse("user_view"),
+            HTTP_AUTHORIZATION=f"Bearer {access_token}",
+            data={"email":"","phone_number":"01098765432"}
+        )
+        self.assertEqual(response.status_code, 400)
+        
+    #회원정보 수정 실패(이메일 중복)
+    def test_user_update_email_unique_fail(self):
+        access_token = self.client.post(reverse('token_obtain_pair_view'), self.data).data['access']
+        response = self.client.put(
+            path=reverse("user_view"),
+            HTTP_AUTHORIZATION=f"Bearer {access_token}",
+            data={"email":"test1@test.com","phone_number":"01098765432"}
+        )
+        self.assertEqual(response.status_code, 400)
+        
+    #회원정보 수정 실패(이메일 중복)
+    def test_user_update_email_invalid_fail(self):
+        access_token = self.client.post(reverse('token_obtain_pair_view'), self.data).data['access']
+        response = self.client.put(
+            path=reverse("user_view"),
+            HTTP_AUTHORIZATION=f"Bearer {access_token}",
+            data={"email":"test1","phone_number":"01098765432"}
+        )
+        self.assertEqual(response.status_code, 400)
+        
+    #회원정보 수정 실패(휴대폰번호 중복)
+    def test_user_update_phone_number_unique_fail(self):
+        access_token = self.client.post(reverse('token_obtain_pair_view'), self.data).data['access']
+        response = self.client.put(
+            path=reverse("user_view"),
+            HTTP_AUTHORIZATION=f"Bearer {access_token}",
+            data={"email":"test2@test.com","phone_number":"01012351234"}
+        )
+        self.assertEqual(response.status_code, 400)
+    
 class UserDeleteAPIViewTestCase(APITestCase):
     def setUp(self):
         self.data = {"username": "test1234", "password":"Test1234!"}
@@ -223,6 +279,7 @@ class UserDeleteAPIViewTestCase(APITestCase):
             HTTP_AUTHORIZATION=f"Bearer {access_token}",
         )
         self.assertEqual(response.status_code, 200)
+
 class UserLoginLogoutAPIViewTestCase(APITestCase):
     def setUp(self):
         self.success_data = {"username": "test1234", "password":"Test1234!"}

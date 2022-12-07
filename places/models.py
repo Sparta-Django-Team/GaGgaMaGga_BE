@@ -30,7 +30,7 @@ class Place(models.Model):
     hit = models.PositiveIntegerField('조회수', default=0)
 
     place_bookmark = models.ManyToManyField(User, verbose_name='장소 북마크', related_name="bookmark_place",blank=True)
-    
+
     objects = PlaceManager()
 
     class Meta:

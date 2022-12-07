@@ -75,7 +75,7 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
             
             #is_active False 계정잠금 
             if self.is_active == False:
-                raise serializers.ValidationError("계정이 잠금이 되었습니다. 잠시 후 다시 시도해주시길 바랍니다. ")
+                raise serializers.ValidationError("로그인 시도가 너무 많습니다. 나중에 다시 시도해 주세요.")
             
         #login error
         if not api_settings.USER_AUTHENTICATION_RULE(self.user):

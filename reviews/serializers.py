@@ -2,6 +2,7 @@ from rest_framework import serializers
 
 from .models import Review, Comment, Recomment, Report
 
+#후기 전체 serializer
 class ReviewListSerializer(serializers.ModelSerializer):
     nickname = serializers.SerializerMethodField()
     profile_image = serializers.SerializerMethodField()
@@ -24,6 +25,7 @@ class ReviewListSerializer(serializers.ModelSerializer):
         model = Review
         fields = ('content', 'review_image_one', 'created_at', 'updated_at', 'rating_cnt', 'review_like_count', 'review_like', 'nickname', 'profile_image', 'place_name', )
 
+#후기 생성, 수정 serializer
 class ReviewCreateSerializer(serializers.ModelSerializer):
 
     class Meta:
@@ -39,7 +41,7 @@ class ReviewCreateSerializer(serializers.ModelSerializer):
                         'required':'평점을 입력해주세요',
                         'blank':'평점을 입력해주세요',}},}
 
-
+#대댓글 serializer
 class RecommentSerializer(serializers.ModelSerializer):
     nickname = serializers.SerializerMethodField()
     profile_image = serializers.SerializerMethodField()
@@ -58,6 +60,7 @@ class RecommentSerializer(serializers.ModelSerializer):
         model = Recomment
         fields = ('content', 'created_at', 'updated_at', 'recomment_like', 'comment', 'nickname', 'profile_image', 'recomment_like_count',)
 
+#대댓글 생성, 수정 serializer
 class RecommentCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Recomment
@@ -67,6 +70,7 @@ class RecommentCreateSerializer(serializers.ModelSerializer):
                         'required':'내용을 입력해주세요.',
                         'blank':'내용을 입력해주세요.',}},}
 
+#댓글 serializer
 class CommentSerializer(serializers.ModelSerializer):
     nickname = serializers.SerializerMethodField()
     profile_image = serializers.SerializerMethodField()
@@ -85,11 +89,22 @@ class CommentSerializer(serializers.ModelSerializer):
 
     def get_review_content(self, obj):
         return obj.review.content
-
+    
     class Meta:
         model = Comment
         fields = ('content', 'created_at', 'updated_at', 'comment_like', 'review_content', 'nickname', 'profile_image', 'comment_like_count','comment_recomments',)
 
+#댓글 생성 serializer
+class CommentCreateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Comment
+        fields = ('content',)
+        extra_kwargs = {'content':{
+                        'error_messages': {
+                        'required':'내용을 입력해주세요.',
+                        'blank':'내용을 입력해주세요.',}},}
+
+#후기 상세페이지 serializer
 class ReviewDetailSerializer(serializers.ModelSerializer):
     nickname = serializers.SerializerMethodField()
     profile_image = serializers.SerializerMethodField()
@@ -113,16 +128,7 @@ class ReviewDetailSerializer(serializers.ModelSerializer):
         model = Review
         fields = ('content', 'review_image_one', 'review_image_two', 'review_image_three', 'created_at', 'updated_at', 'rating_cnt', 'review_like', 'review_like_count', 'nickname', 'profile_image', 'place_name','review_comments' )
 
-
-class CommentCreateSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Comment
-        fields = ('content',)
-        extra_kwargs = {'content':{
-                        'error_messages': {
-                        'required':'내용을 입력해주세요.',
-                        'blank':'내용을 입력해주세요.',}},}
-        
+#신고 생성serializer
 class ReportSerializer(serializers.ModelSerializer):
     class Meta:
         model = Report
