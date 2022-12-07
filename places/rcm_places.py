@@ -19,7 +19,7 @@ from reviews.models import Review
 from places.models import Place
 
 
-# 유사한 유저 정보 조회 및 추천(기존 사용이력이 없는 사용자
+# 유사한 유저 정보 조회 및 추천(기존 사용이력이 없는 사용자)
 def rcm_place_2(user_id, picked_place_id):
     places = pd.DataFrame(list(Place.objects.values()))
     if 0:       # 카테고리일 경우
@@ -32,7 +32,6 @@ def rcm_place_2(user_id, picked_place_id):
 
     place_ratings = pd.merge(places, reviews, on='place_id')
     review_user = place_ratings.pivot_table('rating_cnt', index='author_id', columns='place_id')
-    review_user = review_user.fillna(0)
 
     review_user.loc[user_id] = np.nan
     review_user = review_user.fillna(0)

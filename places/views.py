@@ -16,6 +16,7 @@ from .serializers import PlaceSelectSerializer, PlaceSerializer, PlaceCreateSeri
 
 from .rcm_places import rcm_place
 
+from django.db.models import Case, Q, When
 
 FOOD_CATEGORY = (
         ('F1', '분식'),
@@ -56,7 +57,8 @@ class PlaceListView(APIView):
     #맛집 리스트
     def get(self, request, place_id):
         place_list = rcm_place(user_id = request.user.id, picked_place_id=place_id)
-        place = Place.objects.filter(id__in=place_list)
+        preserved = Case(*[When(pk=pk, then=pos) for pos, pk in enumerate(place_list)])
+        place = Place.objects.filter(id__in=place_list).order_by(preserved)
         serializer = PlaceSerializer(place, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
