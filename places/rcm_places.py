@@ -18,14 +18,17 @@ django.setup()
 from reviews.models import Review
 from places.models import Place
 
+CHOICE_ONE = ['분식', '한식', '돼지고기구이','치킨,닭강정', '햄버거', '피자', '중식당', '일식당', '양식',  '태국음식', '인도음식', '베트남음식', '제주시', '서귀포시']
 
 # 유사한 유저 정보 조회 및 추천(기존 사용이력이 없는 사용자)
-def rcm_place_new_user(cate_id):
+def rcm_place_new_user(place_id, category):
     places = pd.DataFrame(list(Place.objects.values()))
-    if 0:       # 카테고리일 경우
-        places = places[places['category'].str.contains("분식")]
+    cate_id = CHOICE_ONE.index(category)
+    print(cate_id)
+    if cate_id <= 12:       # 카테고리일 경우
+        places = places[places['category'].str.contains(category)]
     else:       # 장소일 경우
-        places = places[places['place_address'].str.contains("압구정")]
+        places = places[places['place_address'].str.contains(category)]
     reviews = pd.DataFrame(list(Review.objects.values()))
     places.rename(columns={'id':'place_id'}, inplace=True)
 
@@ -38,7 +41,7 @@ def rcm_place_new_user(cate_id):
 
     review_user.loc[len(review_user)+1] = np.nan
     review_user = review_user.fillna(0)
-    review_user.loc[len(review_user), cate_id] = 5
+    review_user.loc[len(review_user), place_id] = 5
     print(review_user)
 
     user_sim_np = cosine_similarity(review_user, review_user)
