@@ -52,11 +52,10 @@ class PlaceSelectView(APIView):
             return Response(serializer.data, status=status.HTTP_200_OK)
         # 음식 선택일 경우
         else:
-            for i in range(0, 12):
-                pick = Place.objects.filter(category=CHOICE_CATEGORY[choice_no-1][1])
-                place.append(pick)
-            print(place)
-            serializer = PlaceSelectSerializer(place, many=True)
+            place_list = []
+            pick = Place.objects.filter(category=CHOICE_CATEGORY[choice_no-1][1])[0:12]
+            print(pick)
+            serializer = PlaceSelectSerializer(pick, many=True)
             return Response(serializer.data, status=status.HTTP_200_OK)
 
 
