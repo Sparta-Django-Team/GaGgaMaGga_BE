@@ -78,7 +78,7 @@ class User(AbstractBaseUser):
     @property
     def is_staff(self):
         return self.is_admin
-    
+
 #이메일 확인 
 class ConfirmEmail(models.Model):
     secured_key = models.CharField('시크릿 키', max_length=255, default=0)
@@ -88,7 +88,7 @@ class ConfirmEmail(models.Model):
     
     def __str__(self):
         return f"[이메일]{self.user.email}"
-    
+
 #휴대폰 번호 확인
 class ConfirmPhoneNumber(models.Model): 
     auth_number = models.IntegerField('인증 번호', default=0, validators=[MaxValueValidator(9999)])
@@ -133,7 +133,6 @@ class ConfirmPhoneNumber(models.Model):
         
         requests.post(url, json=data, headers=headers)
 
-
     def __str__(self):
         return f"[휴대폰 번호]{self.user.phone_number}"
 
@@ -162,10 +161,11 @@ class Profile(models.Model):
     profile_image = models.ImageField('프로필 사진', default='default_profile_pic.jpg', upload_to='profile_pics' )
     nickname = models.CharField('닉네임', max_length=10, null=True, unique=True, error_messages={"unique": "이미 사용중인 닉네임 이거나 탈퇴한 닉네임입니다."})
     intro = models.CharField('자기소개', max_length=100, null=True)
-    user = models.OneToOneField(User, on_delete=models.CASCADE, verbose_name="회원", related_name='user_profile')
-
-    followings = models.ManyToManyField('self', symmetrical=False, blank=True, related_name= 'followers')
     review_cnt = models.PositiveIntegerField('리뷰수', default=0)
+
+    user = models.OneToOneField(User, on_delete=models.CASCADE, verbose_name="회원", related_name='user_profile')
+    
+    followings = models.ManyToManyField('self', symmetrical=False, blank=True, related_name= 'followers')
 
     def __str__(self):
         return f"[아이디]{self.user.username}[닉네임]{self.nickname}"

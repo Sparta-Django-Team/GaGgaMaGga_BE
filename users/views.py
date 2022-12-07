@@ -24,13 +24,19 @@ import requests
 
 from gaggamagga.settings import get_secret
 from .jwt_claim_serializer import CustomTokenObtainPairSerializer
-from .serializers import (SignupSerializer, PrivateProfileSerializer, PublicProfileSerializer, LogoutSerializer, 
-ProfileUpdateSerializer, ChangePasswordSerializer, SetNewPasswordSerializer, PasswordResetSerializer, LoginLogListSerializer)
+from .serializers import (SignupSerializer,UserUpdateSerializer, PublicProfileSerializer,
+LogoutSerializer, ProfileUpdateSerializer, ChangePasswordSerializer, SetNewPasswordSerializer, 
+PasswordResetSerializer, LoginLogListSerializer, PrivateProfileSerializer)
 from .models import User, ConfirmEmail, ConfirmPhoneNumber, Profile, LoggedIn, OauthId
 from .utils import Util
 
 class UserView(APIView):
     permission_classes = [AllowAny]
+
+    def get_permissions(self):
+        if self.request.method == "PUT" or self.request.method == "DELETE":
+            return [IsAuthenticated(),]
+        return super(UserView, self).get_permissions()
 
     #회원가입
     @swagger_auto_schema(request_body=SignupSerializer, 
@@ -56,16 +62,28 @@ class UserView(APIView):
 
             return Response({"message":"회원가입이 되었습니다."}, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
+    
+    #회원정보 수정
+    @swagger_auto_schema(request_body=UserUpdateSerializer, 
+                    operation_summary="회원정보 수정",  
+                    responses={200 : '성공', 400 : '인풋값 에러', 404:'찾을 수 없음', 500 : '서버 에러'})
+    def put(self, request):
+        user = get_object_or_404(User, id=request.user.id)
+        serializer = UserUpdateSerializer(user, data=request.data, context={'request': request})
+        if serializer.is_valid():
+            serializer.save()
+            return Response({"message":"회원 수정이 완료되었습니다."}, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        
     #회원 비활성화
     @swagger_auto_schema(operation_summary="회원 비활성화",
                     responses={200 : '성공', 403 : '접근 권한 에러', 500 : '서버에러'})
     def delete(self, request):
-        user = User.objects.filter(id=request.user.id)
-        if user:
-            user.update(withdraw="True", withdraw_at=str(timezone.now()))
-            return Response({"message":"회원 비활성화가 되었습니다."}, status=status.HTTP_200_OK)
-        return Response({"message":"접근 권한 없음"}, status=status.HTTP_403_FORBIDDEN)
+        user = get_object_or_404(User, id=request.user.id)
+        user.withdraw = True
+        user.withdraw_at = timezone.now()
+        user.save()
+        return Response({"message":"회원 비활성화가 되었습니다."}, status=status.HTTP_200_OK)
 
 #로그인
 class CustomTokenObtainPairView(TokenViewBase):
@@ -198,9 +216,8 @@ class ConfirmPhoneNumberView(APIView):
         except:
             return Response({'message': '인증번호를 확인해주세요.'}, status=status.HTTP_400_BAD_REQUEST)
 
-
 class PrivateProfileView(APIView):
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated]
 
     #개인 프로필
     @swagger_auto_schema(operation_summary="개인 프로필", 
@@ -213,16 +230,14 @@ class PrivateProfileView(APIView):
     #프로필 수정
     @swagger_auto_schema(request_body=ProfileUpdateSerializer, 
                     operation_summary="프로필 수정", 
-                    responses={200 : '성공',  400 : '인풋값 에러', 403 : '접근 권한 에러', 404 : '찾을 수 없음', 500 : '서버 에러'})
+                    responses={200 : '성공',  400 : '인풋값 에러', 404 : '찾을 수 없음', 500 : '서버 에러'})
     def put(self, request):
         profile = get_object_or_404(Profile, user=request.user)
-        if profile.user == request.user:
-            serializer = ProfileUpdateSerializer(profile, data=request.data)
-            if serializer.is_valid():
-                serializer.save()
-                return Response({"message":"프로필 수정이 완료되었습니다."}, status=status.HTTP_200_OK)
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-        return Response({"message":"접근 권한 없음"}, status=status.HTTP_403_FORBIDDEN)
+        serializer = ProfileUpdateSerializer(profile, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response({"message":"프로필 수정이 완료되었습니다."}, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 #공개 프로필 
 class PublicProfileView(APIView):

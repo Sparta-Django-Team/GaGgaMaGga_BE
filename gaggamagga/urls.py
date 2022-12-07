@@ -26,7 +26,6 @@ urlpatterns = [
     path('users/', include('users.urls')),
     path('reviews/',include('reviews.urls')),
     path('places/',include('places.urls')),
-    # path('search/', include('search.urls')),
     path('', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
     path('api/api.json/', schema_view.without_ui(cache_timeout=0), name='schema-swagger-json'), 
     path('redoc/', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),

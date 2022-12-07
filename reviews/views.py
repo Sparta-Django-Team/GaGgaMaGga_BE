@@ -41,12 +41,12 @@ class ReviewListView(APIView):
     permission_classes = [AllowAny]
     
     def get_permissions(self):
-        if self.request.POST:
+        if self.request.method == 'POST':
             return [IsAuthenticated(),]
         return super(ReviewListView, self).get_permissions()
 
     #장소 리뷰 리스트
-    @swagger_auto_schema(operation_summary="리뷰 조회",
+    @swagger_auto_schema(operation_summary="장소 리뷰 리스트",
                     responses={200 : '성공', 404 : '찾을 수 없음', 500 : '서버 에러'})
     def get(self, request, place_id):
 

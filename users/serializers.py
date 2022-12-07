@@ -53,7 +53,6 @@ class SignupSerializer(serializers.ModelSerializer):
         repassword = data.get('repassword')
         term_check = data.get('term_check')
 
-
         #아이디 유효성 검사
         if not re.search(USERNAME_VALIDATION, str(username)):
             raise serializers.ValidationError(detail={"username":"아이디는 6자 이상 20자 이하의 숫자, 영문 대/소문자 이어야 합니다."})
@@ -96,6 +95,39 @@ class SignupSerializer(serializers.ModelSerializer):
         Profile.objects.create(user=user)
         return user
 
+#회원정보 수정 serializer
+class UserUpdateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ('email', 'phone_number',)
+        extra_kwargs = {'email': {
+                        'error_messages': {
+                        'required': '이메일을 입력해주세요.',
+                        'invalid': '알맞은 형식의 이메일을 입력해주세요.',
+                        'blank':'이메일을 입력해주세요.',}},
+
+                        'phone_number':{
+                        'error_messages':{
+                        'required': '휴대폰 번호를 입력해주세요.',}}}
+        
+    def validate(self, data):
+        phone_number = data.get('phone_number')
+
+        current_phone_number = self.context.get("request").user.phone_number
+        
+        #휴대폰 번호 존재여부와 blank 허용
+        if User.objects.filter(phone_number=phone_number).exclude(phone_number=current_phone_number).exists() and not phone_number=='' :
+            raise serializers.ValidationError(detail={"phone_number":"이미 사용중인 휴대폰 번호 이거나 탈퇴한 휴대폰 번호입니다."})
+        
+        return data
+        
+    def update(self, instance, validated_data):
+        instance.email = validated_data.get('email', instance.email)
+        instance.phone_number = validated_data.get('phone_number', instance.phone_number)
+        instance.save()
+        
+        return instance       
+    
 #로그아웃 serializer
 class LogoutSerializer(serializers.Serializer):
     refresh = serializers.CharField()
@@ -142,7 +174,7 @@ class ProfileUpdateSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Profile
-        fields = ('nickname', 'profile_image', 'intro',)
+        fields = ('nickname', 'profile_image', 'intro', )
         extra_kwargs = {
                         'nickname': {
                         'error_messages': {
@@ -163,15 +195,15 @@ class ProfileUpdateSerializer(serializers.ModelSerializer):
         #닉네임 유효성 검사
         if not re.search(NICKNAME_VALIDATION, str(nickname)):
             raise serializers.ValidationError(detail={"nickname":"닉네임은 3자이상 10자 이하로 작성해야하며 특수문자는 포함할 수 없습니다."})
-
+        
         return data
 
     def update(self, instance, validated_data):
         instance.nickname = validated_data.get('nickname', instance.nickname)
         instance.profile_image = validated_data.get('profile_image', instance.profile_image)
         instance.intro = validated_data.get('intro', instance.intro)
-        
         instance.save()
+        
         return instance
 
 #로그인 로그 serializer

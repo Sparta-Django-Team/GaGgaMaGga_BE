@@ -5,7 +5,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.generics import get_object_or_404
 from rest_framework import generics
 
-from django.shortcuts import get_list_or_404
+from django.db.models import Case, When
 
 from drf_yasg.utils import swagger_auto_schema
 
@@ -13,10 +13,7 @@ from gaggamagga.permissions import IsAdminOrOntherReadOnly
 from . import client
 from .models import Place
 from .serializers import PlaceSelectSerializer, PlaceSerializer, PlaceCreateSerializer
-
 from .rcm_places import rcm_place_user, rcm_place_new_user
-
-from django.db.models import Case, Q, When
 
 CHOICE_CATEGORY = (
         ('1', '분식'),
@@ -32,7 +29,6 @@ CHOICE_CATEGORY = (
         ('11', '인도음식'),
         ('12', '베트남음식'),
         ('13', '강남'),
-
     )
 
 ##### 취향 선택 #####
@@ -58,7 +54,6 @@ class PlaceSelectView(APIView):
             serializer = PlaceSelectSerializer(pick, many=True)
             return Response(serializer.data, status=status.HTTP_200_OK)
 
-
 ##### 장소(리뷰가 없거나, 비로그인 계정일 경우) #####
 class NewUserPlaceListView(APIView):
     #맛집 전체 리스트
@@ -71,7 +66,6 @@ class NewUserPlaceListView(APIView):
         place = Place.objects.filter(id__in=place_list).order_by(preserved)
         serializer = PlaceSerializer(place, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
-
 
 ##### 장소 #####
 class UserPlaceListView(APIView):
@@ -135,7 +129,7 @@ class PlaceDetailView(APIView):
 class PlaceBookmarkView(APIView):
     permission_classes = [IsAuthenticated] 
 
-    # 장소 북마크
+    #맛집 북마크
     @swagger_auto_schema(operation_summary="장소 북마크",  
                 responses={200 : '성공', 404 : '찾을 수 없음', 500 : '서버 에러'})
     def post(self, request, place_id):
@@ -147,6 +141,7 @@ class PlaceBookmarkView(APIView):
             place.place_bookmark.add(request.user)
             return Response({"message":"북마크를 했습니다."}, status=status.HTTP_200_OK)
 
+#####검색#####
 class SearchListView(generics.GenericAPIView):
     def get(self, request, *args, **wsargs):
         query = request.GET.get('q')
