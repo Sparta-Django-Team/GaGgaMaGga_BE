@@ -14,7 +14,7 @@ from . import client
 from .models import Place
 from .serializers import PlaceSelectSerializer, PlaceSerializer, PlaceCreateSerializer
 
-from .rcm_places import rcm_place
+from .rcm_places import rcm_place_user, rcm_place_new_user
 
 from django.db.models import Case, Q, When
 
@@ -35,9 +35,8 @@ FOOD_CATEGORY = (
 
 ##### 취향 선택 #####
 class PlaceSelectView(APIView):
-    permission_class = [IsAuthenticated]
 
-    #맛집 취향 선택
+    #맛집 취향 선택(리뷰가 없거나, 비로그인 계정일 경우)
     def get(self, request):
         place = []
         for i in range(len(FOOD_CATEGORY)):
@@ -47,16 +46,30 @@ class PlaceSelectView(APIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
+##### 장소(리뷰가 없거나, 비로그인 계정일 경우) #####
+class NewUserPlaceListView(APIView):
+    #맛집 전체 리스트
+    @swagger_auto_schema(operation_summary="맛집 전체 리스트",
+                    responses={200 : '성공', 500 : '서버 에러'})
+    #맛집 리스트 추천
+    def get(self, request, place_id):
+        place_list = rcm_place_new_user(place_id=place_id)
+        preserved = Case(*[When(pk=pk, then=pos) for pos, pk in enumerate(place_list)])
+        place = Place.objects.filter(id__in=place_list).order_by(preserved)
+        serializer = PlaceSerializer(place, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
 ##### 장소 #####
-class PlaceListView(APIView):
+class UserPlaceListView(APIView):
     permission_classes = [IsAdminOrOntherReadOnly]
 
     #맛집 전체 리스트
     @swagger_auto_schema(operation_summary="맛집 전체 리스트",
                     responses={200 : '성공', 500 : '서버 에러'})
-    #맛집 리스트
-    def get(self, request, place_id):
-        place_list = rcm_place(user_id = request.user.id, picked_place_id=place_id)
+    #맛집 리스트 추천
+    def get(self, request):
+        place_list = rcm_place_user(user_id = request.user.id)
         preserved = Case(*[When(pk=pk, then=pos) for pos, pk in enumerate(place_list)])
         place = Place.objects.filter(id__in=place_list).order_by(preserved)
         serializer = PlaceSerializer(place, many=True)
@@ -72,6 +85,7 @@ class PlaceListView(APIView):
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 class PlaceDetailView(APIView):
     permission_classes = [IsAdminOrOntherReadOnly]
