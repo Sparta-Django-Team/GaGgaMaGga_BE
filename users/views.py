@@ -8,7 +8,6 @@ from rest_framework_simplejwt.views import TokenViewBase
 from rest_framework_simplejwt.exceptions import TokenError, InvalidToken
 from rest_framework_simplejwt.settings import api_settings
 
-from django.shortcuts import redirect
 from django.contrib.auth.hashers import check_password
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from django.utils.http import urlsafe_base64_decode
@@ -49,7 +48,7 @@ class UserView(APIView):
 
             ConfirmEmail.objects.create(secured_key=secured_key, expired_at=expired_at, user=user)
 
-            frontend_site = "127.0.0.1:5500" 
+            frontend_site = "127.0.0.1:5501" 
             absurl = f'http://{frontend_site}/confrim_email.html?secured_key={str(secured_key)}'
             email_body = '안녕하세요!' + user.username +"고객님 이메일인증을 하시려면 아래 사이트를 접속해주세요 \n" + absurl
             message = {'email_body': email_body,'to_email':user.email, 'email_subject':'이메일 인증' }
@@ -147,7 +146,7 @@ class ReSendEmailView(APIView):
 
         ConfirmEmail.objects.create(secured_key=secured_key, expired_at=expired_at, user=user)
 
-        frontend_site = "127.0.0.1:5500" 
+        frontend_site = "127.0.0.1:5501" 
         absurl = f'http://{frontend_site}/confrim_email.html?secured_key={str(secured_key)}'
         email_body = '안녕하세요!' + user.username +"고객님 이메일인증을 하시려면 아래 사이트를 접속해주세요 \n" + absurl
         message = {'email_body': email_body,'to_email':user.email, 'email_subject':'이메일 인증' }
@@ -164,17 +163,15 @@ class SendPhoneNumberView(APIView):
     def post(self, request):
         try:
             phone_number = request.data["phone_number"]
-
-        except:
-            return Response({'message': '잘못된 요청입니다.'}, status=status.HTTP_400_BAD_REQUEST)
-
-        else:
             if not User.objects.filter(phone_number=phone_number).exists():
                 return Response({'message': '등록된 휴대폰 번호가 없습니다.'}, status=status.HTTP_400_BAD_REQUEST)
 
             user = User.objects.get(phone_number=phone_number)
             ConfirmPhoneNumber.objects.create(user=user)
             return Response({'message':'인증번호가 발송되었습니다. 확인부탁드립니다.'}, status=status.HTTP_200_OK)
+
+        except:
+            return Response({'message':'휴대폰 번호를 입력해주세요'}, status=status.HTTP_400_BAD_REQUEST)
 
 #아이디 찾기 인증번호 확인
 class ConfirmPhoneNumberView(APIView):
@@ -187,10 +184,6 @@ class ConfirmPhoneNumberView(APIView):
             phone_number = request.data['phone_number']
             auth_number = request.data['auth_number']
 
-        except:
-            return Response({'message': '잘못된 요청입니다.'}, status=status.HTTP_400_BAD_REQUEST)
-
-        else:
             user = get_object_or_404(User, phone_number=phone_number)
             confirm_phone_number = ConfirmPhoneNumber.objects.filter(user=user).last()
 
@@ -201,6 +194,10 @@ class ConfirmPhoneNumberView(APIView):
                 return Response({'message': '인증 번호가 틀립니다. 다시 입력해주세요'}, status=status.HTTP_400_BAD_REQUEST)
 
             return Response({'message':f'회원님의 아이디는 {user.username}입니다.'}, status=status.HTTP_200_OK)
+        
+        except:
+            return Response({'message': '인증번호를 확인해주세요.'}, status=status.HTTP_400_BAD_REQUEST)
+
 
 class PrivateProfileView(APIView):
     permission_classes = [AllowAny]
@@ -371,7 +368,9 @@ class ProcessFollowView(APIView):
 #카카오 로그인
 class KakaoLoginView(APIView):
     permission_classes = [AllowAny]
-
+        
+    @swagger_auto_schema(operation_summary="카카오 소셜 로그인", 
+                        responses={ 200 : '성공', 400: '잘못된 요청', 500:'서버 에러'})
     def post(self, request):
         try:
             code = request.data.get('code')

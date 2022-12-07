@@ -241,7 +241,7 @@ class PasswordResetSerializer(serializers.Serializer):
             uidb64 = urlsafe_base64_encode(smart_bytes(user.id)) 
             token = PasswordResetTokenGenerator().make_token(user) #토큰 생성
 
-            frontend_site = "127.0.0.1:5500" #프론트 주소
+            frontend_site = "127.0.0.1:5501" #프론트 주소
             absurl = f'http://{frontend_site}/set_password.html?/{uidb64}/{token}/' #확인된 토큰 주소 생성
 
             email_body = '안녕하세요? \n 비밀번호 재설정 주소입니다.\n'+ absurl #이메일 내용
