@@ -10,7 +10,7 @@ urlpatterns = [
     path('api/token/', views.CustomTokenObtainPairView.as_view(), name='token_obtain_pair_view'),
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh_view'),
     path('logout/', views.LogoutView.as_view(), name='logout_view'),
-    path("kakao/", views.KakaoLogIn.as_view()),
+    path("kakao/", views.KakaoLoginView.as_view(), name='kakao_login_view'),
     
     #email
     path('email-confirm/', views.ConfirmEmailView.as_view(), name='confirm_email_view'),

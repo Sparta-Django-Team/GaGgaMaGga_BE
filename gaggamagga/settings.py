@@ -1,7 +1,6 @@
 from pathlib import Path
 from datetime import timedelta
 import os, json
-
 from django.core.exceptions import ImproperlyConfigured
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -199,7 +198,7 @@ DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 #CORS settings
 CORS_ALLOW_ALL_ORIGINS = True
 
-#Search Engine ALGOLIA settings
+# Search Engine ALGOLIA settings
 ALGOLIA = {
     'APPLICATION_ID': get_secret("SEARCH_ID"),
     'API_KEY': get_secret("SEARCH_KEY"),

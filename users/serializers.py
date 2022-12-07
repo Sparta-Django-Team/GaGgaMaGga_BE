@@ -56,7 +56,7 @@ class SignupSerializer(serializers.ModelSerializer):
 
         #아이디 유효성 검사
         if not re.search(USERNAME_VALIDATION, str(username)):
-            raise serializers.ValidationError(detail={"username":"아이디는 숫자 6자 이상 20자 이하의 영문 대/소문자 이어야 합니다."})
+            raise serializers.ValidationError(detail={"username":"아이디는 6자 이상 20자 이하의 숫자, 영문 대/소문자 이어야 합니다."})
 
         #비밀번호 일치
         if password != repassword:

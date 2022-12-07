@@ -114,7 +114,6 @@ class ReviewDetailSerializer(serializers.ModelSerializer):
         fields = ('content', 'review_image_one', 'review_image_two', 'review_image_three', 'created_at', 'updated_at', 'rating_cnt', 'review_like', 'review_like_count', 'nickname', 'profile_image', 'place_name','review_comments' )
 
 
-
 class CommentCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Comment
