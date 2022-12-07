@@ -20,7 +20,7 @@ from places.models import Place
 
 
 # 유사한 유저 정보 조회 및 추천(기존 사용이력이 없는 사용자)
-def rcm_place_new_user(place_id):
+def rcm_place_new_user(cate_id):
     places = pd.DataFrame(list(Place.objects.values()))
     if 0:       # 카테고리일 경우
         places = places[places['category'].str.contains("분식")]
@@ -38,7 +38,7 @@ def rcm_place_new_user(place_id):
 
     review_user.loc[len(review_user)+1] = np.nan
     review_user = review_user.fillna(0)
-    review_user.loc[len(review_user), place_id] = 5
+    review_user.loc[len(review_user), cate_id] = 5
     print(review_user)
 
     user_sim_np = cosine_similarity(review_user, review_user)

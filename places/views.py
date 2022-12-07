@@ -18,32 +18,46 @@ from .rcm_places import rcm_place_user, rcm_place_new_user
 
 from django.db.models import Case, Q, When
 
-FOOD_CATEGORY = (
-        ('F1', '분식'),
-        ('F2', '한식'),
-        ('F3', '돼지고기구이'),
-        ('F4', '치킨,닭강정'),
-        ('F5', '햄버거'),
-        ('F6', '피자'),
-        ('F7', '중식당'),
-        ('F8', '일식당'),
-        ('F9', '양식'),
-        ('F10', '태국음식'),
-        ('F11', '인도음식'),
-        ('F12', '베트남음식'),
+CHOICE_CATEGORY = (
+        ('1', '분식'),
+        ('2', '한식'),
+        ('3', '돼지고기구이'),
+        ('4', '치킨,닭강정'),
+        ('5', '햄버거'),
+        ('6', '피자'),
+        ('7', '중식당'),
+        ('8', '일식당'),
+        ('9', '양식'),
+        ('10', '태국음식'),
+        ('11', '인도음식'),
+        ('12', '베트남음식'),
+        ('13', '강남'),
+
     )
 
 ##### 취향 선택 #####
 class PlaceSelectView(APIView):
-
     #맛집 취향 선택(리뷰가 없거나, 비로그인 계정일 경우)
-    def get(self, request):
-        place = []
-        for i in range(len(FOOD_CATEGORY)):
-            pick = Place.objects.filter(category=FOOD_CATEGORY[i][1]).order_by('-rating')[0]
-            place.append(pick)
-        serializer = PlaceSelectSerializer(place, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+    def get(self, request, choice_no):
+        place_list = []
+        # 지역 선택일 경우
+        if choice_no > 12:
+            place_list = []
+            for i in range(0, 12):
+                pick = Place.objects.filter(place_address__contains=CHOICE_CATEGORY[choice_no-1][1],category=CHOICE_CATEGORY[i][1]).first()
+                place_list.append(pick.id)
+            preserved = Case(*[When(pk=pk, then=pos) for pos, pk in enumerate(place_list)])
+            place = Place.objects.filter(id__in=place_list).order_by(preserved)
+            serializer = PlaceSelectSerializer(place, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        # 음식 선택일 경우
+        else:
+            for i in range(0, 12):
+                pick = Place.objects.filter(category=CHOICE_CATEGORY[choice_no-1][1])
+                place.append(pick)
+            print(place)
+            serializer = PlaceSelectSerializer(place, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 ##### 장소(리뷰가 없거나, 비로그인 계정일 경우) #####
@@ -52,8 +66,8 @@ class NewUserPlaceListView(APIView):
     @swagger_auto_schema(operation_summary="맛집 전체 리스트",
                     responses={200 : '성공', 500 : '서버 에러'})
     #맛집 리스트 추천
-    def get(self, request, place_id):
-        place_list = rcm_place_new_user(place_id=place_id)
+    def get(self, request, cate_id):
+        place_list = rcm_place_new_user(cate_id=cate_id)
         preserved = Case(*[When(pk=pk, then=pos) for pos, pk in enumerate(place_list)])
         place = Place.objects.filter(id__in=place_list).order_by(preserved)
         serializer = PlaceSerializer(place, many=True)
