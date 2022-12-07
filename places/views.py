@@ -118,22 +118,6 @@ class PlaceBookmarkView(APIView):
             place.place_bookmark.add(request.user)
             return Response({"message":"북마크를 했습니다."}, status=status.HTTP_200_OK)
 
-class PlaceLocationSelectView(APIView):
-    permission_classes = [IsAuthenticated]
-
-    def get(self, request):
-        place = get_list_or_404(Place)
-        serializer = PlaceLocationSelectSerializer(place, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
-
-class RecommendPlaceView(APIView):
-    permission_classes = [IsAuthenticated]
-
-    def get(self, request):
-        place = get_list_or_404(Place)
-        serializer = PlaceLocationSelectSerializer(place, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
-
 class SearchListView(generics.GenericAPIView):
     def get(self, request, *args, **wsargs):
         query = request.GET.get('q')
