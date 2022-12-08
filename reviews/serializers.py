@@ -23,7 +23,7 @@ class ReviewListSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Review
-        fields = ('content', 'review_image_one', 'created_at', 'updated_at', 'rating_cnt', 'review_like_count', 'review_like', 'nickname', 'profile_image', 'place_name', )
+        fields = ('content', 'review_image_one', 'created_at', 'updated_at', 'rating_cnt', 'review_like_count', 'review_like', 'nickname', 'profile_image', 'place_name', 'id','author_id','place_id',)
 
 #후기 생성, 수정 serializer
 class ReviewCreateSerializer(serializers.ModelSerializer):
