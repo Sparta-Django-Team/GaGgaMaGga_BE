@@ -2,6 +2,9 @@ from rest_framework import serializers
 
 from .models import Review, Comment, Recomment, Report
 from places.models import Place
+from places.serializers import PlaceSerializer
+
+
 
 #후기 전체 serializer
 class ReviewListSerializer(serializers.ModelSerializer):
@@ -9,6 +12,7 @@ class ReviewListSerializer(serializers.ModelSerializer):
     profile_image = serializers.SerializerMethodField()
     place_name = serializers.SerializerMethodField()
     review_like_count = serializers.SerializerMethodField()
+    place = PlaceSerializer()
 
     def get_nickname(self, obj):
         return obj.author.user_profile.nickname
@@ -24,7 +28,7 @@ class ReviewListSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Review
-        fields = ('content', 'review_image_one', 'created_at', 'updated_at', 'rating_cnt', 'review_like_count', 'review_like', 'nickname', 'profile_image', 'place_name', )
+        fields = ('place','content', 'review_image_one', 'created_at', 'updated_at', 'rating_cnt', 'review_like_count', 'review_like', 'nickname', 'profile_image', 'place_name','id')
 
 #후기 생성, 수정 serializer
 class ReviewCreateSerializer(serializers.ModelSerializer):
