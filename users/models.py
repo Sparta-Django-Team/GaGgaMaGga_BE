@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import BaseUserManager, AbstractBaseUser
-from django.core.validators import MaxValueValidator
+from django.core.validators import MaxValueValidator, validate_image_file_extension, validate_ipv46_address
+
 from django.utils import timezone
 
 from gaggamagga.settings import get_secret
@@ -138,7 +139,7 @@ class ConfirmPhoneNumber(models.Model):
 
 #로그 기록
 class LoggedIn(models.Model):
-    update_ip = models.GenericIPAddressField('로그인한 IP', null=True)
+    update_ip = models.GenericIPAddressField('로그인한 IP', null=True, validators=[validate_ipv46_address])
     created_at = models.DateTimeField('로그인 기록', auto_now_add=True)
 
     user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name="회원")
@@ -161,7 +162,7 @@ class OauthId(models.Model):
 
 #프로필
 class Profile(models.Model):
-    profile_image = models.ImageField('프로필 사진', default='default_profile_pic.jpg', upload_to='profile_pics' )
+    profile_image = models.ImageField('프로필 사진', default='default_profile_pic.jpg', upload_to='profile_pics', validators=[validate_image_file_extension])
     nickname = models.CharField('닉네임', max_length=10, null=True, unique=True, error_messages={"unique": "이미 사용중인 닉네임 이거나 탈퇴한 닉네임입니다."})
     intro = models.CharField('자기소개', max_length=100, null=True)
     review_cnt = models.PositiveIntegerField('리뷰수', default=0)
