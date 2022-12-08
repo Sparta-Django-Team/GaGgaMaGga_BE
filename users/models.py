@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import BaseUserManager, AbstractBaseUser
-from django.core.validators import MaxValueValidator
+from django.core.validators import MaxValueValidator, validate_image_file_extension, validate_ipv46_address
+
 from django.utils import timezone
 
 from gaggamagga.settings import get_secret
@@ -138,13 +139,13 @@ class ConfirmPhoneNumber(models.Model):
 
 #로그 기록
 class LoggedIn(models.Model):
-    update_ip = models.GenericIPAddressField('로그인한 IP', null=True)
+    update_ip = models.GenericIPAddressField('로그인한 IP', null=True, validators=[validate_ipv46_address])
     created_at = models.DateTimeField('로그인 기록', auto_now_add=True)
 
     user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name="회원")
 
     def __str__(self):
-        return f"[아이디]{self.user.username}[접속 기록]{self.created_at}"
+        return f"[아이디]{self.user.username}, [접속 기록]{self.created_at}"
 
     class Meta:
         ordering = ['-created_at']
@@ -155,10 +156,13 @@ class OauthId(models.Model):
     provider = models.CharField('구분자', max_length=255)
 
     user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name="회원")
+    
+    def __str__(self):
+        return f"[아이디]{self.user.username}, [소셜 도메인]{self.provider}"
 
 #프로필
 class Profile(models.Model):
-    profile_image = models.ImageField('프로필 사진', default='default_profile_pic.jpg', upload_to='profile_pics' )
+    profile_image = models.ImageField('프로필 사진', default='default_profile_pic.jpg', upload_to='profile_pics', validators=[validate_image_file_extension])
     nickname = models.CharField('닉네임', max_length=10, null=True, unique=True, error_messages={"unique": "이미 사용중인 닉네임 이거나 탈퇴한 닉네임입니다."})
     intro = models.CharField('자기소개', max_length=100, null=True)
     review_cnt = models.PositiveIntegerField('리뷰수', default=0)
@@ -168,7 +172,7 @@ class Profile(models.Model):
     followings = models.ManyToManyField('self', symmetrical=False, blank=True, related_name= 'followers')
 
     def __str__(self):
-        return f"[아이디]{self.user.username}[닉네임]{self.nickname}"
+        return f"[아이디]{self.user.username}, [닉네임]{self.nickname}"
 
     @property
     def review_count_add(self):

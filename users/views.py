@@ -21,7 +21,6 @@ from drf_yasg import openapi
 from datetime import datetime
 import jwt
 import requests
-import tempfile
 
 from gaggamagga.settings import get_secret
 from .jwt_claim_serializer import CustomTokenObtainPairSerializer
@@ -55,8 +54,8 @@ class UserView(APIView):
 
             ConfirmEmail.objects.create(secured_key=secured_key, expired_at=expired_at, user=user)
 
-            frontend_site = "127.0.0.1:5501" 
-            absurl = f'http://{frontend_site}/confrim_email.html?secured_key={str(secured_key)}'
+            frontend_site = "127.0.0.1:5500" 
+            absurl = f'http://{frontend_site}/confirm_email.html?secured_key={str(secured_key)}'
             email_body = '안녕하세요!' + user.username +"고객님 이메일인증을 하시려면 아래 사이트를 접속해주세요 \n" + absurl
             message = {'email_body': email_body,'to_email':user.email, 'email_subject':'이메일 인증' }
             Util.send_email(message)
@@ -165,8 +164,8 @@ class ReSendEmailView(APIView):
 
         ConfirmEmail.objects.create(secured_key=secured_key, expired_at=expired_at, user=user)
 
-        frontend_site = "127.0.0.1:5501" 
-        absurl = f'http://{frontend_site}/confrim_email.html?secured_key={str(secured_key)}'
+        frontend_site = "127.0.0.1:5500" 
+        absurl = f'http://{frontend_site}/confirm_email.html?secured_key={str(secured_key)}'
         email_body = '안녕하세요!' + user.username +"고객님 이메일인증을 하시려면 아래 사이트를 접속해주세요 \n" + absurl
         message = {'email_body': email_body,'to_email':user.email, 'email_subject':'이메일 인증' }
         Util.send_email(message)
@@ -386,12 +385,11 @@ class KakaoLoginView(APIView):
                 data={
                     "grant_type": "authorization_code",
                     "client_id": get_secret("SOCIAL_AUTH_KAKAO_CLIENT_ID"),
-                    "redirect_uri": "http://127.0.0.1:5501",
+                    "redirect_uri": "http://127.0.0.1:5500",
                     "code": code,
                 },
             )
             access_token = access_token.json().get("access_token")
-            
             user_data = requests.get(
                 "https://kapi.kakao.com/v2/user/me",
                 headers={
@@ -416,6 +414,9 @@ class KakaoLoginView(APIView):
                     user.withdraw = False
                     user.save()
                     
+                    user_ip= Util.get_client_ip(request)
+                    LoggedIn.objects.create(user=user, created_at=timezone.now(), update_ip=user_ip)
+                    
                     refresh = RefreshToken.for_user(user)
                     return Response({'refresh': str(refresh), 'access':str(refresh.access_token)}, status=status.HTTP_200_OK)
                 
@@ -429,9 +430,12 @@ class KakaoLoginView(APIView):
                 
                 profile = Profile.objects.create(nickname=kakao_nickname, user=new_user)
                 OauthId.objects.create(provider="kakao", access_token=access_token, user=new_user)
-                
+
                 util_image = Util.profile_image_download(kakao_profile_image)
                 profile.profile_image.save(util_image["file_name"], File(util_image["temp_image"]))
+                
+                user_ip= Util.get_client_ip(request)
+                LoggedIn.objects.create(user=new_user, created_at=timezone.now(), update_ip=user_ip)
                 
                 refresh = RefreshToken.for_user(new_user)
                 

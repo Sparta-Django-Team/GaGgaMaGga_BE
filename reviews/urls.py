@@ -5,7 +5,7 @@ from . import views
 urlpatterns = [
     # Review
     path('<int:place_id>/', views.ReviewListView.as_view(), name='review_list_view'),
-    path('details/<int:review_id>/',views.ReviewDetailView.as_view(), name='review_detail_view'),
+    path('details/<int:place_id>/<int:review_id>/',views.ReviewDetailView.as_view(), name='review_detail_view'),
     path('<int:review_id>/likes/',views.ReviewLikeView.as_view(), name='review_like_view'),
     path('review_rank/',views.ReviewRankView.as_view(), name='reveiw_rank_view'),
 

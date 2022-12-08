@@ -11,7 +11,7 @@ class PlaceSelectSerializer(serializers.ModelSerializer):
 class PlaceSerializer(serializers.ModelSerializer):
     class Meta:
         model = Place
-        fields = ('place_name', 'category', 'rating', 'place_address', 'place_number', 'place_time', 'place_img', 'latitude', 'longitude', 'hit',)
+        fields = ('id', 'place_name', 'category', 'rating', 'place_address', 'place_number', 'place_time', 'place_img', 'latitude', 'longitude', 'hit', 'place_bookmark')
 
 #장소 생성 serializer
 class PlaceCreateSerializer(serializers.ModelSerializer):
@@ -42,3 +42,4 @@ class PlaceCreateSerializer(serializers.ModelSerializer):
                 'error_messages':{
                 'required':'시간을 입력해주세요',
                 'blank':'시간을 입력해주세요',}},}
+
