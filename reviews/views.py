@@ -9,6 +9,7 @@ from django.db.models import Count
 from drf_yasg.utils import swagger_auto_schema
 
 from .models import Review, Comment, Recomment, Report
+from places.models import Place
 from .serializers import (ReviewListSerializer, ReviewCreateSerializer, ReviewDetailSerializer, 
 CommentSerializer, CommentCreateSerializer , RecommentSerializer, RecommentCreateSerializer, ReportSerializer)
 
@@ -70,7 +71,7 @@ class ReviewListView(APIView):
                     operation_summary="리뷰 작성",
                     responses={201 : '성공', 400:'인풋값 에러', 500 : '서버 에러'})
     def post(self, request, place_id):
-        serializer = ReviewCreateSerializer(data=request.data)
+        serializer = ReviewCreateSerializer(data=request.data, context={"place_id":place_id, "request":request})
         if serializer.is_valid():
             serializer.save(author=request.user, place_id=place_id)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
@@ -82,7 +83,7 @@ class ReviewDetailView(APIView):
     #리뷰 상세 페이지
     @swagger_auto_schema(operation_summary="리뷰 상세 조회",
                     responses={200 : '성공', 404 : '찾을 수 없음', 500 : '서버 에러'})
-    def get(self, request, review_id):
+    def get(self, request, place_id, review_id):
         review = get_object_or_404(Review, id=review_id)
         serializer = ReviewDetailSerializer(review)
         return Response(serializer.data, status=status.HTTP_200_OK)
@@ -91,10 +92,10 @@ class ReviewDetailView(APIView):
     @swagger_auto_schema(request_body=ReviewCreateSerializer,
                     operation_summary="리뷰 작성",
                     responses={201 : '성공', 400:'인풋값 에러', 500 : '서버 에러'})
-    def put(self, request, review_id):
+    def put(self, request, place_id, review_id):
         review = get_object_or_404(Review, id=review_id)
         if request.user == review.author:
-            serializer = ReviewCreateSerializer(review, data=request.data, partial=True)
+            serializer = ReviewCreateSerializer(review, data=request.data, partial=True, context={"place_id":place_id, "review_id":review_id, "request":request})
             if serializer.is_valid():
                 serializer.save(author=request.user, review_id=review_id)
                 return Response(serializer.data, status=status.HTTP_200_OK)
@@ -104,9 +105,13 @@ class ReviewDetailView(APIView):
     #리뷰 삭제
     @swagger_auto_schema(operation_summary="리뷰 삭제", 
                     responses={201 : '성공', 403:'접근 권한 없음', 404:'찾을 수 없음', 500 : '서버 에러'})
-    def delete(self, request, review_id):
+    def delete(self, request, place_id, review_id):
         review = get_object_or_404(Review, id=review_id)
+        place = get_object_or_404(Place, id=place_id)
         if request.user == review.author:
+            review_cnt = place.place_review.count()
+            place.rating = (place.rating * review_cnt - review.rating_cnt) / (review_cnt - 1)
+            place.save()
             review.delete()
             return Response({"message":"리뷰 삭제"}, status=status.HTTP_200_OK)
         return Response({"message":"접근 권한 없음"}, status=status.HTTP_403_FORBIDDEN) 
