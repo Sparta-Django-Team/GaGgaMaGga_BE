@@ -48,11 +48,21 @@ class PlaceSelectView(APIView):
             return Response(serializer.data, status=status.HTTP_200_OK)
         # 음식 선택일 경우
         else:
-            place_list = []
-            pick = Place.objects.filter(category=CHOICE_CATEGORY[choice_no-1][1])[0:12]
-            print(pick)
-            serializer = PlaceSelectSerializer(pick, many=True)
-            return Response(serializer.data, status=status.HTTP_200_OK)
+            if (choice_no == 3)|(choice_no == 6)|(choice_no == 12):
+                place_list = []
+                pick1 = Place.objects.filter(category=CHOICE_CATEGORY[choice_no-1][1])[0:3]
+                pick2 = Place.objects.filter(category=CHOICE_CATEGORY[choice_no-2][1])[0:3]
+                pick3 = Place.objects.filter(category=CHOICE_CATEGORY[choice_no-3][1])[0:3]
+                pick = (pick1|pick2|pick3)
+                serializer = PlaceSelectSerializer(pick, many=True)
+                return Response(serializer.data, status=status.HTTP_200_OK)
+            else:
+                place_list = []
+                pick = Place.objects.filter(category=CHOICE_CATEGORY[choice_no-1][1])[0:12]
+                print(pick)
+                serializer = PlaceSelectSerializer(pick, many=True)
+                return Response(serializer.data, status=status.HTTP_200_OK)
+
 
 ##### 장소(리뷰가 없거나, 비로그인 계정일 경우) #####
 class NewUserPlaceListView(APIView):
@@ -60,8 +70,8 @@ class NewUserPlaceListView(APIView):
     @swagger_auto_schema(operation_summary="맛집 전체 리스트",
                     responses={200 : '성공', 500 : '서버 에러'})
     #맛집 리스트 추천
-    def get(self, request, cate_id):
-        place_list = rcm_place_new_user(cate_id=cate_id)
+    def get(self, request, place_id, category):
+        place_list = rcm_place_new_user(place_id=place_id, category=str(category))
         preserved = Case(*[When(pk=pk, then=pos) for pos, pk in enumerate(place_list)])
         place = Place.objects.filter(id__in=place_list).order_by(preserved)
         serializer = PlaceSerializer(place, many=True)
@@ -75,8 +85,9 @@ class UserPlaceListView(APIView):
     @swagger_auto_schema(operation_summary="맛집 전체 리스트",
                     responses={200 : '성공', 500 : '서버 에러'})
     #맛집 리스트 추천
-    def get(self, request):
-        place_list = rcm_place_user(user_id = request.user.id)
+    def get(self, request, cate_id):
+        # 지역 선택일 경우
+        place_list = rcm_place_user(user_id = request.user.id, cate_id=cate_id)
         preserved = Case(*[When(pk=pk, then=pos) for pos, pk in enumerate(place_list)])
         place = Place.objects.filter(id__in=place_list).order_by(preserved)
         serializer = PlaceSerializer(place, many=True)
