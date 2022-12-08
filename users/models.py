@@ -144,7 +144,7 @@ class LoggedIn(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name="회원")
 
     def __str__(self):
-        return f"[아이디]{self.user.username}[접속 기록]{self.created_at}"
+        return f"[아이디]{self.user.username}, [접속 기록]{self.created_at}"
 
     class Meta:
         ordering = ['-created_at']
@@ -155,6 +155,9 @@ class OauthId(models.Model):
     provider = models.CharField('구분자', max_length=255)
 
     user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name="회원")
+    
+    def __str__(self):
+        return f"[아이디]{self.user.username}, [소셜 도메인]{self.provider}"
 
 #프로필
 class Profile(models.Model):
@@ -168,7 +171,7 @@ class Profile(models.Model):
     followings = models.ManyToManyField('self', symmetrical=False, blank=True, related_name= 'followers')
 
     def __str__(self):
-        return f"[아이디]{self.user.username}[닉네임]{self.nickname}"
+        return f"[아이디]{self.user.username}, [닉네임]{self.nickname}"
 
     @property
     def review_count_add(self):
