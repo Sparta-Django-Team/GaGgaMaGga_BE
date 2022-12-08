@@ -12,6 +12,7 @@ from .models import User, Profile, LoggedIn
 from .utils import Util
 
 from reviews.serializers import ReviewListSerializer
+from places.serializers import PlaceSerializer
 
 #회원가입 serializer
 class SignupSerializer(serializers.ModelSerializer):
@@ -156,7 +157,7 @@ class PrivateProfileSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Profile
-        fields = ('nickname', 'profile_image', 'email', 'username',)
+        fields = ('nickname', 'profile_image', 'email', 'username', 'intro',)
 
 #공개 프로필 serializer
 class PublicProfileSerializer(serializers.ModelSerializer):
@@ -164,10 +165,11 @@ class PublicProfileSerializer(serializers.ModelSerializer):
     followings = serializers.StringRelatedField(many=True)
     followers = serializers.StringRelatedField(many=True)
     review_set = ReviewListSerializer(many=True, source='user.review_set')
+    bookmark_place = PlaceSerializer(many=True, source='user.bookmark_place')
 
     class Meta:
         model = Profile
-        fields = ('nickname', 'profile_image', 'intro', 'followings', 'followers','review_set',)
+        fields = ('nickname', 'profile_image', 'intro', 'followings', 'followers','review_set', 'bookmark_place',)
 
 #프로필 편집 serializer
 class ProfileUpdateSerializer(serializers.ModelSerializer):
@@ -188,7 +190,7 @@ class ProfileUpdateSerializer(serializers.ModelSerializer):
                         } 
 
     def validate(self, data):
-        NICKNAME_VALIDATION = r'^[A-Za-z0-9]{3,10}$'
+        NICKNAME_VALIDATION = r'^[A-Za-z가-힣0-9]{3,10}$'
         
         nickname = data.get('nickname')
         
@@ -273,7 +275,7 @@ class PasswordResetSerializer(serializers.Serializer):
             uidb64 = urlsafe_base64_encode(smart_bytes(user.id)) 
             token = PasswordResetTokenGenerator().make_token(user) #토큰 생성
 
-            frontend_site = "127.0.0.1:5501" #프론트 주소
+            frontend_site = "127.0.0.1:5500" #프론트 주소
             absurl = f'http://{frontend_site}/set_password.html?/{uidb64}/{token}/' #확인된 토큰 주소 생성
 
             email_body = '안녕하세요? \n 비밀번호 재설정 주소입니다.\n'+ absurl #이메일 내용

@@ -95,8 +95,8 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
     @classmethod
     def get_token(cls, user):
         token = super().get_token(user)
-        token["email"] = user.email
-        token["username"] = user.username
+        token["nickname"] = user.user_profile.nickname
         token["password_expired"] = user.password_expired
+        token["is_confirmed"] = user.is_confirmed
         
         return token
