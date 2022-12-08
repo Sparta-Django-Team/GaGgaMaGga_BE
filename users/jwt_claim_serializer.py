@@ -98,5 +98,6 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
         token["email"] = user.email
         token["username"] = user.username
         token["password_expired"] = user.password_expired
+        token["is_confirmed"] = user.is_confirmed
         
         return token

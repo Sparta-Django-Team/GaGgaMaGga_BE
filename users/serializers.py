@@ -156,7 +156,7 @@ class PrivateProfileSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Profile
-        fields = ('nickname', 'profile_image', 'email', 'username',)
+        fields = ('nickname', 'profile_image', 'email', 'username', 'intro',)
 
 #공개 프로필 serializer
 class PublicProfileSerializer(serializers.ModelSerializer):
@@ -188,7 +188,7 @@ class ProfileUpdateSerializer(serializers.ModelSerializer):
                         } 
 
     def validate(self, data):
-        NICKNAME_VALIDATION = r'^[A-Za-z0-9]{3,10}$'
+        NICKNAME_VALIDATION = r'^[A-Za-z가-힣0-9]{3,10}$'
         
         nickname = data.get('nickname')
         

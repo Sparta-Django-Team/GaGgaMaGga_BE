@@ -179,4 +179,3 @@ class Profile(models.Model):
     def review_count_remove(self):
         self.review_cnt -=1
         self.save()
-
