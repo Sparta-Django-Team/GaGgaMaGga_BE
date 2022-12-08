@@ -12,6 +12,7 @@ from .models import User, Profile, LoggedIn
 from .utils import Util
 
 from reviews.serializers import ReviewListSerializer
+from places.serializers import PlaceSerializer
 
 #회원가입 serializer
 class SignupSerializer(serializers.ModelSerializer):
@@ -164,10 +165,11 @@ class PublicProfileSerializer(serializers.ModelSerializer):
     followings = serializers.StringRelatedField(many=True)
     followers = serializers.StringRelatedField(many=True)
     review_set = ReviewListSerializer(many=True, source='user.review_set')
+    bookmark_place = PlaceSerializer(many=True, source='user.bookmark_place')
 
     class Meta:
         model = Profile
-        fields = ('nickname', 'profile_image', 'intro', 'followings', 'followers','review_set',)
+        fields = ('nickname', 'profile_image', 'intro', 'followings', 'followers','review_set', 'bookmark_place',)
 
 #프로필 편집 serializer
 class ProfileUpdateSerializer(serializers.ModelSerializer):
