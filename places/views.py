@@ -12,7 +12,7 @@ from drf_yasg.utils import swagger_auto_schema
 from gaggamagga.permissions import IsAdminOrOntherReadOnly
 from . import client
 from .models import Place
-from .serializers import PlaceSelectSerializer, PlaceSerializer, PlaceCreateSerializer
+from .serializers import PlaceSelectSerializer, PlaceSerializer
 from .rcm_places import rcm_place_user, rcm_place_new_user
 
 CHOICE_CATEGORY = (
