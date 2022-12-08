@@ -15,7 +15,7 @@ class Review(models.Model):
     review_like = models.ManyToManyField(User, verbose_name='후기 좋아요', related_name="like_review", blank=True)
 
     author = models.ForeignKey(User, verbose_name='작성자', on_delete=models.CASCADE)
-    place = models.ForeignKey(Place, verbose_name='장소', on_delete=models.CASCADE)
+    place = models.ForeignKey(Place, verbose_name='장소', on_delete=models.CASCADE, related_name="place_review")
 
     class Meta:
         db_table = 'review'

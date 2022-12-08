@@ -12,7 +12,7 @@ from drf_yasg.utils import swagger_auto_schema
 from gaggamagga.permissions import IsAdminOrOntherReadOnly
 from . import client
 from .models import Place
-from .serializers import PlaceSelectSerializer, PlaceSerializer, PlaceCreateSerializer
+from .serializers import PlaceSelectSerializer, PlaceSerializer
 from .rcm_places import rcm_place_user, rcm_place_new_user
 
 CHOICE_CATEGORY = (
@@ -93,17 +93,6 @@ class UserPlaceListView(APIView):
         serializer = PlaceSerializer(place, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
-    #맛집 생성
-    @swagger_auto_schema(request_body=PlaceCreateSerializer, 
-                    operation_summary="맛집 생성",
-                    responses={200 : '성공', 400 : '인풋값 에러', 500 : '서버 에러'})
-    def post(self, request):
-        serializer = PlaceCreateSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
 
 class PlaceDetailView(APIView):
     permission_classes = [IsAdminOrOntherReadOnly]
@@ -116,18 +105,6 @@ class PlaceDetailView(APIView):
         place.hit_count
         serializer = PlaceSerializer(place)
         return Response(serializer.data, status=status.HTTP_200_OK)
-
-    #맛집 수정
-    @swagger_auto_schema(request_body=PlaceCreateSerializer, 
-                    operation_summary="맛집 수정",
-                    responses={200 : '성공', 400 : '인풋값 에러', 404: '찾을 수 없음' ,500 : '서버 에러'})
-    def put(self, request, place_id):
-        place = get_object_or_404(Place, id=place_id)
-        serializer = PlaceCreateSerializer(place, data=request.data, partial=True)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     #맛집 삭제
     @swagger_auto_schema(operation_summary="맛집 삭제",
