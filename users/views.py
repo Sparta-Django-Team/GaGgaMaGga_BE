@@ -8,7 +8,7 @@ from rest_framework_simplejwt.views import TokenViewBase
 from rest_framework_simplejwt.exceptions import TokenError, InvalidToken
 from rest_framework_simplejwt.settings import api_settings
 
-from django.contrib.auth.hashers import check_password
+from django.core.files import File
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from django.utils.http import urlsafe_base64_decode
 from django.utils.encoding import DjangoUnicodeDecodeError, force_str
@@ -54,8 +54,8 @@ class UserView(APIView):
 
             ConfirmEmail.objects.create(secured_key=secured_key, expired_at=expired_at, user=user)
 
-            frontend_site = "127.0.0.1:5501" 
-            absurl = f'http://{frontend_site}/confrim_email.html?secured_key={str(secured_key)}'
+            frontend_site = "127.0.0.1:5500" 
+            absurl = f'http://{frontend_site}/confirm_email.html?secured_key={str(secured_key)}'
             email_body = '안녕하세요!' + user.username +"고객님 이메일인증을 하시려면 아래 사이트를 접속해주세요 \n" + absurl
             message = {'email_body': email_body,'to_email':user.email, 'email_subject':'이메일 인증' }
             Util.send_email(message)
@@ -164,8 +164,8 @@ class ReSendEmailView(APIView):
 
         ConfirmEmail.objects.create(secured_key=secured_key, expired_at=expired_at, user=user)
 
-        frontend_site = "127.0.0.1:5501" 
-        absurl = f'http://{frontend_site}/confrim_email.html?secured_key={str(secured_key)}'
+        frontend_site = "127.0.0.1:5500" 
+        absurl = f'http://{frontend_site}/confirm_email.html?secured_key={str(secured_key)}'
         email_body = '안녕하세요!' + user.username +"고객님 이메일인증을 하시려면 아래 사이트를 접속해주세요 \n" + absurl
         message = {'email_body': email_body,'to_email':user.email, 'email_subject':'이메일 인증' }
         Util.send_email(message)
@@ -263,16 +263,6 @@ class LoginLogListView(APIView):
 
 class ChangePasswordView(APIView):
     permission_classes = [IsAuthenticated]
-
-    #비밀번호 인증
-    @swagger_auto_schema(operation_summary="비밀번호 인증", 
-                    responses={200 : '성공', 201 : '인증 에러', 400 : '인풋값 에러', 401 : '인증 에러', 404 : '찾을 수 없음', 500 : '서버 에러'})
-    def post(self, request):
-        user = get_object_or_404(User, id=request.user.id)
-        password = user.password
-        if check_password(request.data["password"], password):
-            return Response({"message":"인증이 완료되었습니다."}, status=status.HTTP_200_OK)        
-        return Response({"message":"맞는 비밀번호를 적어주세요."}, status=status.HTTP_400_BAD_REQUEST)
 
     #비밀번호 변경
     @swagger_auto_schema(request_body=ChangePasswordSerializer, 
@@ -395,12 +385,11 @@ class KakaoLoginView(APIView):
                 data={
                     "grant_type": "authorization_code",
                     "client_id": get_secret("SOCIAL_AUTH_KAKAO_CLIENT_ID"),
-                    "redirect_uri": "http://127.0.0.1:5501",
+                    "redirect_uri": "http://127.0.0.1:5500",
                     "code": code,
                 },
             )
             access_token = access_token.json().get("access_token")
-            
             user_data = requests.get(
                 "https://kapi.kakao.com/v2/user/me",
                 headers={
@@ -410,17 +399,23 @@ class KakaoLoginView(APIView):
             )
             
             user_data = user_data.json()
-            
+
             kakao_email = user_data.get('kakao_account')['email']
             kakao_nickname = user_data.get('properties')['nickname']
             kakao_profile_image = user_data.get('properties')['profile_image']
-            
+
             try:
                 user = User.objects.get(email=kakao_email)
                 social_user = OauthId.objects.filter(user=user).first()
                 if social_user:
                     if social_user.provider !="kakao":
                         return Response({"error":"카카오로 가입한 유저가 아닙니다."}, status=status.HTTP_400_BAD_REQUEST)
+                    
+                    user.withdraw = False
+                    user.save()
+                    
+                    user_ip= Util.get_client_ip(request)
+                    LoggedIn.objects.create(user=user, created_at=timezone.now(), update_ip=user_ip)
                     
                     refresh = RefreshToken.for_user(user)
                     return Response({'refresh': str(refresh), 'access':str(refresh.access_token)}, status=status.HTTP_200_OK)
@@ -433,8 +428,14 @@ class KakaoLoginView(APIView):
                 new_user.set_unusable_password()
                 new_user.save()
                 
-                Profile.objects.create(nickname=kakao_nickname, profile_image=kakao_profile_image, user=new_user)
+                profile = Profile.objects.create(nickname=kakao_nickname, user=new_user)
                 OauthId.objects.create(provider="kakao", access_token=access_token, user=new_user)
+
+                util_image = Util.profile_image_download(kakao_profile_image)
+                profile.profile_image.save(util_image["file_name"], File(util_image["temp_image"]))
+                
+                user_ip= Util.get_client_ip(request)
+                LoggedIn.objects.create(user=new_user, created_at=timezone.now(), update_ip=user_ip)
                 
                 refresh = RefreshToken.for_user(new_user)
                 
