@@ -11,7 +11,7 @@ class PlaceSelectSerializer(serializers.ModelSerializer):
 class PlaceSerializer(serializers.ModelSerializer):
     class Meta:
         model = Place
-        fields = ('place_name', 'category', 'rating', 'place_address', 'place_number', 'place_time', 'place_img', 'latitude', 'longitude', 'hit',)
+        fields = ('id', 'place_name', 'category', 'rating', 'place_address', 'place_number', 'place_time', 'place_img', 'latitude', 'longitude', 'hit',)
 
 #장소 생성 serializer
 class PlaceCreateSerializer(serializers.ModelSerializer):
