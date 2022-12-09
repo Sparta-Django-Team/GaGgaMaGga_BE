@@ -161,9 +161,8 @@ class PrivateProfileSerializer(serializers.ModelSerializer):
 
 #공개 프로필 serializer
 class PublicProfileSerializer(serializers.ModelSerializer):
-    #팔로우 닉네임만 보게함
-    followings = serializers.StringRelatedField(many=True)
-    followers = serializers.StringRelatedField(many=True)
+    followings = PrivateProfileSerializer(many=True)
+    followers = PrivateProfileSerializer(many=True)
     review_set = ReviewListSerializer(many=True, source='user.review_set')
     bookmark_place = PlaceSerializer(many=True, source='user.bookmark_place')
 
