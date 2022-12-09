@@ -10,6 +10,7 @@ import re
 
 from .models import User, Profile, LoggedIn
 from .utils import Util
+from .validators import password_validator, password_pattern, username_validator, nickname_validator
 
 from reviews.serializers import ReviewListSerializer
 from places.serializers import PlaceSerializer
@@ -44,10 +45,6 @@ class SignupSerializer(serializers.ModelSerializer):
                         'required': '휴대폰 번호를 입력해주세요.',}}}
 
     def validate(self, data):
-        PASSWORD_VALIDATION = r"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[$@$!%*?&])[A-Za-z\d$@$!%*?&]{8,16}"
-        PASSWORD_PATTERN = r"(.)\1+\1"
-        USERNAME_VALIDATION = r'^[A-Za-z0-9]{6,20}$'
-
         username = data.get('username')
         phone_number = data.get('phone_number')
         password = data.get('password')
@@ -55,7 +52,7 @@ class SignupSerializer(serializers.ModelSerializer):
         term_check = data.get('term_check')
 
         # 아이디 유효성 검사
-        if not re.search(USERNAME_VALIDATION, str(username)):
+        if username_validator(username):
             raise serializers.ValidationError(detail={"username":"아이디는 6자 이상 20자 이하의 숫자, 영문 대/소문자 이어야 합니다."})
 
         # 비밀번호 일치
@@ -63,11 +60,11 @@ class SignupSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError(detail={"password":"비밀번호가 일치하지 않습니다."})
 
         # 비밀번호 유효성 검사
-        if not re.search(PASSWORD_VALIDATION, str(password)):
+        if password_validator(password):
             raise serializers.ValidationError(detail={"password":"비밀번호는 8자 이상 16자이하의 영문 대/소문자, 숫자, 특수문자 조합이어야 합니다. "})
 
         # 비밀번호 동일여부 검사
-        if re.search(PASSWORD_PATTERN, str(password)):
+        if password_pattern(password):
             raise serializers.ValidationError(detail={"password":"비밀번호는 3자리 이상 동일한 영문,숫자,특수문자 사용 불가합니다. "})
 
         # 휴대폰 번호 존재여부와 blank 허용
@@ -189,13 +186,11 @@ class ProfileUpdateSerializer(serializers.ModelSerializer):
                         'blank':'자기소개를 입력해주세요.',}},
                         } 
 
-    def validate(self, data):
-        NICKNAME_VALIDATION = r'^[A-Za-z가-힣0-9]{3,10}$'
-        
+    def validate(self, data):        
         nickname = data.get('nickname')
         
         # 닉네임 유효성 검사
-        if not re.search(NICKNAME_VALIDATION, str(nickname)):
+        if nickname_validator(nickname):
             raise serializers.ValidationError(detail={"nickname":"닉네임은 3자이상 10자 이하로 작성해야하며 특수문자는 포함할 수 없습니다."})
         
         return data
@@ -228,9 +223,6 @@ class ChangePasswordSerializer(serializers.ModelSerializer):
                         'blank':'비밀번호를 입력해주세요.',}},}
 
     def validate(self, data):
-        PASSWORD_VALIDATION = r"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[$@$!%*?&])[A-Za-z\d$@$!%*?&]{8,16}"
-        PASSWORD_PATTERN = r"(.)\1+\1"
-
         current_password = self.context.get("request").user.password
         password = data.get('password')
         repassword = data.get('repassword')
@@ -244,11 +236,11 @@ class ChangePasswordSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError(detail={"password":"비밀번호가 일치하지 않습니다."})
 
         # 비밀번호 유효성 검사
-        if not re.search(PASSWORD_VALIDATION, str(password)):
+        if password_validator(password):
             raise serializers.ValidationError(detail={"password":"비밀번호는 8자 이상 16자이하의 영문 대/소문자, 숫자, 특수문자 조합이어야 합니다. "})
 
         # 비밀번호 문자열 동일여부 검사
-        if re.search(PASSWORD_PATTERN, str(password)):
+        if password_pattern(password):
             raise serializers.ValidationError(detail={"password":"비밀번호는 3자리 이상 동일한 영문/사용 사용 불가합니다. "})
 
         return data
@@ -296,9 +288,6 @@ class SetNewPasswordSerializer(serializers.Serializer):
         fields = ('repassword','password','token','uidb64',)
 
     def validate(self, attrs):
-        PASSWORD_VALIDATION = r"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[$@$!%*?&])[A-Za-z\d$@$!%*?&]{8,16}"
-        PASSWORD_PATTERN = r"(.)\1+\1"
-
         password = attrs.get('password')
         repassword = attrs.get('repassword')
         token = attrs.get('token')
@@ -316,11 +305,11 @@ class SetNewPasswordSerializer(serializers.Serializer):
             raise serializers.ValidationError(detail={"password":"비밀번호가 일치하지 않습니다."})
 
         # 비밀번호 유효성 검사
-        if not re.search(PASSWORD_VALIDATION, str(password)):
+        if password_validator(password):
             raise serializers.ValidationError(detail={"password":"비밀번호는 8자 이상 16자이하의 영문 대/소문자, 숫자, 특수문자 조합이어야 합니다. "})
 
         # 비밀번호 문자열 동일여부 검사
-        if re.search(PASSWORD_PATTERN, str(password)):
+        if password_pattern(password):
             raise serializers.ValidationError(detail={"password":"비밀번호는 3자리 이상 동일한 영문/사용 사용 불가합니다. "})
 
         user.set_password(password)
