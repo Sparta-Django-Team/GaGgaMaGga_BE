@@ -29,7 +29,7 @@ def rcm_place_new_user(place_id, category):
         places = places[places['category'].str.contains(category)]
     else:                   # Case2: choice place location
         places = places[places['place_address'].str.contains(category)]
-        
+    
     # Create dataframe
     reviews = pd.DataFrame(list(Review.objects.values()))
     places.rename(columns={'id':'place_id'}, inplace=True)
@@ -68,6 +68,7 @@ def rcm_place_user(user_id, cate_id):
 
     # Create dataframe
     reviews = pd.DataFrame(list(Review.objects.values()))
+    print(reviews)
     places.rename(columns={'id':'place_id'}, inplace=True)
     place_ratings = pd.merge(places, reviews, on='place_id')
     review_user = place_ratings.pivot_table('rating_cnt', index='author_id', columns='place_id')
