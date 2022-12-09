@@ -38,30 +38,35 @@ class PlaceSelectView(APIView):
     #맛집 취향 선택(리뷰가 없거나, 비로그인 계정일 경우)
     def get(self, request, choice_no):
         place_list = []
-        # 지역 선택일 경우
+        
+        # Case1: choice place location
         if choice_no > 12:
             place_list = []
             for i in range(0, 12):
                 pick = Place.objects.filter(place_address__contains=CHOICE_CATEGORY[choice_no-1][1],category=CHOICE_CATEGORY[i][1]).first()
                 place_list.append(pick.id)
+            
+            # Create list for custom sorting
             preserved = Case(*[When(pk=pk, then=pos) for pos, pk in enumerate(place_list)])
             place = Place.objects.filter(id__in=place_list).order_by(preserved)
             serializer = PlaceSelectSerializer(place, many=True)
             return Response(serializer.data, status=status.HTTP_200_OK)
-        # 음식 선택일 경우
+        
+        # Case2: choice food group
         else:
             if (choice_no == 3)|(choice_no == 6)|(choice_no == 12):
+                # Merge queryset for 3categories
                 place_list = []
                 pick1 = Place.objects.filter(category=CHOICE_CATEGORY[choice_no-1][1])[0:3]
                 pick2 = Place.objects.filter(category=CHOICE_CATEGORY[choice_no-2][1])[0:3]
                 pick3 = Place.objects.filter(category=CHOICE_CATEGORY[choice_no-3][1])[0:3]
                 pick = (pick1|pick2|pick3)
+                
                 serializer = PlaceSelectSerializer(pick, many=True)
                 return Response(serializer.data, status=status.HTTP_200_OK)
             else:
                 place_list = []
                 pick = Place.objects.filter(category=CHOICE_CATEGORY[choice_no-1][1])[0:12]
-                print(pick)
                 serializer = PlaceSelectSerializer(pick, many=True)
                 return Response(serializer.data, status=status.HTTP_200_OK)
 
