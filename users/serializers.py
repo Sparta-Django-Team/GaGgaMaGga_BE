@@ -6,8 +6,6 @@ from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.encoding import smart_bytes, force_str
 
-import re
-
 from .models import User, Profile, LoggedIn
 from .utils import Util
 from .validators import password_validator, password_pattern, username_validator, nickname_validator
