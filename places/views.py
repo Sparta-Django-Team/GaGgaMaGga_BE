@@ -136,20 +136,8 @@ class PlaceBookmarkView(APIView):
 #####검색#####
 class SearchListView(generics.GenericAPIView):
     def get(self, request, *args, **wsargs):
-        query = request.GET.get('q')
+        query = request.GET.get('keyword')
         if not query:
             return Response('', status=status.HTTP_400_BAD_REQUEST)
         results = client.perform_search(query)
         return Response(results)
-
-class SearchListOldView(generics.ListAPIView):
-    queryset = Place.objects.all()
-    serializer_class = PlaceSerializer
-
-    def get_queryset(self, *args, **kwargs):
-        qs = super().get_queryset(*args, **kwargs)
-        q = self.request.GET.get('q')
-        results = Place.objects.none()
-        if q is not None:
-            results = qs.search(q)
-        return results
