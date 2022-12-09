@@ -1,5 +1,6 @@
 from django.db import models
 from django.core.validators import MaxValueValidator, validate_image_file_extension
+
 from users.models import User
 from places.models import Place
 

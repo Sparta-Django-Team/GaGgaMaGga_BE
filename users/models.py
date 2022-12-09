@@ -80,7 +80,7 @@ class User(AbstractBaseUser):
     def is_staff(self):
         return self.is_admin
 
-#이메일 확인 
+# 이메일 확인 
 class ConfirmEmail(models.Model):
     secured_key = models.CharField('시크릿 키', max_length=255, default=0)
     expired_at = models.DateTimeField('만료일', auto_now_add=True)
@@ -90,7 +90,7 @@ class ConfirmEmail(models.Model):
     def __str__(self):
         return f"[이메일]{self.user.email}"
 
-#휴대폰 번호 확인
+# 휴대폰 번호 확인
 class ConfirmPhoneNumber(models.Model): 
     auth_number = models.IntegerField('인증 번호', default=0, validators=[MaxValueValidator(9999)])
     expired_at = models.DateTimeField('만료일',)
@@ -137,7 +137,7 @@ class ConfirmPhoneNumber(models.Model):
     def __str__(self):
         return f"[휴대폰 번호]{self.user.phone_number}"
 
-#로그 기록
+# 로그 기록
 class LoggedIn(models.Model):
     update_ip = models.GenericIPAddressField('로그인한 IP', null=True, validators=[validate_ipv46_address])
     created_at = models.DateTimeField('로그인 기록', auto_now_add=True)
@@ -150,7 +150,7 @@ class LoggedIn(models.Model):
     class Meta:
         ordering = ['-created_at']
 
-#소셜 로그인
+# 소셜 로그인
 class OauthId(models.Model):
     access_token = models.CharField('토큰', max_length=255)
     provider = models.CharField('구분자', max_length=255)
@@ -160,7 +160,7 @@ class OauthId(models.Model):
     def __str__(self):
         return f"[아이디]{self.user.username}, [소셜 도메인]{self.provider}"
 
-#프로필
+# 프로필
 class Profile(models.Model):
     profile_image = models.ImageField('프로필 사진', default='default_profile_pic.jpg', upload_to='profile_pics', validators=[validate_image_file_extension])
     nickname = models.CharField('닉네임', max_length=10, null=True, unique=True, error_messages={"unique": "이미 사용중인 닉네임 이거나 탈퇴한 닉네임입니다."})

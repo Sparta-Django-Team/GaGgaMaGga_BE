@@ -15,6 +15,7 @@ class EmailThread(threading.Thread):
         self.email.send()
 
 class Util:
+
     @staticmethod
     def send_email(message):
         email = EmailMessage(subject=message['email_subject'], body=message['email_body'], to=[message['to_email']])
@@ -27,7 +28,7 @@ class Util:
         else:
             ip = request.META.get('REMOTE_ADDR')
         return ip
-    
+
     def profile_image_download(url):
         response = requests.get(url, stream=True)
         file_name = ''.join(url.split('/')[-2:]) #파일명으로 사용
