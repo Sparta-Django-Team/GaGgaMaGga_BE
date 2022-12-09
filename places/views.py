@@ -31,11 +31,49 @@ CHOICE_CATEGORY = (
         ('13', '강남'),
     )
 
+##### 맛집 #####
+class PlaceDetailView(APIView):
+    permission_classes = [IsAdminOrOntherReadOnly]
+
+    # 맛집 상세 페이지
+    @swagger_auto_schema(operation_summary="맛집 상세 페이지",
+                    responses={200 : '성공', 404 : '찾을 수 없음', 500 : '서버 에러'})
+    def get(self, request, place_id):
+        place = get_object_or_404(Place, id=place_id)
+        place.hit_count
+        serializer = PlaceSerializer(place)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    # 맛집 삭제
+    @swagger_auto_schema(operation_summary="맛집 삭제",
+                    responses={200 : '성공', 404 : '찾을 수 없음', 500 : '서버 에러'})
+    def delete(self, request, place_id):
+        place = get_object_or_404(Place, id=place_id)
+        place.delete()
+        return Response({"message":"맛집 삭제 완료"},status=status.HTTP_200_OK)
+
+class PlaceBookmarkView(APIView):
+    permission_classes = [IsAuthenticated] 
+
+    # 맛집 북마크
+    @swagger_auto_schema(operation_summary="맛집 북마크",  
+                responses={200 : '성공', 404 : '찾을 수 없음', 500 : '서버 에러'})
+    def post(self, request, place_id):
+        place = get_object_or_404(Place, id=place_id)
+        if request.user in place.place_bookmark.all():
+            place.place_bookmark.remove(request.user)
+            return Response({"message":"북마크를 취소했습니다."}, status=status.HTTP_200_OK)
+        else:
+            place.place_bookmark.add(request.user)
+            return Response({"message":"북마크를 했습니다."}, status=status.HTTP_200_OK)
+
 ##### 취향 선택 #####
 class PlaceSelectView(APIView):
     permission_classes = [AllowAny]
     
-    #맛집 취향 선택(리뷰가 없거나, 비로그인 계정일 경우)
+    # 맛집 취향 선택(리뷰가 없거나, 비로그인 계정일 경우)
+    @swagger_auto_schema(operation_summary="맛집 취향 선택",
+                responses={200 : '성공', 500 : '서버 에러'})
     def get(self, request, choice_no):
         place_list = []
         
@@ -70,15 +108,13 @@ class PlaceSelectView(APIView):
                 serializer = PlaceSelectSerializer(pick, many=True)
                 return Response(serializer.data, status=status.HTTP_200_OK)
 
-
-##### 장소(리뷰가 없거나, 비로그인 계정일 경우) #####
+##### 맛집(리뷰가 없거나, 비로그인 계정일 경우) #####
 class NewUserPlaceListView(APIView):
     permission_classes = [AllowAny]
 
-    #맛집 전체 리스트
-    @swagger_auto_schema(operation_summary="맛집 전체 리스트",
+    # 맛집 리스트 추천
+    @swagger_auto_schema(operation_summary="맛집 리스트 추천(비유저)",
                     responses={200 : '성공', 500 : '서버 에러'})
-    #맛집 리스트 추천
     def get(self, request, place_id, category):
         place_list = rcm_place_new_user(place_id=place_id, category=str(category))
         preserved = Case(*[When(pk=pk, then=pos) for pos, pk in enumerate(place_list)])
@@ -86,60 +122,26 @@ class NewUserPlaceListView(APIView):
         serializer = PlaceSerializer(place, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
-##### 장소 #####
+##### 맛집(유저일 경우) #####
 class UserPlaceListView(APIView):
     permission_classes = [AllowAny]
 
-    #맛집 전체 리스트
-    @swagger_auto_schema(operation_summary="맛집 전체 리스트",
+    # 맛집 리스트 추천
+    @swagger_auto_schema(operation_summary="맛집 리스트 추천(유저)",
                     responses={200 : '성공', 500 : '서버 에러'})
-    #맛집 리스트 추천
     def get(self, request, cate_id):
-        # 지역 선택일 경우
         place_list = rcm_place_user(user_id = request.user.id, cate_id=cate_id)
         preserved = Case(*[When(pk=pk, then=pos) for pos, pk in enumerate(place_list)])
         place = Place.objects.filter(id__in=place_list).order_by(preserved)
         serializer = PlaceSerializer(place, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
-
-class PlaceDetailView(APIView):
-    permission_classes = [IsAdminOrOntherReadOnly]
-
-    #맛집 상세 페이지
-    @swagger_auto_schema(operation_summary="맛집 상세 페이지",
-                    responses={200 : '성공', 404 : '찾을 수 없음', 500 : '서버 에러'})
-    def get(self, request, place_id):
-        place = get_object_or_404(Place, id=place_id)
-        place.hit_count
-        serializer = PlaceSerializer(place)
-        return Response(serializer.data, status=status.HTTP_200_OK)
-
-    #맛집 삭제
-    @swagger_auto_schema(operation_summary="맛집 삭제",
-                    responses={200 : '성공', 404 : '찾을 수 없음', 500 : '서버 에러'})
-    def delete(self, request, place_id):
-        place = get_object_or_404(Place, id=place_id)
-        place.delete()
-        return Response({"message":"맛집 삭제 완료"},status=status.HTTP_200_OK)
-
-class PlaceBookmarkView(APIView):
-    permission_classes = [IsAuthenticated] 
-
-    #맛집 북마크
-    @swagger_auto_schema(operation_summary="장소 북마크",  
-                responses={200 : '성공', 404 : '찾을 수 없음', 500 : '서버 에러'})
-    def post(self, request, place_id):
-        place = get_object_or_404(Place, id=place_id)
-        if request.user in place.place_bookmark.all():
-            place.place_bookmark.remove(request.user)
-            return Response({"message":"북마크를 취소했습니다."}, status=status.HTTP_200_OK)
-        else:
-            place.place_bookmark.add(request.user)
-            return Response({"message":"북마크를 했습니다."}, status=status.HTTP_200_OK)
-
-#####검색#####
+##### 검색 #####
 class SearchListView(generics.GenericAPIView):
+    permission_classes = [AllowAny]
+    
+    @swagger_auto_schema(operation_summary="검색",
+                    responses={200 : '성공', 400:'', 500 : '서버 에러'})
     def get(self, request, *args, **wsargs):
         query = request.GET.get('keyword')
         if not query:

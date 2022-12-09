@@ -10,7 +10,7 @@ from .models import User, ConfirmPhoneNumber, Profile
 
 class UserSignupAPIViewTestCase(APITestCase):
     
-    #회원가입 성공
+    # 회원가입 성공
     def test_signup_success(self):
         url = reverse("user_view")
         user_data = {
@@ -24,7 +24,7 @@ class UserSignupAPIViewTestCase(APITestCase):
         response = self.client.post(url, user_data)
         self.assertEqual(response.status_code, 201)
     
-    #회원가입 실패(이메일 빈칸)
+    # 회원가입 실패(이메일 빈칸)
     def test_signup_email_blank_fail(self):
         url = reverse("user_view")
         user_data = {
@@ -38,7 +38,7 @@ class UserSignupAPIViewTestCase(APITestCase):
         response = self.client.post(url, user_data)
         self.assertEqual(response.status_code, 400)
         
-    #회원가입 실패(이메일 형식)
+    # 회원가입 실패(이메일 형식)
     def test_signup_email_invalid_fail(self):
         url = reverse("user_view")
         user_data = {
@@ -52,7 +52,7 @@ class UserSignupAPIViewTestCase(APITestCase):
         response = self.client.post(url, user_data)
         self.assertEqual(response.status_code, 400)
         
-    #회원가입 실패(이메일 중복)
+    # 회원가입 실패(이메일 중복)
     def test_signup_email_unique_fail(self):
         User.objects.create_user("test1234","test@test.com", "010123434321","Test1234!")
         url = reverse("user_view")
@@ -67,7 +67,7 @@ class UserSignupAPIViewTestCase(APITestCase):
         response = self.client.post(url, user_data)
         self.assertEqual(response.status_code, 400)
         
-    #회원가입 실패(아이디 빈칸)
+    # 회원가입 실패(아이디 빈칸)
     def test_signup_username_blank_fail(self):
         url = reverse("user_view")
         user_data = {
@@ -81,7 +81,7 @@ class UserSignupAPIViewTestCase(APITestCase):
         response = self.client.post(url, user_data)
         self.assertEqual(response.status_code, 400)
         
-    #회원가입 실패(아이디 유효성검사)
+    # 회원가입 실패(아이디 유효성검사)
     def test_signup_username_validation_fail(self):
         url = reverse("user_view")
         user_data = {
@@ -95,7 +95,7 @@ class UserSignupAPIViewTestCase(APITestCase):
         response = self.client.post(url, user_data)
         self.assertEqual(response.status_code, 400)
     
-    #회원가입 실패(아이디 중복)
+    # 회원가입 실패(아이디 중복)
     def test_signup_username_unique_fail(self):
         User.objects.create_user("test1234","test@test.com", "010123434321","Test1234!")
         url = reverse("user_view")
@@ -110,7 +110,7 @@ class UserSignupAPIViewTestCase(APITestCase):
         response = self.client.post(url, user_data)
         self.assertEqual(response.status_code, 400)
     
-    #회원가입 실패(비밀번호 빈칸)
+    # 회원가입 실패(비밀번호 빈칸)
     def test_signup_password_blank_fail(self):
         url = reverse("user_view")
         user_data = {
@@ -124,7 +124,7 @@ class UserSignupAPIViewTestCase(APITestCase):
         response = self.client.post(url, user_data)
         self.assertEqual(response.status_code, 400)
     
-    #회원가입 실패(아이디 중복)
+    # 회원가입 실패(아이디 중복)
     def test_signup_phone_number_unique_fail(self):
         User.objects.create_user("test1234","test@test.com", "01012341234","Test1234!")
         url = reverse("user_view")
@@ -139,7 +139,7 @@ class UserSignupAPIViewTestCase(APITestCase):
         response = self.client.post(url, user_data)
         self.assertEqual(response.status_code, 400)
     
-    #회원가입 실패(비밀번호확인 빈칸)
+    # 회원가입 실패(비밀번호확인 빈칸)
     def test_signup_password_confirm_blank_fail(self):
         url = reverse("user_view")
         user_data = {
@@ -153,7 +153,7 @@ class UserSignupAPIViewTestCase(APITestCase):
         response = self.client.post(url, user_data)
         self.assertEqual(response.status_code, 400)
         
-    #회원가입 실패(비밀번호, 비밀번호 확인 일치 )
+    # 회원가입 실패(비밀번호, 비밀번호 확인 일치 )
     def test_signup_password_same_fail(self):
         url = reverse("user_view")
         user_data = {
@@ -167,7 +167,7 @@ class UserSignupAPIViewTestCase(APITestCase):
         response = self.client.post(url, user_data)
         self.assertEqual(response.status_code, 400)
         
-    #회원가입 실패(비밀번호 유효성 검사(simple))
+    # 회원가입 실패(비밀번호 유효성 검사(simple))
     def test_signup_password_validation_fail(self):
         url = reverse("user_view")
         user_data = {
@@ -181,7 +181,7 @@ class UserSignupAPIViewTestCase(APITestCase):
         response = self.client.post(url, user_data)
         self.assertEqual(response.status_code, 400)
         
-    #회원가입 실패(비밀번호 유효성검사(동일))
+    # 회원가입 실패(비밀번호 유효성검사(동일))
     def test_signup_password_validation_same_fail(self):
         url = reverse("user_view")
         user_data = {
@@ -195,7 +195,7 @@ class UserSignupAPIViewTestCase(APITestCase):
         response = self.client.post(url, user_data)
         self.assertEqual(response.status_code, 400)
         
-    #회원가입 실패(약관동의)
+    # 회원가입 실패(약관동의)
     def test_signup_term_checkt_fail(self):
         url = reverse("user_view")
         user_data = {
@@ -215,7 +215,7 @@ class UserUpdateAPIViewTestCase(APITestCase):
         self.user1 = User.objects.create_user("test1234","test@test.com", "01012341234","Test1234!")
         self.user2 = User.objects.create_user("test12345","test1@test.com", "01012351234","Test1234!")
     
-    #회원정보 수정 성공
+    # 회원정보 수정 성공
     def test_user_update_success(self):
         access_token = self.client.post(reverse('token_obtain_pair_view'), self.data).data['access']
         response = self.client.put(
@@ -225,7 +225,7 @@ class UserUpdateAPIViewTestCase(APITestCase):
         )
         self.assertEqual(response.status_code, 200)
         
-    #회원정보 수정 실패(이메일 빈칸)
+    # 회원정보 수정 실패(이메일 빈칸)
     def test_user_update_email_blank_fail(self):
         access_token = self.client.post(reverse('token_obtain_pair_view'), self.data).data['access']
         response = self.client.put(
@@ -235,7 +235,7 @@ class UserUpdateAPIViewTestCase(APITestCase):
         )
         self.assertEqual(response.status_code, 400)
         
-    #회원정보 수정 실패(이메일 중복)
+    # 회원정보 수정 실패(이메일 중복)
     def test_user_update_email_unique_fail(self):
         access_token = self.client.post(reverse('token_obtain_pair_view'), self.data).data['access']
         response = self.client.put(
@@ -245,7 +245,7 @@ class UserUpdateAPIViewTestCase(APITestCase):
         )
         self.assertEqual(response.status_code, 400)
         
-    #회원정보 수정 실패(이메일 중복)
+    # 회원정보 수정 실패(이메일 중복)
     def test_user_update_email_invalid_fail(self):
         access_token = self.client.post(reverse('token_obtain_pair_view'), self.data).data['access']
         response = self.client.put(
@@ -255,7 +255,7 @@ class UserUpdateAPIViewTestCase(APITestCase):
         )
         self.assertEqual(response.status_code, 400)
         
-    #회원정보 수정 실패(휴대폰번호 중복)
+    # 회원정보 수정 실패(휴대폰번호 중복)
     def test_user_update_phone_number_unique_fail(self):
         access_token = self.client.post(reverse('token_obtain_pair_view'), self.data).data['access']
         response = self.client.put(
@@ -271,7 +271,7 @@ class UserDeleteAPIViewTestCase(APITestCase):
         self.user1 = User.objects.create_user("test1234","test@test.com", "01012341234","Test1234!")
         self.user2 = User.objects.create_user("test12345","test1@test.com", "01012351234","Test1234!")
     
-    #회원 비활성화 
+    # 회원 비활성화 
     def test_user_delete_success(self):
         access_token = self.client.post(reverse('token_obtain_pair_view'), self.data).data['access']
         response = self.client.delete(
@@ -286,17 +286,17 @@ class UserLoginLogoutAPIViewTestCase(APITestCase):
         self.fail_data = {"username": "test12345", "password":"Test1234!!"}
         self.user = User.objects.create_user("test1234","test@test.com", "01012341234","Test1234!")
         
-    #(access token)로그인 성공
+    # (access token)로그인 성공
     def test_access_token_login_success(self):
         response = self.client.post(reverse('token_obtain_pair_view'), self.success_data)
         self.assertEqual(response.status_code, 200)
     
-    #(access token)로그인 실패
+    # (access token)로그인 실패
     def test_access_token_login_fail(self):
         response = self.client.post(reverse('token_obtain_pair_view'), self.fail_data)
         self.assertEqual(response.status_code, 401)
         
-    #(refresh_token)로그인 성공
+    # (refresh_token)로그인 성공
     def test_refresh_token_login_success(self):
         token = self.client.post(reverse('token_obtain_pair_view'), self.success_data)
         access_token = token.data['access']
@@ -308,7 +308,7 @@ class UserLoginLogoutAPIViewTestCase(APITestCase):
         )
         self.assertEqual(response.status_code, 200)
         
-    #(refresh_token)로그인 실패(refresh 입력안했을 때)
+    # (refresh_token)로그인 실패(refresh 입력안했을 때)
     def test_refresh_token_login_fail(self):
         access_token = self.client.post(reverse('token_obtain_pair_view'), self.success_data).data['access']
         response = self.client.post(
@@ -317,7 +317,7 @@ class UserLoginLogoutAPIViewTestCase(APITestCase):
         )
         self.assertEqual(response.status_code, 400)
 
-    #(refresh_token)로그인 실패(access 토큰 넣었을 때)
+    # (refresh_token)로그인 실패(access 토큰 넣었을 때)
     def test_refresh_token_login_invalid_fail(self):
         access_token = self.client.post(reverse('token_obtain_pair_view'), self.success_data).data['access']
         response = self.client.post(
@@ -327,7 +327,7 @@ class UserLoginLogoutAPIViewTestCase(APITestCase):
         )
         self.assertEqual(response.status_code, 401)
 
-    #(refresh_token)로그아웃 성공
+    # (refresh_token)로그아웃 성공
     def test_refresh_token_logout_success(self):
         token = self.client.post(reverse('token_obtain_pair_view'), self.success_data)
         access_token = token.data['access']
@@ -339,7 +339,7 @@ class UserLoginLogoutAPIViewTestCase(APITestCase):
         )
         self.assertEqual(response.status_code, 200)
     
-    #(refresh_token)로그아웃 실패(refresh 입력안했을 때)
+    # (refresh_token)로그아웃 실패(refresh 입력안했을 때)
     def test_refresh_token_logout_fail(self):
         access_token = self.client.post(reverse('token_obtain_pair_view'), self.success_data).data['access']
         response = self.client.post(
@@ -348,7 +348,7 @@ class UserLoginLogoutAPIViewTestCase(APITestCase):
         )
         self.assertEqual(response.status_code, 400)
         
-    #(refresh_token)로그아웃 실패(access 토큰 넣었을 때)
+    # (refresh_token)로그아웃 실패(access 토큰 넣었을 때)
     def test_refresh_token_logout_invalid_fail(self):
         access_token = self.client.post(reverse('token_obtain_pair_view'), self.success_data).data['access']
         response = self.client.post(
@@ -446,7 +446,7 @@ class PrivateProfileAPIViewTestCase(APITestCase):
         self.user = User.objects.create_user("test12341","test1@test.com", "01012351234","Test1234!")
         Profile.objects.create(user=self.user, nickname="test", intro='test')
     
-    #개인 프로필
+    # 개인 프로필
     def test_private_profile_get_success(self):
         access_token = self.client.post(reverse('token_obtain_pair_view'), self.data).data['access']
         response = self.client.get(
@@ -464,7 +464,7 @@ class PrivateProfileAPIViewTestCase(APITestCase):
         self.profile1 = Profile.objects.create(user=self.user1, nickname="test", intro='test')
         self.profile2 = Profile.objects.create(user=self.user2, nickname="test1", intro='test1')
     
-    #회원정보 수정 성공
+    # 회원정보 수정 성공
     def test_profile_update_success(self):
         access_token = self.client.post(reverse('token_obtain_pair_view'), self.data).data['access']
         response = self.client.put(
@@ -474,7 +474,7 @@ class PrivateProfileAPIViewTestCase(APITestCase):
         )
         self.assertEqual(response.status_code, 200)
         
-    #회원정보 수정 실패(닉네임 유효성검사)
+    # 회원정보 수정 실패(닉네임 유효성검사)
     def test_profile_update_nickname_validation_fail(self):
         access_token = self.client.post(reverse('token_obtain_pair_view'), self.data).data['access']
         response = self.client.put(
@@ -484,7 +484,7 @@ class PrivateProfileAPIViewTestCase(APITestCase):
         )
         self.assertEqual(response.status_code, 400)
     
-    #회원정보 수정 실패(닉네임 중복)
+    # 회원정보 수정 실패(닉네임 중복)
     def test_profile_update_nickname_unique_fail(self):
         access_token = self.client.post(reverse('token_obtain_pair_view'), self.data).data['access']
         response = self.client.put(
@@ -502,7 +502,7 @@ class PublicProfileAPIViewTestCase(APITestCase):
         
         self.profile1 = Profile.objects.create(user=self.user1, nickname="test", intro='test')
     
-    #공개 프로필
+    # 공개 프로필
     def test_public_profile_get_success(self):
         access_token = self.client.post(reverse('token_obtain_pair_view'), self.data).data['access']
         response = self.client.get(
@@ -516,7 +516,7 @@ class LoginLogListAPIViewTestCase(APITestCase):
         self.data = {"username": "test1234", "password":"Test1234!"}
         self.user = User.objects.create_user("test1234","test1@test.com", "01012351234","Test1234!")
 
-    #로그인 기록
+    # 로그인 기록
     def test_login_log_get_success(self):
         access_token = self.client.post(reverse('token_obtain_pair_view'), self.data).data['access']
         response = self.client.get(
@@ -530,7 +530,7 @@ class ChangePasswordAPIViewTestCase(APITestCase):
         self.data = {"username": "test12341", "password":"Test1234!"}
         self.user = User.objects.create_user("test12341","test1@test.com", "01012351234","Test1234!")
 
-    #비밀번호 변경 인증 성공
+    # 비밀번호 변경 인증 성공
     def test_password_change_confirm_success(self):
         access_token = self.client.post(reverse('token_obtain_pair_view'), self.data).data['access']
         response = self.client.post(
@@ -540,7 +540,7 @@ class ChangePasswordAPIViewTestCase(APITestCase):
         )
         self.assertEqual(response.status_code, 200)
     
-    #비밀번호 변경 인증 실패
+    # 비밀번호 변경 인증 실패
     def test_password_change_confirm_fail(self):
         access_token = self.client.post(reverse('token_obtain_pair_view'), self.data).data['access']
         response = self.client.post(
@@ -550,7 +550,7 @@ class ChangePasswordAPIViewTestCase(APITestCase):
         )
         self.assertEqual(response.status_code, 400)
     
-    #비밀번호 변경 성공
+    # 비밀번호 변경 성공
     def test_password_change_success(self):
         access_token = self.client.post(reverse('token_obtain_pair_view'), self.data).data['access']
         response = self.client.put(
@@ -560,7 +560,7 @@ class ChangePasswordAPIViewTestCase(APITestCase):
         )
         self.assertEqual(response.status_code, 200)
     
-    #비밀번호 변경 실패(비밀번호 빈칸)
+    # 비밀번호 변경 실패(비밀번호 빈칸)
     def test_password_change_password_blank_fail(self):
         access_token = self.client.post(reverse('token_obtain_pair_view'), self.data).data['access']
         response = self.client.put(
@@ -570,7 +570,7 @@ class ChangePasswordAPIViewTestCase(APITestCase):
         )
         self.assertEqual(response.status_code, 400)
 
-    #비밀번호 변경 실패(비밀번호 확인 빈칸)
+    # 비밀번호 변경 실패(비밀번호 확인 빈칸)
     def test_password_change_password_confirm_blank_fail(self):
         access_token = self.client.post(reverse('token_obtain_pair_view'), self.data).data['access']
         response = self.client.put(
@@ -580,7 +580,7 @@ class ChangePasswordAPIViewTestCase(APITestCase):
         )
         self.assertEqual(response.status_code, 400)
         
-    #비밀번호 변경 실패(비밀번호 현재비밀번호와 동일시)
+    # 비밀번호 변경 실패(비밀번호 현재비밀번호와 동일시)
     def test_password_change_current_password_same_fail(self):
         access_token = self.client.post(reverse('token_obtain_pair_view'), self.data).data['access']
         response = self.client.put(
@@ -591,7 +591,7 @@ class ChangePasswordAPIViewTestCase(APITestCase):
         
         self.assertEqual(response.status_code, 400)
         
-    #비밀번호 변경 실패(비밀번호 유효성검사(simple))
+    # 비밀번호 변경 실패(비밀번호 유효성검사(simple))
     def test_password_change_password_validation_fail(self):
         access_token = self.client.post(reverse('token_obtain_pair_view'), self.data).data['access']
         response = self.client.put(
@@ -601,7 +601,7 @@ class ChangePasswordAPIViewTestCase(APITestCase):
         )
         self.assertEqual(response.status_code, 400)
         
-    #비밀번호 변경 실패(비밀번호 유효성검사(동일))
+    # 비밀번호 변경 실패(비밀번호 유효성검사(동일))
     def test_password_change_password_validation_same_fail(self):
         access_token = self.client.post(reverse('token_obtain_pair_view'), self.data).data['access']
         response = self.client.put(
@@ -611,7 +611,7 @@ class ChangePasswordAPIViewTestCase(APITestCase):
         )
         self.assertEqual(response.status_code, 400)
     
-    #비밀번호 변경 실패(비밀번호, 비밀번호 확인 일치 )
+    # 비밀번호 변경 실패(비밀번호, 비밀번호 확인 일치 )
     def test_password_change_password_same_fail(self):
         access_token = self.client.post(reverse('token_obtain_pair_view'), self.data).data['access']
         response = self.client.put(
@@ -632,7 +632,7 @@ class PasswordResetAPIViewTestCase(APITestCase):
         )
         self.assertEqual(response.status_code, 200)
     
-    #존재하지 않는 이메일전송
+    # 존재하지 않는 이메일전송
     def test_password_reset_email_fail(self):
         response = self.client.post(
             path=reverse("password_reset_email_view"),
@@ -640,7 +640,7 @@ class PasswordResetAPIViewTestCase(APITestCase):
         )
         self.assertEqual(response.status_code, 400)
         
-    #형식에 맞지 않는 이메일전송
+    # 형식에 맞지 않는 이메일전송
     def test_password_reset_email_invalid_fail(self):
         response = self.client.post(
             path=reverse("password_reset_email_view"),
@@ -648,7 +648,7 @@ class PasswordResetAPIViewTestCase(APITestCase):
         )
         self.assertEqual(response.status_code, 400)
         
-    #이메일 빈칸일 때 이메일 전송
+    # 이메일 빈칸일 때 이메일 전송
     def test_password_reset_email_blank_fail(self):
         response = self.client.post(
             path=reverse("password_reset_email_view"),
@@ -662,7 +662,7 @@ class PasswordTokenCheckAPIViewTestCase(APITestCase):
         self.uidb64 = urlsafe_base64_encode(smart_bytes(self.user.id)) 
         self.token = PasswordResetTokenGenerator().make_token(self.user)
 
-    #비밀번호 토큰 인증 성공
+    # 비밀번호 토큰 인증 성공
     def test_password_token_check_success(self):
         response = self.client.get(
             path=reverse("password_reset_confirm_view", kwargs={'uidb64':self.uidb64, 'token':self.token}),
@@ -681,7 +681,7 @@ class SetPasswordAPIViewTestCase(APITestCase):
         self.uidb64 = urlsafe_base64_encode(smart_bytes(self.user.id)) 
         self.token = PasswordResetTokenGenerator().make_token(self.user)
         
-    #비밀번호 변경 성공
+    # 비밀번호 변경 성공
     def test_password_set_success(self):
         response = self.client.put(
             path=reverse("password_reset_complete_view"),
@@ -689,7 +689,7 @@ class SetPasswordAPIViewTestCase(APITestCase):
         )
         self.assertEqual(response.status_code, 200)
     
-    #비밀번호 변경 실패(비밀번호 빈칸)
+    # 비밀번호 변경 실패(비밀번호 빈칸)
     def test_password_set_password_blank_fail(self):
         response = self.client.put(
             path=reverse("password_reset_complete_view"),
@@ -697,7 +697,7 @@ class SetPasswordAPIViewTestCase(APITestCase):
         )
         self.assertEqual(response.status_code, 400)
 
-    #비밀번호 변경 실패(비밀번호 확인 빈칸)
+    # 비밀번호 변경 실패(비밀번호 확인 빈칸)
     def test_password_set_password_confirm_blank_fail(self):
         response = self.client.put(
             path=reverse("password_reset_complete_view"),
@@ -705,7 +705,7 @@ class SetPasswordAPIViewTestCase(APITestCase):
         )
         self.assertEqual(response.status_code, 400)
         
-    #비밀번호 변경 실패(비밀번호 유효성검사(simple))
+    # 비밀번호 변경 실패(비밀번호 유효성검사(simple))
     def test_password_set_password_validation_fail(self):
         response = self.client.put(
             path=reverse("password_reset_complete_view"),
@@ -713,7 +713,7 @@ class SetPasswordAPIViewTestCase(APITestCase):
         )
         self.assertEqual(response.status_code, 400)
         
-    #비밀번호 변경 실패(비밀번호 유효성검사(동일))
+    # 비밀번호 변경 실패(비밀번호 유효성검사(동일))
     def test_password_set_password_validation_same_fail(self):
         response = self.client.put(
             path=reverse("password_reset_complete_view"),
@@ -721,7 +721,7 @@ class SetPasswordAPIViewTestCase(APITestCase):
         )
         self.assertEqual(response.status_code, 400)
     
-    #비밀번호 변경 실패(비밀번호, 비밀번호 확인 일치 )
+    # 비밀번호 변경 실패(비밀번호, 비밀번호 확인 일치 )
     def test_password_set_password_same_fail(self):
         response = self.client.put(
             path=reverse("password_reset_complete_view"),
@@ -729,7 +729,7 @@ class SetPasswordAPIViewTestCase(APITestCase):
         )
         self.assertEqual(response.status_code, 400)
     
-    #토큰이 다를 경우
+    # 토큰이 다를 경우
     def test_password_set_password_token_fail(self):
         response = self.client.put(
             path=reverse("password_reset_complete_view"),
@@ -762,7 +762,7 @@ class ExpiredPasswordChageAPIView(APITestCase):
         )
         self.assertEqual(response.status_code, 200)
         
-    #비밀번호 변경 성공
+    # 비밀번호 변경 성공
     def test_expired_password_put_success(self):
         access_token = self.client.post(reverse('token_obtain_pair_view'), self.data).data['access']
         response = self.client.put(
@@ -772,7 +772,7 @@ class ExpiredPasswordChageAPIView(APITestCase):
         )
         self.assertEqual(response.status_code, 200)
     
-    #비밀번호 변경 실패(비밀번호 빈칸)
+    # 비밀번호 변경 실패(비밀번호 빈칸)
     def test_expired_password_put_blank_fail(self):
         access_token = self.client.post(reverse('token_obtain_pair_view'), self.data).data['access']
         response = self.client.put(
@@ -782,7 +782,7 @@ class ExpiredPasswordChageAPIView(APITestCase):
         )
         self.assertEqual(response.status_code, 400)
 
-    #비밀번호 변경 실패(비밀번호 확인 빈칸)
+    # 비밀번호 변경 실패(비밀번호 확인 빈칸)
     def test_expired_password_put_confirm_blank_fail(self):
         access_token = self.client.post(reverse('token_obtain_pair_view'), self.data).data['access']
         response = self.client.put(
@@ -792,7 +792,7 @@ class ExpiredPasswordChageAPIView(APITestCase):
         )
         self.assertEqual(response.status_code, 400)
         
-    #비밀번호 변경 실패(비밀번호 유효성검사(simple))
+    # 비밀번호 변경 실패(비밀번호 유효성검사(simple))
     def test_expired_password_put_validation_fail(self):
         access_token = self.client.post(reverse('token_obtain_pair_view'), self.data).data['access']
         response = self.client.put(
@@ -802,7 +802,7 @@ class ExpiredPasswordChageAPIView(APITestCase):
         )
         self.assertEqual(response.status_code, 400)
         
-    #비밀번호 변경 실패(비밀번호 유효성검사(동일))
+    # 비밀번호 변경 실패(비밀번호 유효성검사(동일))
     def test_expired_password_put_validation_same_fail(self):
         access_token = self.client.post(reverse('token_obtain_pair_view'), self.data).data['access']
         response = self.client.put(
@@ -812,7 +812,7 @@ class ExpiredPasswordChageAPIView(APITestCase):
         )
         self.assertEqual(response.status_code, 400)
     
-    #비밀번호 변경 실패(비밀번호, 비밀번호 확인 일치 )
+    # 비밀번호 변경 실패(비밀번호, 비밀번호 확인 일치 )
     def test_expired_password_put_same_fail(self):
         access_token = self.client.post(reverse('token_obtain_pair_view'), self.data).data['access']
         response = self.client.put(

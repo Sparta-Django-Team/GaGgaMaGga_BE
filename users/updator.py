@@ -12,7 +12,7 @@ from django.utils import timezone
 from users.models import User
 from users.utils import Util
 
-#회원정보 보유기간이 지나면 withdraw True로 만듬
+# 회원정보 보유기간이 지나면 withdraw True로 만듬
 year_ago = timezone.now() - timezone.timedelta(days=365)
 user = User.objects.filter(is_admin=False, last_login__lte=year_ago)
 
@@ -26,7 +26,7 @@ if user:
         Util.send_email(message)
     user.update(withdraw=True)
 
-#비활성화가 되고 60일이 지나면 삭제
+# 비활성화가 되고 60일이 지나면 삭제
 two_months_ago = timezone.now() - timezone.timedelta(days=60)
 
 user = User.objects.filter(is_admin=False,  withdraw_at__lte=two_months_ago, withdraw=True)
@@ -41,6 +41,6 @@ if user:
         Util.send_email(message)
     user.delete()
 
-#로그인 비밀번호 변경이 60일이 지났을 경우 passw1ord_expired를 True로 바꿈
+# 로그인 비밀번호 변경이 60일이 지났을 경우 passw1ord_expired를 True로 바꿈
 user = User.objects.filter(is_admin=False, last_password_changed__lte=two_months_ago)
 user.update(password_expired=True)

@@ -13,11 +13,10 @@ from places.models import Place
 from .serializers import (ReviewListSerializer, ReviewCreateSerializer, ReviewDetailSerializer, 
 CommentSerializer, CommentCreateSerializer , RecommentSerializer, RecommentCreateSerializer, ReportSerializer)
 
-
-#####리뷰#####
+##### 리뷰 #####
 class ReviewRankView(APIView):
     permission_classes = [AllowAny]
-    
+
     @swagger_auto_schema(operation_summary="전체 리뷰 조회",
                     responses={200 : '성공', 404 : '찾을 수 없음', 500 : '서버 에러'})
     #리뷰 전체 리스트
@@ -31,7 +30,7 @@ class ReviewRankView(APIView):
 
         recent_review_serializer = ReviewListSerializer(recent_review, many=True).data
         like_count_review_serializer = ReviewListSerializer(like_count_review, many=True).data
-        
+
         review = {
             "recent_review": recent_review_serializer,
             "like_count_review": like_count_review_serializer
@@ -40,7 +39,7 @@ class ReviewRankView(APIView):
 
 class ReviewListView(APIView):
     permission_classes = [AllowAny]
-    
+
     def get_permissions(self):
         if self.request.method == 'POST':
             return [IsAuthenticated(),]
@@ -147,7 +146,7 @@ class ReviewLikeView(APIView):
             review.review_like.add(request.user)
             return Response({"message":"리뷰 좋아요를 했습니다."}, status=status.HTTP_200_OK)
 
-#####댓글#####
+##### 댓글 #####
 class CommentListView(APIView):
     permission_classes = [IsAuthenticated] 
 
@@ -229,7 +228,7 @@ class CommentLikeView(APIView):
             comment.comment_like.add(request.user)
             return Response({"message":"댓글 좋아요를 했습니다"}, status=status.HTTP_200_OK)
 
-#####대댓글##### 
+##### 대댓글 ##### 
 class RecommentListView(APIView):
     permission_classes = [IsAuthenticated] 
 

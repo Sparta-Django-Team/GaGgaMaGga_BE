@@ -27,7 +27,7 @@ class Util:
         else:
             ip = request.META.get('REMOTE_ADDR')
         return ip
-    
+
     def profile_image_download(url):
         response = requests.get(url, stream=True)
         file_name = ''.join(url.split('/')[-2:]) #파일명으로 사용
