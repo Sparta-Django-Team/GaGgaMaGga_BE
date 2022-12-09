@@ -5,7 +5,7 @@ from .models import Place
 
 @register(Place)
 class PlaceIndex(AlgoliaIndex):
-    fields = [
+    fields = [ # aoglolia 페이지에서 확인할 필드 지정
         'place_name',
         'category',
         'rating',
@@ -14,6 +14,6 @@ class PlaceIndex(AlgoliaIndex):
         'place_img'
     ]
 
-    settings = {
+    settings = {           # 검색 가능한 필드 지정
         'searchableAttributes' : ["place_name", "category", "palce_address", "place_number"]
     }
