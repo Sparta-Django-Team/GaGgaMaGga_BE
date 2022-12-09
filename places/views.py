@@ -1,7 +1,7 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.generics import get_object_or_404
 from rest_framework import generics
 
@@ -33,6 +33,8 @@ CHOICE_CATEGORY = (
 
 ##### 취향 선택 #####
 class PlaceSelectView(APIView):
+    permission_classes = [AllowAny]
+    
     #맛집 취향 선택(리뷰가 없거나, 비로그인 계정일 경우)
     def get(self, request, choice_no):
         place_list = []
@@ -66,6 +68,8 @@ class PlaceSelectView(APIView):
 
 ##### 장소(리뷰가 없거나, 비로그인 계정일 경우) #####
 class NewUserPlaceListView(APIView):
+    permission_classes = [AllowAny]
+
     #맛집 전체 리스트
     @swagger_auto_schema(operation_summary="맛집 전체 리스트",
                     responses={200 : '성공', 500 : '서버 에러'})
@@ -79,7 +83,7 @@ class NewUserPlaceListView(APIView):
 
 ##### 장소 #####
 class UserPlaceListView(APIView):
-    permission_classes = [IsAdminOrOntherReadOnly]
+    permission_classes = [AllowAny]
 
     #맛집 전체 리스트
     @swagger_auto_schema(operation_summary="맛집 전체 리스트",
