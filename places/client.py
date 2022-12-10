@@ -3,7 +3,7 @@ from algoliasearch_django import algolia_engine
 def get_client() :
     return algolia_engine.client
 
-def get_index(index_name='cfe_Place') :
+def get_index(index_name='cfe_Place') : # algolia 사이트에서 확인 가능한 이름
     client = get_client()
     index = client.init_index(index_name)
     return index
