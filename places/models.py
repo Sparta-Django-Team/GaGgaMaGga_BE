@@ -4,18 +4,18 @@ from django.core.validators import MaxValueValidator
 
 from users.models import User
 
-class PlaceQerySet(models.QuerySet) :
+class PlaceQerySet(models.QuerySet):
     def search(self, query) :
         lookup = (Q(place_name__contains=query) | Q(category__contains=query) 
         | Q(place_address__contains=query) | Q(place_number__contains=query))
         qs = self.filter(lookup)
         return qs
 
-class PlaceManager(models.Manager) :
+class PlaceManager(models.Manager):
     def get_queryset(self, *args, **kwargs) :
         return PlaceQerySet(self.model, using=self._db)
 
-    def search(self, query, user=None) :
+    def search(self, query, user=None):
         return self.get_queryset().search(query)
 
 class Place(models.Model):
