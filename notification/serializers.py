@@ -2,16 +2,16 @@ from rest_framework import serializers
 
 from .models import Notification
 
-
-#후기 전체 serializer
+#알람 리스트 serializer
 class NotificationSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Notification
         fields = '__all__'
 
+#알람 상세페이지 serializer
 class NotificationDetailSerializer(serializers.ModelSerializer) :
-    
+
     class Meta:
         model = Notification
         fields = ('is_seen',)

@@ -1,11 +1,9 @@
-from channels.generic.websocket import AsyncJsonWebsocketConsumer, AsyncWebsocketConsumer
+from channels.generic.websocket import AsyncWebsocketConsumer
 from channels.db import database_sync_to_async
 
 import json
 
 from .models import Notification
-
-
 
 class NotificationConsumer(AsyncWebsocketConsumer):
     @database_sync_to_async
@@ -18,7 +16,7 @@ class NotificationConsumer(AsyncWebsocketConsumer):
         await self.channel_layer.group_add(self.room_name, self.channel_name)
         await self.accept()
     async def disconnect(self, code):
-        print(10000000)
+        
         # 그룹 떠남
         await self.channel_layer.group_discard(self.room_name, self.channel_name)
 
@@ -35,12 +33,8 @@ class NotificationConsumer(AsyncWebsocketConsumer):
             "user_id" : user_id
         }
 
-# 그룹에 메시지 보내기
+        # 그룹에 메시지 보내기
         await self.channel_layer.group_send(self.room_name, event)
-        print(author)
-        print(user_id)
-        print(type(author))
-        print(type(user_id))
 
         if int(author) != user_id :
             save_message = await self.create_notification(message=message, author = author)
