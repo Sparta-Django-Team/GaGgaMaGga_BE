@@ -37,10 +37,6 @@ class NotificationConsumer(AsyncWebsocketConsumer):
 
 # 그룹에 메시지 보내기
         await self.channel_layer.group_send(self.room_name, event)
-        print(author)
-        print(user_id)
-        print(type(author))
-        print(type(user_id))
 
         if int(author) != user_id :
             save_message = await self.create_notification(message=message, author = author)
