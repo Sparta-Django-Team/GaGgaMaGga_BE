@@ -71,6 +71,10 @@ class RecommentSerializer(serializers.ModelSerializer):
     nickname = serializers.SerializerMethodField()
     profile_image = serializers.SerializerMethodField()
     recomment_like_count = serializers.SerializerMethodField()
+    user_id = serializers.SerializerMethodField()
+    
+    def get_user_id(self, obj) :
+        return obj.author.id
     
     def get_nickname(self, obj):
         return obj.author.user_profile.nickname
@@ -83,7 +87,7 @@ class RecommentSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Recomment
-        fields = ('id', 'content', 'created_at', 'updated_at', 'recomment_like', 'comment', 'nickname', 'profile_image', 'recomment_like_count',)
+        fields = ('user_id','id', 'content', 'created_at', 'updated_at', 'recomment_like', 'comment', 'nickname', 'profile_image', 'recomment_like_count',)
 
 # 대댓글 생성, 수정 serializer
 class RecommentCreateSerializer(serializers.ModelSerializer):
@@ -103,6 +107,10 @@ class CommentSerializer(serializers.ModelSerializer):
     comment_recomments = RecommentSerializer(many=True)
     comment_like_count = serializers.SerializerMethodField()
     review_content = serializers.SerializerMethodField()
+    user_id = serializers.SerializerMethodField()
+    
+    def get_user_id(self, obj) :
+        return obj.author.id
 
     def get_nickname(self, obj):
         return obj.author.user_profile.nickname
@@ -118,7 +126,7 @@ class CommentSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Comment
-        fields = ('content','id', 'created_at', 'updated_at', 'comment_like', 'review_content', 'nickname', 'profile_image', 'comment_like_count','comment_recomments',)
+        fields = ('user_id','content','id', 'created_at', 'updated_at', 'comment_like', 'review_content', 'nickname', 'profile_image', 'comment_like_count','comment_recomments',)
 
 # 댓글 생성 serializer
 class CommentCreateSerializer(serializers.ModelSerializer):
