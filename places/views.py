@@ -28,7 +28,8 @@ CHOICE_CATEGORY = (
         ('10', '태국음식'),
         ('11', '인도음식'),
         ('12', '베트남음식'),
-        ('13', '강남'),
+        ('13', '제주시'),
+        ('14', '서귀포시'),
     )
 
 ##### 맛집 #####
@@ -82,7 +83,10 @@ class PlaceSelectView(APIView):
             place_list = []
             for i in range(0, 12):
                 pick = Place.objects.filter(place_address__contains=CHOICE_CATEGORY[choice_no-1][1],category=CHOICE_CATEGORY[i][1]).first()
-                place_list.append(pick.id)
+                if pick == None:
+                    pass
+                else:
+                    place_list.append(pick.id)
             
             # Create list for custom sorting
             preserved = Case(*[When(pk=pk, then=pos) for pos, pk in enumerate(place_list)])
