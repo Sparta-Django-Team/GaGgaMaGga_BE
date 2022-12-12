@@ -83,7 +83,7 @@ class RecommentSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Recomment
-        fields = ('content', 'created_at', 'updated_at', 'recomment_like', 'comment', 'nickname', 'profile_image', 'recomment_like_count',)
+        fields = ('id', 'content', 'created_at', 'updated_at', 'recomment_like', 'comment', 'nickname', 'profile_image', 'recomment_like_count',)
 
 #대댓글 생성, 수정 serializer
 class RecommentCreateSerializer(serializers.ModelSerializer):
