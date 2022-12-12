@@ -52,12 +52,11 @@ def rcm_place_new_user(place_id, category):
         result_list.append(column)
     return result_list
 
-
 # 유사한 유저 정보 조회 및 추천(기존 유저)
 def rcm_place_user(user_id, cate_id):
     places = pd.DataFrame(list(Place.objects.values()))
     category = CHOICE_ONE[cate_id-1]
-    print(cate_id)
+
     if cate_id <= 12:       # Case1: choice food group
         places = places[places['category'].str.contains(category)]
     else:                   # Case2: choice place location

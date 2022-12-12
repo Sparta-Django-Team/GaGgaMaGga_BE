@@ -38,7 +38,7 @@ class UserView(APIView):
             return [IsAuthenticated(),]
         return super(UserView, self).get_permissions()
 
-    #회원가입
+    # 회원가입
     @swagger_auto_schema(request_body=SignupSerializer, 
                     operation_summary="회원가입",  
                     responses={201 : '성공', 400 : '인풋값 에러', 500 : '서버 에러'})
@@ -63,7 +63,7 @@ class UserView(APIView):
             return Response({"message":"회원가입이 되었습니다."}, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
-    #회원정보 수정
+    # 회원정보 수정
     @swagger_auto_schema(request_body=UserUpdateSerializer, 
                     operation_summary="회원정보 수정",  
                     responses={200 : '성공', 400 : '인풋값 에러', 404:'찾을 수 없음', 500 : '서버 에러'})
@@ -75,7 +75,7 @@ class UserView(APIView):
             return Response({"message":"회원 수정이 완료되었습니다."}, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         
-    #회원 비활성화
+    # 회원 비활성화
     @swagger_auto_schema(operation_summary="회원 비활성화",
                     responses={200 : '성공', 403 : '접근 권한 에러', 500 : '서버에러'})
     def delete(self, request):
@@ -85,7 +85,7 @@ class UserView(APIView):
         user.save()
         return Response({"message":"회원 비활성화가 되었습니다."}, status=status.HTTP_200_OK)
 
-#로그인
+# 로그인
 class CustomTokenObtainPairView(TokenViewBase):
     _serializer_class = api_settings.TOKEN_OBTAIN_SERIALIZER
 
@@ -97,7 +97,7 @@ class CustomTokenObtainPairView(TokenViewBase):
         try:
             serializer.is_valid(raise_exception=True)
 
-            #로그인 로그 저장
+            # 로그인 로그 저장
             user_ip= Util.get_client_ip(request)
             user = User.objects.get(username=request.data["username"])
             LoggedIn.objects.create(user=user, created_at=timezone.now(), update_ip=user_ip)
@@ -110,7 +110,7 @@ class CustomTokenObtainPairView(TokenViewBase):
 class CustomTokenObtainPairView(CustomTokenObtainPairView):
     serializer_class = CustomTokenObtainPairSerializer
 
-#로그아웃
+# 로그아웃
 class LogoutView(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -128,8 +128,8 @@ class ConfirmEmailView(APIView):
     permission_classes = [AllowAny]
 
     secured_key_param_config = openapi.Parameter('secured_key', in_=openapi.IN_QUERY, description='Secured_key', type=openapi.TYPE_STRING)
-    
-    #이메일 인증 확인
+
+    # 이메일 인증 확인
     @swagger_auto_schema(manual_parameters=[secured_key_param_config],
                     operation_summary="이메일 인증 확인",
                     responses={200 : '성공', 400 : '토큰 유효하지 않음' , 404 : '찾을 수 없음' , 500 : '서버 에러'})
@@ -153,7 +153,7 @@ class ConfirmEmailView(APIView):
 class ReSendEmailView(APIView):
     permission_classes = [IsAuthenticated]
 
-    #이메일 재발송
+    # 이메일 재발송
     @swagger_auto_schema(operation_summary="이메일 재발송", 
                     responses={200 : '성공', 401 : '인증 에러', 404 : '찾을 수 없음', 500 : '서버 에러'})
     def post(self, request):
@@ -172,7 +172,7 @@ class ReSendEmailView(APIView):
 
         return Response({"message":"인증 이메일이 발송되었습니다. 확인부탁드립니다."}, status=status.HTTP_200_OK)
 
-#아이디 찾기 휴대폰 sms 발송
+# 아이디 찾기 휴대폰 sms 발송
 class SendPhoneNumberView(APIView):
     permission_classes = [AllowAny]
 
@@ -191,7 +191,7 @@ class SendPhoneNumberView(APIView):
         except:
             return Response({'message':'휴대폰 번호를 입력해주세요'}, status=status.HTTP_400_BAD_REQUEST)
 
-#아이디 찾기 인증번호 확인
+# 아이디 찾기 인증번호 확인
 class ConfirmPhoneNumberView(APIView):
     permission_classes = [AllowAny]
 
@@ -219,7 +219,7 @@ class ConfirmPhoneNumberView(APIView):
 class PrivateProfileView(APIView):
     permission_classes = [IsAuthenticated]
 
-    #개인 프로필
+    # 개인 프로필
     @swagger_auto_schema(operation_summary="개인 프로필", 
                     responses={200 : '성공',  404 : '찾을 수 없음', 500 : '서버 에러'}) 
     def get(self, request):
@@ -227,7 +227,7 @@ class PrivateProfileView(APIView):
         serializer = PrivateProfileSerializer(profile)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
-    #프로필 수정
+    # 프로필 수정
     @swagger_auto_schema(request_body=ProfileUpdateSerializer, 
                     operation_summary="프로필 수정", 
                     responses={200 : '성공',  400 : '인풋값 에러', 404 : '찾을 수 없음', 500 : '서버 에러'})
@@ -239,7 +239,7 @@ class PrivateProfileView(APIView):
             return Response({"message":"프로필 수정이 완료되었습니다."}, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-#공개 프로필 
+# 공개 프로필 
 class PublicProfileView(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -250,7 +250,7 @@ class PublicProfileView(APIView):
         serializer = PublicProfileSerializer(profile)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
-#로그인 로그기록
+# 로그인 로그기록
 class LoginLogListView(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -264,7 +264,7 @@ class LoginLogListView(APIView):
 class ChangePasswordView(APIView):
     permission_classes = [IsAuthenticated]
 
-    #비밀번호 변경
+    # 비밀번호 변경
     @swagger_auto_schema(request_body=ChangePasswordSerializer, 
                     operation_summary="비밀번호 변경", 
                     responses={200 : '성공', 201 : '인증 에러', 400 :'인풋값 에러', 401 : '인증 에러', 404 : '찾을 수 없음', 500 : '서버 에러'})
@@ -276,7 +276,7 @@ class ChangePasswordView(APIView):
             return Response({"message":"비밀번호 변경이 완료되었습니다! 다시 로그인해주세요."} , status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-#비밀번호 찾기(이메일 전송)
+# 비밀번호 찾기(이메일 전송)
 class PasswordResetView(APIView):
     permission_classes = [AllowAny]
 
@@ -289,7 +289,7 @@ class PasswordResetView(APIView):
             return Response({"message":"비밀번호 재설정 이메일을 발송했습니다. 확인부탁드립니다."}, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-#비밀번호 재설정 토큰 확인
+# 비밀번호 재설정 토큰 확인
 class PasswordTokenCheckView(APIView):
     permission_classes = [AllowAny]
 
@@ -307,7 +307,7 @@ class PasswordTokenCheckView(APIView):
         except DjangoUnicodeDecodeError as identifier:
             return Response({"message":"링크가 유효하지 않습니다."}, status=status.HTTP_401_UNAUTHORIZED)
 
-#비밀번호 재설정
+# 비밀번호 재설정
 class SetNewPasswordView(APIView):
     permission_classes = [AllowAny]
 
@@ -320,7 +320,7 @@ class SetNewPasswordView(APIView):
             return Response({"message":"비밀번호 재설정 완료"}, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-#비밀번호 변경일시 만료되면 변경
+# 비밀번호 변경일시 만료되면 변경
 class ExpiredPasswordChage(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -354,7 +354,7 @@ class ExpiredPasswordChage(APIView):
             return Response({"message":"비밀번호 변경이 완료되었습니다!"} , status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-#팔로우 
+# 팔로우 
 class ProcessFollowView(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -370,10 +370,10 @@ class ProcessFollowView(APIView):
             you.followers.add(me)
             return Response({"message":"팔로우를 취소했습니다."}, status=status.HTTP_200_OK)
 
-#카카오 로그인
+# 카카오 로그인
 class KakaoLoginView(APIView):
     permission_classes = [AllowAny]
-        
+
     @swagger_auto_schema(operation_summary="카카오 소셜 로그인", 
                         responses={ 200 : '성공', 400: '잘못된 요청', 500:'서버 에러'})
     def post(self, request):
@@ -416,9 +416,8 @@ class KakaoLoginView(APIView):
                     
                     user_ip= Util.get_client_ip(request)
                     LoggedIn.objects.create(user=user, created_at=timezone.now(), update_ip=user_ip)
-                    
                     refresh = RefreshToken.for_user(user)
-                    return Response({'refresh': str(refresh), 'access':str(refresh.access_token)}, status=status.HTTP_200_OK)
+                    return Response({'refresh': str(refresh), 'access':str(refresh.access_token), 'nickname':kakao_nickname}, status=status.HTTP_200_OK)
                 
                 if social_user is None:
                     return Response({"error":"이메일이 존재하지만 , 소셜유저가 아닙니다"}, status=status.HTTP_400_BAD_REQUEST)
@@ -438,8 +437,7 @@ class KakaoLoginView(APIView):
                 LoggedIn.objects.create(user=new_user, created_at=timezone.now(), update_ip=user_ip)
                 
                 refresh = RefreshToken.for_user(new_user)
-                
-                return Response({'refresh': str(refresh), 'access':str(refresh.access_token)}, status=status.HTTP_200_OK)
+                return Response({'refresh': str(refresh), 'access': str(refresh.access_token), 'nickname':kakao_nickname}, status=status.HTTP_200_OK)
             
         except Exception:
             return Response(status=status.HTTP_400_BAD_REQUEST)

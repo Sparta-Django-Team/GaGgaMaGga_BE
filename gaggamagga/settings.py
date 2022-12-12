@@ -1,6 +1,7 @@
 from pathlib import Path
 from datetime import timedelta
 import os, json
+
 from django.core.exceptions import ImproperlyConfigured
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -31,7 +32,6 @@ ALLOWED_HOSTS = []
 
 # Application definition
 INSTALLED_APPS = [
-    'channels',
     'daphne',
     'django.contrib.admin',
     'django.contrib.auth',
@@ -48,19 +48,21 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt.token_blacklist',
     'drf_yasg',
     'corsheaders',
+    'channels',
     
     # internal apps
-    'users',
-    'reviews',
-    'places',
     'notification',
+    'places',
+    'reviews',
+    'users',
 ]
-
+# RestFramework
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
     'rest_framework_simplejwt.authentication.JWTAuthentication',]
 }
 
+# Swagger 
 SWAGGER_SETTINGS = {
     'SECURITY_DEFINITIONS' :{
         'Bearer':{
@@ -100,12 +102,10 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'gaggamagga.wsgi.application'
-# Database
-# https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 ASGI_APPLICATION = "gaggamagga.asgi.application"
+WSGI_APPLICATION = 'gaggamagga.wsgi.application'
 
-
+# Django Channels
 CHANNEL_LAYERS = {
     "default": {
         "BACKEND": "channels_redis.core.RedisChannelLayer",
@@ -114,6 +114,10 @@ CHANNEL_LAYERS = {
         },
     },
 }
+
+
+# Database
+# https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 
 DATABASES = {
     'default': {
@@ -166,8 +170,6 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-
-
 
 #Auth Settings
 AUTH_USER_MODEL = 'users.User'

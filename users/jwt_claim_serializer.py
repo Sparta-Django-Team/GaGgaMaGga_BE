@@ -41,18 +41,18 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
             
             account_lock_count = self.target_user.account_lock_count
             
-            #account_lock_count counting
+            # account_lock_count counting
             if self.user == None:
                 self.target_user.account_lock_count += 1
                 self.target_user.save()
 
-            #account_lock_count 4이면 잠금
+            # account_lock_count 4이면 잠금
             if account_lock_count == 4:
                 self.target_user.is_active = False   
                 self.target_user.account_lock_time = timezone.now()
                 self.target_user.save()
                 
-            #is_active False 제한 시간 확인 후 True
+            # is_active False 제한 시간 확인 후 True
             self.now_today_time = timezone.now()
 
             if self.is_active == False:
@@ -63,7 +63,7 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
                     self.target_user.lock_count = 0
                     self.target_user.save()
 
-            #withdraw True이면 로그인 시 False
+            # withdraw True이면 로그인 시 False
             if self.withdraw == True:
                 self.target_user.withdraw = False
                 self.target_user.save()
@@ -73,15 +73,15 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
         
         if User.objects.filter(username=username).exists():
             
-            #is_active False 계정잠금 
+            # is_active False 계정잠금 
             if self.is_active == False:
                 raise serializers.ValidationError("로그인 시도가 너무 많습니다. 나중에 다시 시도해 주세요.")
             
-        #login error
+        # login error
         if not api_settings.USER_AUTHENTICATION_RULE(self.user):
             raise exceptions.AuthenticationFailed(self.error_messages["no_active_account"],"no_active_account",)
         
-        #login token 
+        # login token 
         refresh = self.get_token(self.user)
 
         attrs["refresh"] = str(refresh)

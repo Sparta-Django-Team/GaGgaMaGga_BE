@@ -75,7 +75,6 @@ class UserAdmin(BaseUserAdmin):
     search_fields = ('username','email', 'phone_number',)
     ordering = ('username',)
     filter_horizontal = ()
-    
 
 admin.site.register(OauthId)
 admin.site.register(LoggedIn)
