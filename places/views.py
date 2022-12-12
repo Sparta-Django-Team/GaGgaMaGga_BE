@@ -130,6 +130,7 @@ class UserPlaceListView(APIView):
     @swagger_auto_schema(operation_summary="맛집 리스트 추천(유저)",
                     responses={200 : '성공', 500 : '서버 에러'})
     def get(self, request, cate_id):
+        print("뷰 동작")
         place_list = rcm_place_user(user_id = request.user.id, cate_id=cate_id)
         preserved = Case(*[When(pk=pk, then=pos) for pos, pk in enumerate(place_list)])
         place = Place.objects.filter(id__in=place_list).order_by(preserved)

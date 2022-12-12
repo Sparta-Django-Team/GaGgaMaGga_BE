@@ -64,7 +64,7 @@ def rcm_place_user(user_id, cate_id):
 
     # Create dataframe
     reviews = pd.DataFrame(list(Review.objects.values()))
-    print(reviews)
+    
     places.rename(columns={'id':'place_id'}, inplace=True)
     place_ratings = pd.merge(places, reviews, on='place_id')
     review_user = place_ratings.pivot_table('rating_cnt', index='author_id', columns='place_id')
