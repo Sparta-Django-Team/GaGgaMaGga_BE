@@ -142,14 +142,14 @@ class UserPlaceListView(APIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 ##### 검색 #####
-class SearchListView(generics.GenericAPIView):
+class SearchListView(APIView):
     permission_classes = [AllowAny]
     
     @swagger_auto_schema(operation_summary="검색",
-                    responses={200 : '성공', 400:'', 500 : '서버 에러'})
-    def get(self, request, *args, **wsargs):
+                    responses={200 : '성공', 400:'쿼리값 없음', 500 : '서버 에러'})
+    def get(self, request):
         query = request.GET.get('keyword')
         if not query:
             return Response('', status=status.HTTP_400_BAD_REQUEST)
         results = client.perform_search(query)
-        return Response(results)
+        return Response(results, status=status.HTTP_200_OK)
