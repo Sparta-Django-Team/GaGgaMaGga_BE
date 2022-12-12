@@ -140,6 +140,7 @@ venv/
 ENV/
 env.bak/
 venv.bak/
+gagga_env/
 
 # Spyder project settings
 .spyderproject
@@ -338,3 +339,18 @@ $RECYCLE.BIN/
 *.lnk
 
 # End of https://www.toptal.com/developers/gitignore/api/django,windows,python,macos,visualstudiocode
+gagga_env/pyvenv.cfg
+gagga_env/Scripts/activate
+gagga_env/Scripts/activate.bat
+gagga_env/Scripts/Activate.ps1
+gagga_env/Scripts/deactivate.bat
+gagga_env/Scripts/django-admin.exe
+gagga_env/Scripts/f2py.exe
+gagga_env/Scripts/normalizer.exe
+gagga_env/Scripts/pip.exe
+gagga_env/Scripts/pip3.10.exe
+gagga_env/Scripts/pip3.11.exe
+gagga_env/Scripts/pip3.exe
+gagga_env/Scripts/python.exe
+gagga_env/Scripts/pythonw.exe
+gagga_env/Scripts/sqlformat.exe

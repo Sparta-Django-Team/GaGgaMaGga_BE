@@ -28,7 +28,8 @@ CHOICE_CATEGORY = (
         ('10', '태국음식'),
         ('11', '인도음식'),
         ('12', '베트남음식'),
-        ('13', '강남'),
+        ('13', '제주시'),
+        ('14', '서귀포시'),
     )
 
 ##### 맛집 #####
@@ -82,7 +83,10 @@ class PlaceSelectView(APIView):
             place_list = []
             for i in range(0, 12):
                 pick = Place.objects.filter(place_address__contains=CHOICE_CATEGORY[choice_no-1][1],category=CHOICE_CATEGORY[i][1]).first()
-                place_list.append(pick.id)
+                if pick == None:
+                    pass
+                else:
+                    place_list.append(pick.id)
             
             # Create list for custom sorting
             preserved = Case(*[When(pk=pk, then=pos) for pos, pk in enumerate(place_list)])
@@ -130,6 +134,7 @@ class UserPlaceListView(APIView):
     @swagger_auto_schema(operation_summary="맛집 리스트 추천(유저)",
                     responses={200 : '성공', 500 : '서버 에러'})
     def get(self, request, cate_id):
+        print("뷰 동작")
         place_list = rcm_place_user(user_id = request.user.id, cate_id=cate_id)
         preserved = Case(*[When(pk=pk, then=pos) for pos, pk in enumerate(place_list)])
         place = Place.objects.filter(id__in=place_list).order_by(preserved)
@@ -137,12 +142,12 @@ class UserPlaceListView(APIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 ##### 검색 #####
-class SearchListView(generics.GenericAPIView):
+class SearchListView(APIView):
     permission_classes = [AllowAny]
     
     @swagger_auto_schema(operation_summary="검색",
-                    responses={200 : '성공', 400:'', 500 : '서버 에러'})
-    def get(self, request, *args, **wsargs):
+                    responses={200 : '성공', 400:'쿼리값 없음', 500 : '서버 에러'})
+    def get(self, request):
         query = request.GET.get('keyword')
         if not query:
             return Response('', status=status.HTTP_400_BAD_REQUEST)

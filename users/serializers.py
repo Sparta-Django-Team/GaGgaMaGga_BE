@@ -153,7 +153,7 @@ class PrivateProfileSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Profile
-        fields = ('nickname', 'profile_image', 'email', 'username', 'intro',)
+        fields = ('id','nickname', 'profile_image', 'email', 'username', 'intro',)
 
 # 공개 프로필 serializer
 class PublicProfileSerializer(serializers.ModelSerializer):
@@ -161,10 +161,14 @@ class PublicProfileSerializer(serializers.ModelSerializer):
     followers = PrivateProfileSerializer(many=True)
     review_set = ReviewListSerializer(many=True, source='user.review_set')
     bookmark_place = PlaceSerializer(many=True, source='user.bookmark_place')
+    user_id = serializers.SerializerMethodField()
+
+    def get_user_id(self, obj):
+        return obj.user.id
 
     class Meta:
         model = Profile
-        fields = ('nickname', 'profile_image', 'intro', 'followings', 'followers','review_set', 'bookmark_place',)
+        fields = ('id', 'user_id', 'nickname', 'profile_image', 'intro', 'followings', 'followers','review_set', 'bookmark_place',)
 
 # 프로필 편집 serializer
 class ProfileUpdateSerializer(serializers.ModelSerializer):
