@@ -147,4 +147,4 @@ class SearchListView(generics.GenericAPIView):
         if not query:
             return Response('', status=status.HTTP_400_BAD_REQUEST)
         results = client.perform_search(query)
-        return Response(results)
+        return Response(results, status=status.HTTP_200_OK)
