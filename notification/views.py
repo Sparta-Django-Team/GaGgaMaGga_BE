@@ -18,7 +18,7 @@ class NotificationView(APIView):
     @swagger_auto_schema(operation_summary="읽지 않은 해당 알람 리스트",  
                 responses={200 : '성공', 500 : '서버 에러'})
     def get(self, request, user_id):
-        notifiactions = Notification.objects.filter(Q(user_id=user_id) & Q(is_seen=False))
+        notifiactions = Notification.objects.filter(Q(user_id=user_id) & Q(is_seen=False)).order_by('-created_at')
         serializer = NotificationSerializer(notifiactions, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
