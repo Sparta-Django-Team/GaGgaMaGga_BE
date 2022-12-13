@@ -41,7 +41,7 @@ class UserView(APIView):
     # 회원가입
     @swagger_auto_schema(request_body=SignupSerializer, 
                     operation_summary="회원가입",  
-                    responses={201 : '성공', 400 : '인풋값 에러', 500 : '서버 에러'})
+                    responses={201 : '성공', 400 : '인풋값 에러', 404 : '찾을 수 없음', 500 : '서버 에러'})
     def post(self, request):
         serializer = SignupSerializer(data=request.data)
         if serializer.is_valid():
@@ -66,7 +66,7 @@ class UserView(APIView):
     # 회원정보 수정
     @swagger_auto_schema(request_body=UserUpdateSerializer, 
                     operation_summary="회원정보 수정",  
-                    responses={200 : '성공', 400 : '인풋값 에러', 404:'찾을 수 없음', 500 : '서버 에러'})
+                    responses={200 : '성공', 400 : '인풋값 에러', 401 : '인증 오류', 404 : '찾을 수 없음', 500 : '서버 에러'})
     def put(self, request):
         user = get_object_or_404(User, id=request.user.id)
         serializer = UserUpdateSerializer(user, data=request.data, context={'request': request})
@@ -77,7 +77,7 @@ class UserView(APIView):
         
     # 회원 비활성화
     @swagger_auto_schema(operation_summary="회원 비활성화",
-                    responses={200 : '성공', 403 : '접근 권한 에러', 500 : '서버에러'})
+                    responses={200 : '성공', 401:'인증 오류', 403 : '접근 권한 에러', 500 : '서버에러'})
     def delete(self, request):
         user = get_object_or_404(User, id=request.user.id)
         user.withdraw = True
@@ -91,7 +91,7 @@ class CustomTokenObtainPairView(TokenViewBase):
 
     @swagger_auto_schema(request_body=CustomTokenObtainPairSerializer,
                     operation_summary="로그인",
-                    responses={200: '성공', 400: '인풋값 에러', 500: '서버에러'})
+                    responses={200 : '성공', 400 : '인풋값 에러', 500 : '서버에러'})
     def post(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         try:
@@ -221,7 +221,7 @@ class PrivateProfileView(APIView):
 
     # 개인 프로필
     @swagger_auto_schema(operation_summary="개인 프로필", 
-                    responses={200 : '성공',  404 : '찾을 수 없음', 500 : '서버 에러'}) 
+                    responses={200 : '성공', 401 : '인증오류', 404 : '찾을 수 없음', 500 : '서버 에러'}) 
     def get(self, request):
         profile = get_object_or_404(Profile, user=request.user)
         serializer = PrivateProfileSerializer(profile)
@@ -230,7 +230,7 @@ class PrivateProfileView(APIView):
     # 프로필 수정
     @swagger_auto_schema(request_body=ProfileUpdateSerializer, 
                     operation_summary="프로필 수정", 
-                    responses={200 : '성공',  400 : '인풋값 에러', 404 : '찾을 수 없음', 500 : '서버 에러'})
+                    responses={200 : '성공',  400 : '인풋값 에러', 401 : '인증 오류', 404 : '찾을 수 없음', 500 : '서버 에러'})
     def put(self, request):
         profile = get_object_or_404(Profile, user=request.user)
         serializer = ProfileUpdateSerializer(profile, data=request.data)
@@ -244,7 +244,7 @@ class PublicProfileView(APIView):
     permission_classes = [IsAuthenticated]
 
     @swagger_auto_schema(operation_summary="공개 프로필", 
-                    responses={200 : '성공',  404 : '찾을 수 없음', 500 : '서버 에러'}) 
+                    responses={200 : '성공', 401:'인증 오류', 404 : '찾을 수 없음', 500 : '서버 에러'}) 
     def get(self, request, nickname):
         profile = get_object_or_404(Profile, nickname=nickname)
         serializer = PublicProfileSerializer(profile)
@@ -255,7 +255,7 @@ class LoginLogListView(APIView):
     permission_classes = [IsAuthenticated]
 
     @swagger_auto_schema(operation_summary="로그인 로그기록", 
-                    responses={200 : '성공', 404 : '찾을 수 없음', 500 : '서버 에러'}) 
+                    responses={200 : '성공', 401: '인증 오류', 404 : '찾을 수 없음', 500 : '서버 에러'}) 
     def get(self, request):
         logged_in = get_list_or_404(LoggedIn, user=request.user)[:10]
         serializer = LoginLogListSerializer(logged_in, many=True)
@@ -267,7 +267,7 @@ class ChangePasswordView(APIView):
     # 비밀번호 변경
     @swagger_auto_schema(request_body=ChangePasswordSerializer, 
                     operation_summary="비밀번호 변경", 
-                    responses={200 : '성공', 201 : '인증 에러', 400 :'인풋값 에러', 401 : '인증 에러', 404 : '찾을 수 없음', 500 : '서버 에러'})
+                    responses={200 : '성공', 201 : '인증 에러', 400 : '인풋값 에러', 401 : '인증 에러', 404 : '찾을 수 없음', 500 : '서버 에러'})
     def put(self, request):
         user = get_object_or_404(User, id=request.user.id)
         serializer = ChangePasswordSerializer(user, data=request.data, context={'request': request}) 
@@ -359,7 +359,7 @@ class ProcessFollowView(APIView):
     permission_classes = [IsAuthenticated]
 
     @swagger_auto_schema(operation_summary="팔로우", 
-                        responses={ 200 : '성공', 404:'찾을 수 없음', 500:'서버 에러'})
+                        responses={200 : '성공', 401 : '인증오류', 404 : '찾을 수 없음', 500 : '서버 에러'})
     def post(self, request, nickname):
         you = get_object_or_404(Profile, nickname=nickname)
         me = request.user.user_profile
@@ -375,7 +375,7 @@ class KakaoLoginView(APIView):
     permission_classes = [AllowAny]
 
     @swagger_auto_schema(operation_summary="카카오 소셜 로그인", 
-                        responses={ 200 : '성공', 400: '잘못된 요청', 500:'서버 에러'})
+                        responses={200 : '성공', 400 :  '잘못된 요청', 500 : '서버 에러'})
     def post(self, request):
         try:
             code = request.data.get('code')

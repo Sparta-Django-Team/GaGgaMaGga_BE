@@ -3,7 +3,6 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.generics import get_object_or_404
-from rest_framework import generics
 from rest_framework.pagination import PageNumberPagination
 
 from django.db.models import Case, When
@@ -16,8 +15,6 @@ from . import client
 from .models import Place
 from .serializers import PlaceSerializer
 from .rcm_places import rcm_place_user, rcm_place_new_user
-
-import random
 
 CHOICE_CATEGORY = (
         ('1', '분식'),
@@ -53,7 +50,7 @@ class PlaceDetailView(APIView):
 
     # 맛집 삭제
     @swagger_auto_schema(operation_summary="맛집 삭제",
-                    responses={200 : '성공', 404 : '찾을 수 없음', 500 : '서버 에러'})
+                    responses={200 : '성공', 401 : '인증 에러', 404 : '찾을 수 없음', 500 : '서버 에러'})
     def delete(self, request, place_id):
         place = get_object_or_404(Place, id=place_id)
         place.delete()
@@ -64,7 +61,7 @@ class PlaceBookmarkView(APIView):
 
     # 맛집 북마크
     @swagger_auto_schema(operation_summary="맛집 북마크",  
-                responses={200 : '성공', 404 : '찾을 수 없음', 500 : '서버 에러'})
+                responses={200 : '성공', 401 : '인증 에러', 404 : '찾을 수 없음', 500 : '서버 에러'})
     def post(self, request, place_id):
         place = get_object_or_404(Place, id=place_id)
         if request.user in place.place_bookmark.all():
@@ -109,13 +106,11 @@ class PlaceSelectView(APIView):
                 pick2 = Place.objects.filter(category=CHOICE_CATEGORY[choice_no-2][1])[load_no-1:load_no+2]
                 pick3 = Place.objects.filter(category=CHOICE_CATEGORY[choice_no-3][1])[load_no-1:load_no+2]
                 pick = (pick1|pick2|pick3)
-                print(pick)
                 serializer = PlaceSerializer(pick, many=True)
                 return Response(serializer.data, status=status.HTTP_200_OK)
             else:
                 place_list = []
-                pick = Place.objects.filter(category=CHOICE_CATEGORY[choice_no-1][1])[load_no-1:load_no+8]
-                print(pick)
+                pick = Place.objects.filter(category=CHOICE_CATEGORY[choice_no-1][1])[0:9]
                 serializer = PlaceSerializer(pick, many=True)
                 return Response(serializer.data, status=status.HTTP_200_OK)
 
@@ -144,7 +139,7 @@ class UserPlaceListView(PaginationHandlerMixin, APIView):
 
     # 맛집 리스트 추천
     @swagger_auto_schema(operation_summary="맛집 리스트 추천(유저)",
-                    responses={200 : '성공', 500 : '서버 에러'})
+                    responses={200 : '성공', 401 : '인증 에러', 500 : '서버 에러'})
     def get(self, request, cate_id):
         place_list = rcm_place_user(user_id = request.user.id, cate_id=cate_id)
         preserved = Case(*[When(pk=pk, then=pos) for pos, pk in enumerate(place_list)])

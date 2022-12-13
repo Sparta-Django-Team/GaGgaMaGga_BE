@@ -153,7 +153,7 @@ class PrivateProfileSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Profile
-        fields = ('id','nickname', 'profile_image', 'email', 'username', 'intro',)
+        fields = ('id', 'nickname', 'profile_image', 'email', 'username', 'intro',)
 
 # 공개 프로필 serializer
 class PublicProfileSerializer(serializers.ModelSerializer):
@@ -168,7 +168,7 @@ class PublicProfileSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Profile
-        fields = ('id', 'user_id', 'nickname', 'profile_image', 'intro', 'followings', 'followers','review_set', 'bookmark_place',)
+        fields = ('id', 'user_id', 'nickname', 'profile_image', 'intro', 'followings', 'followers', 'review_set', 'bookmark_place',)
 
 # 프로필 편집 serializer
 class ProfileUpdateSerializer(serializers.ModelSerializer):
@@ -287,7 +287,7 @@ class SetNewPasswordSerializer(serializers.Serializer):
     uidb64 = serializers.CharField(max_length=100, write_only=True)
 
     class Meta:
-        fields = ('repassword','password','token','uidb64',)
+        fields = ('repassword', 'password', 'token', 'uidb64',)
 
     def validate(self, attrs):
         password = attrs.get('password')
