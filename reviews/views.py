@@ -134,7 +134,6 @@ class ReviewDetailView(APIView):
             return Response({"message":"이미 신고를 한 후기입니다."}, status=status.HTTP_208_ALREADY_REPORTED)
         
         except Report.DoesNotExist:
-            print(request.data)
             serializer = ReportSerializer(data=request.data)
             if serializer.is_valid():
                 serializer.save(author=request.user, review_id=review_id)
@@ -219,7 +218,7 @@ class CommentDetailView(APIView):
         except Report.DoesNotExist:
             serializer = ReportSerializer(data=request.data)
             if serializer.is_valid():
-                serializer.save(author=request.user, comment=comment_id)
+                serializer.save(author=request.user, comment_id=comment_id)
                 return Response({"message":"신고가 완료되었습니다."}, status=status.HTTP_200_OK)
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -301,7 +300,7 @@ class RecommentDetailView(APIView):
         except Report.DoesNotExist:
             serializer = ReportSerializer(data=request.data)
             if serializer.is_valid():
-                serializer.save(author=request.user, recomment=recomment_id)
+                serializer.save(author=request.user, recomment_id=recomment_id)
                 return Response({"message":"신고가 완료되었습니다."}, status=status.HTTP_200_OK)
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
