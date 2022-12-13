@@ -8,3 +8,4 @@ class PlaceSerializer(serializers.ModelSerializer):
         model = Place
         fields = ('id', 'place_name', 'category', 'rating', 'menu', 'place_desc', 'place_address', 'place_number', 'place_time', 'place_img', 'latitude', 'longitude', 'hit', 'place_bookmark', )
 
+
