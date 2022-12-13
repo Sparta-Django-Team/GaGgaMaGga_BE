@@ -16,6 +16,8 @@ from .models import Place
 from .serializers import PlaceSerializer
 from .rcm_places import rcm_place_user, rcm_place_new_user
 
+import random
+
 CHOICE_CATEGORY = (
         ('1', '분식'),
         ('2', '한식'),
