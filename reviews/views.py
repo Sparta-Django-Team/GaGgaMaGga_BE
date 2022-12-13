@@ -128,12 +128,13 @@ class ReviewDetailView(APIView):
     @swagger_auto_schema(request_body=ReportSerializer, 
                 operation_summary="리뷰 신고", 
                 responses={ 200 : '성공', 208 : '중복 데이터', 404:'인풋값 에러',  500:'서버 에러'})
-    def post(self, request, review_id):
+    def post(self, request, place_id, review_id):
         try :
             Report.objects.get(author=request.user.id, review=review_id)
             return Response({"message":"이미 신고를 한 후기입니다."}, status=status.HTTP_208_ALREADY_REPORTED)
         
         except Report.DoesNotExist:
+            print(request.data)
             serializer = ReportSerializer(data=request.data)
             if serializer.is_valid():
                 serializer.save(author=request.user, review_id=review_id)
@@ -292,7 +293,7 @@ class RecommentDetailView(APIView):
     @swagger_auto_schema(request_body=ReportSerializer, 
             operation_summary="대댓글 신고", 
             responses={ 200 : '성공', 208 : '중복 데이터', 404:'인풋값 에러',  500:'서버 에러'})
-    def post(self, request,review_id, comment_id, recomment_id):
+    def post(self, request, review_id, comment_id, recomment_id):
         try :
             Report.objects.get(author=request.user.id, recomment=recomment_id)
             return Response({"message":"이미 신고를 한 후기입니다."}, status=status.HTTP_208_ALREADY_REPORTED)
