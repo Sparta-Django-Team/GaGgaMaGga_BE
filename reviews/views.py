@@ -3,19 +3,25 @@ from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework.pagination import PageNumberPagination
 
 from django.db.models import Count
 
 from drf_yasg.utils import swagger_auto_schema
 
+from gaggamagga.pagination import PaginationHandlerMixin
 from .models import Review, Comment, Recomment, Report
 from places.models import Place
 from .serializers import (ReviewListSerializer, ReviewCreateSerializer, ReviewDetailSerializer, 
 CommentSerializer, CommentCreateSerializer , RecommentSerializer, RecommentCreateSerializer, ReportSerializer)
 
+class ReviewListPagination(PageNumberPagination):
+    page_size = 10
+
 ##### 리뷰 #####
-class ReviewRankView(APIView):
+class ReviewRankView(PaginationHandlerMixin, APIView):
     permission_classes = [AllowAny]
+    pagination_class = ReviewListPagination
 
     @swagger_auto_schema(operation_summary="전체 리뷰 조회",
                     responses={200 : '성공', 404 : '찾을 수 없음', 500 : '서버 에러'})
@@ -28,12 +34,15 @@ class ReviewRankView(APIView):
         #좋아요순
         like_count_review = Review.objects.annotate(num_likes=Count('review_like')).order_by('-num_likes','-created_at')
 
-        recent_review_serializer = ReviewListSerializer(recent_review, many=True).data
-        like_count_review_serializer = ReviewListSerializer(like_count_review, many=True).data
+        page_recent = self.paginate_queryset(recent_review)
+        page_like = self.paginate_queryset(like_count_review)
+        
+        recent_review_serializer = self.get_paginated_response(ReviewListSerializer(page_recent, many=True).data)
+        like_count_review_serializer = self.get_paginated_response(ReviewListSerializer(page_like, many=True).data)
 
         review = {
-            "recent_review": recent_review_serializer,
-            "like_count_review": like_count_review_serializer
+            "recent_review": recent_review_serializer.data,
+            "like_count_review": like_count_review_serializer.data
         }
         return Response(review, status=status.HTTP_200_OK)
 
