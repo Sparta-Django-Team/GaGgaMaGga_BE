@@ -18,7 +18,7 @@ class NotificationView(APIView):
     @swagger_auto_schema(operation_summary="읽지 않은 해당 알람 리스트",  
                 responses={200 : '성공', 500 : '서버 에러'})
     def get(self, request, user_id):
-        notifiactions = Notification.objects.filter(Q(user_id=user_id) & Q(is_seen=False))
+        notifiactions = Notification.objects.filter(Q(user_id=user_id) & Q(is_seen=False)).order_by('-created_at')
         serializer = NotificationSerializer(notifiactions, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
@@ -30,6 +30,7 @@ class NotificationDetailView(APIView) :
                 responses={200 : '성공', 400: '입력값 에러' , 403: '접근 권한 없음 ', 404 : '찾을 수 없음', 500 : '서버 에러'})  
     def put(self, request, notification_id) :
         notification = get_object_or_404(Notification, id=notification_id)
+        print('hello')
         if request.user == notification.user :
             serializer = NotificationDetailSerializer(notification, data=request.data, partial=True)
             if serializer.is_valid() :
