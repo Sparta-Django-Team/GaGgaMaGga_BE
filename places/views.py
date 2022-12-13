@@ -4,16 +4,20 @@ from rest_framework import status
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.generics import get_object_or_404
 from rest_framework import generics
+from rest_framework.pagination import PageNumberPagination
 
 from django.db.models import Case, When
 
 from drf_yasg.utils import swagger_auto_schema
 
 from gaggamagga.permissions import IsAdminOrOntherReadOnly
+from gaggamagga.pagination import PaginationHandlerMixin
 from . import client
 from .models import Place
 from .serializers import PlaceSelectSerializer, PlaceSerializer
 from .rcm_places import rcm_place_user, rcm_place_new_user
+
+import random
 
 CHOICE_CATEGORY = (
         ('1', '분식'),
@@ -22,8 +26,8 @@ CHOICE_CATEGORY = (
         ('4', '치킨,닭강정'),
         ('5', '햄버거'),
         ('6', '피자'),
-        ('7', '중식당'),
-        ('8', '일식당'),
+        ('7', '중식'),
+        ('8', '일식'),
         ('9', '양식'),
         ('10', '태국음식'),
         ('11', '인도음식'),
@@ -31,6 +35,8 @@ CHOICE_CATEGORY = (
         ('13', '제주시'),
         ('14', '서귀포시'),
     )
+class PlaceListPagination(PageNumberPagination):
+    page_size = 10
 
 ##### 맛집 #####
 class PlaceDetailView(APIView):
@@ -82,7 +88,8 @@ class PlaceSelectView(APIView):
         if choice_no > 12:
             place_list = []
             for i in range(0, 12):
-                pick = Place.objects.filter(place_address__contains=CHOICE_CATEGORY[choice_no-1][1],category=CHOICE_CATEGORY[i][1]).first()
+                num = random.randint(0, 6238)
+                pick = Place.objects.filter(place_address__contains=CHOICE_CATEGORY[choice_no-1][1],category=CHOICE_CATEGORY[i][1])
                 if pick == None:
                     pass
                 else:
@@ -103,18 +110,20 @@ class PlaceSelectView(APIView):
                 pick2 = Place.objects.filter(category=CHOICE_CATEGORY[choice_no-2][1])[0:3]
                 pick3 = Place.objects.filter(category=CHOICE_CATEGORY[choice_no-3][1])[0:3]
                 pick = (pick1|pick2|pick3)
-                
                 serializer = PlaceSelectSerializer(pick, many=True)
                 return Response(serializer.data, status=status.HTTP_200_OK)
             else:
                 place_list = []
-                pick = Place.objects.filter(category=CHOICE_CATEGORY[choice_no-1][1])[0:12]
+                pick = Place.objects.filter(category=CHOICE_CATEGORY[choice_no-1][1])[0:9]
                 serializer = PlaceSelectSerializer(pick, many=True)
                 return Response(serializer.data, status=status.HTTP_200_OK)
 
+
+
 ##### 맛집(리뷰가 없거나, 비로그인 계정일 경우) #####
-class NewUserPlaceListView(APIView):
+class NewUserPlaceListView(PaginationHandlerMixin, APIView):
     permission_classes = [AllowAny]
+    pagination_class = PlaceListPagination
 
     # 맛집 리스트 추천
     @swagger_auto_schema(operation_summary="맛집 리스트 추천(비유저)",
@@ -123,22 +132,24 @@ class NewUserPlaceListView(APIView):
         place_list = rcm_place_new_user(place_id=place_id, category=str(category))
         preserved = Case(*[When(pk=pk, then=pos) for pos, pk in enumerate(place_list)])
         place = Place.objects.filter(id__in=place_list).order_by(preserved)
-        serializer = PlaceSerializer(place, many=True)
+        page = self.paginate_queryset(place)
+        serializer = self.get_paginated_response(PlaceSerializer(page, many=True).data)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 ##### 맛집(유저일 경우) #####
-class UserPlaceListView(APIView):
+class UserPlaceListView(PaginationHandlerMixin, APIView):
     permission_classes = [AllowAny]
+    pagination_class = PlaceListPagination
 
     # 맛집 리스트 추천
     @swagger_auto_schema(operation_summary="맛집 리스트 추천(유저)",
                     responses={200 : '성공', 500 : '서버 에러'})
     def get(self, request, cate_id):
-        print("뷰 동작")
         place_list = rcm_place_user(user_id = request.user.id, cate_id=cate_id)
         preserved = Case(*[When(pk=pk, then=pos) for pos, pk in enumerate(place_list)])
         place = Place.objects.filter(id__in=place_list).order_by(preserved)
-        serializer = PlaceSerializer(place, many=True)
+        page = self.paginate_queryset(place)
+        serializer = self.get_paginated_response(PlaceSerializer(page, many=True).data)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 ##### 검색 #####

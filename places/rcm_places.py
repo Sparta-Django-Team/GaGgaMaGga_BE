@@ -15,7 +15,7 @@ django.setup()
 from reviews.models import Review
 from places.models import Place
 
-CHOICE_ONE = ['분식', '한식', '돼지고기구이','치킨,닭강정', '햄버거', '피자', '중식당', '일식당', '양식',  '태국음식', '인도음식', '베트남음식', '제주시', '서귀포시']
+CHOICE_ONE = ['분식', '한식', '돼지고기구이','치킨,닭강정', '햄버거', '피자', '중식', '일식', '양식',  '태국음식', '인도음식', '베트남음식', '제주시', '서귀포시']
 
 # 유사한 유저 정보 조회 및 추천(기존 사용이력이 없는 사용자)
 def rcm_place_new_user(place_id, category):
