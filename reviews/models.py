@@ -29,7 +29,7 @@ class Comment(models.Model):
     created_at = models.DateTimeField('생성 시간', auto_now_add=True)
     updated_at = models.DateTimeField('수정 시간', auto_now=True)
 
-    comment_like = models.ManyToManyField(User, verbose_name='댓글 좋아요',  blank=True, related_name="like_comment")
+    comment_like = models.ManyToManyField(User, verbose_name='댓글 좋아요', related_name="like_comment", blank=True)
 
     author = models.ForeignKey(User, verbose_name='작성자', on_delete=models.CASCADE)
     review = models.ForeignKey(Review, verbose_name='후기', on_delete=models.CASCADE, related_name="review_comments")
