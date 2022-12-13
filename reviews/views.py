@@ -99,7 +99,7 @@ class ReviewDetailView(APIView):
     #리뷰 수정
     @swagger_auto_schema(request_body=ReviewCreateSerializer,
                     operation_summary="리뷰 작성",
-                    responses={201 : '성공', 400:'인풋값 에러', 500 : '서버 에러'})
+                    responses={200 : '성공', 400:'인풋값 에러', 500 : '서버 에러'})
     def put(self, request, place_id, review_id):
         review = get_object_or_404(Review, id=review_id)
         if request.user == review.author:
@@ -112,7 +112,7 @@ class ReviewDetailView(APIView):
 
     #리뷰 삭제
     @swagger_auto_schema(operation_summary="리뷰 삭제", 
-                    responses={201 : '성공', 403:'접근 권한 없음', 404:'찾을 수 없음', 500 : '서버 에러'})
+                    responses={200 : '성공', 403:'접근 권한 없음', 404:'찾을 수 없음', 500 : '서버 에러'})
     def delete(self, request, place_id, review_id):
         review = get_object_or_404(Review, id=review_id)
         place = get_object_or_404(Place, id=place_id)
@@ -134,7 +134,6 @@ class ReviewDetailView(APIView):
             return Response({"message":"이미 신고를 한 후기입니다."}, status=status.HTTP_208_ALREADY_REPORTED)
         
         except Report.DoesNotExist:
-            print(request.data)
             serializer = ReportSerializer(data=request.data)
             if serializer.is_valid():
                 serializer.save(author=request.user, review_id=review_id)
@@ -219,7 +218,7 @@ class CommentDetailView(APIView):
         except Report.DoesNotExist:
             serializer = ReportSerializer(data=request.data)
             if serializer.is_valid():
-                serializer.save(author=request.user, comment=comment_id)
+                serializer.save(author=request.user, comment_id=comment_id)
                 return Response({"message":"신고가 완료되었습니다."}, status=status.HTTP_200_OK)
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -301,7 +300,7 @@ class RecommentDetailView(APIView):
         except Report.DoesNotExist:
             serializer = ReportSerializer(data=request.data)
             if serializer.is_valid():
-                serializer.save(author=request.user, recomment=recomment_id)
+                serializer.save(author=request.user, recomment_id=recomment_id)
                 return Response({"message":"신고가 완료되었습니다."}, status=status.HTTP_200_OK)
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
