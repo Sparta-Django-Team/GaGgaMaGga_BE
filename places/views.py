@@ -88,8 +88,7 @@ class PlaceSelectView(APIView):
         if choice_no > 12:
             place_list = []
             for i in range(0, 12):
-                num = random.randint(0, 6238)
-                pick = Place.objects.filter(place_address__contains=CHOICE_CATEGORY[choice_no-1][1],category=CHOICE_CATEGORY[i][1])
+                pick = Place.objects.filter(place_address__contains=CHOICE_CATEGORY[choice_no-1][1],category=CHOICE_CATEGORY[i][1]).first()
                 if pick == None:
                     pass
                 else:
