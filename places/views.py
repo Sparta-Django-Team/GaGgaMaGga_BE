@@ -80,7 +80,7 @@ class PlaceSelectView(APIView):
                 responses={200 : '성공', 500 : '서버 에러'})
     def get(self, request, choice_no):
         place_list = []
-        
+        load_no = random.randint(1, 6)
         # Case1: choice place location
         if choice_no > 12:
             place_list = []
@@ -102,9 +102,9 @@ class PlaceSelectView(APIView):
             if (choice_no == 3)|(choice_no == 6)|(choice_no == 12):
                 # Merge queryset for 3categories
                 place_list = []
-                pick1 = Place.objects.filter(category=CHOICE_CATEGORY[choice_no-1][1])[0:3]
-                pick2 = Place.objects.filter(category=CHOICE_CATEGORY[choice_no-2][1])[0:3]
-                pick3 = Place.objects.filter(category=CHOICE_CATEGORY[choice_no-3][1])[0:3]
+                pick1 = Place.objects.filter(category=CHOICE_CATEGORY[choice_no-1][1])[load_no-1:load_no+2]
+                pick2 = Place.objects.filter(category=CHOICE_CATEGORY[choice_no-2][1])[load_no-1:load_no+2]
+                pick3 = Place.objects.filter(category=CHOICE_CATEGORY[choice_no-3][1])[load_no-1:load_no+2]
                 pick = (pick1|pick2|pick3)
                 serializer = PlaceSerializer(pick, many=True)
                 return Response(serializer.data, status=status.HTTP_200_OK)
