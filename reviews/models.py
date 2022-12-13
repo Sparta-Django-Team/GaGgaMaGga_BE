@@ -70,7 +70,7 @@ class Report(models.Model):
     )
     
     category = models.CharField('신고 카테고리', max_length=30, choices=REPORT_CATEGORY)
-    content = models.TextField('신고 내용', max_length=500, blank=True)
+    content = models.TextField('신고 내용', max_length=500)
     created_at = models.DateTimeField('생성 시간', auto_now_add=True)
     
     author = models.ForeignKey(User, verbose_name='작성자', on_delete=models.CASCADE)

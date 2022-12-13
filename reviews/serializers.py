@@ -26,7 +26,7 @@ class ReviewListSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Review
-        fields = ('content', 'review_image_one', 'created_at', 'updated_at', 'rating_cnt', 'review_like_count', 'review_like','author_id' , 'nickname', 'profile_image', 'place_name', 'id','author_id','place_id','place')
+        fields = ('content', 'review_image_one', 'created_at', 'updated_at', 'rating_cnt', 'review_like_count', 'review_like', 'author_id' , 'nickname', 'profile_image', 'place_name', 'id', 'author_id', 'place_id', 'place',)
 
 # 후기 생성, 수정 serializer
 class ReviewCreateSerializer(serializers.ModelSerializer):
@@ -87,7 +87,7 @@ class RecommentSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Recomment
-        fields = ('user_id','id', 'content', 'created_at', 'updated_at', 'recomment_like', 'comment', 'nickname', 'profile_image', 'recomment_like_count',)
+        fields = ('user_id', 'id', 'content', 'created_at', 'updated_at', 'recomment_like', 'comment', 'nickname', 'profile_image', 'recomment_like_count',)
 
 # 대댓글 생성, 수정 serializer
 class RecommentCreateSerializer(serializers.ModelSerializer):
@@ -126,7 +126,7 @@ class CommentSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Comment
-        fields = ('user_id','content','id', 'created_at', 'updated_at', 'comment_like', 'review_content', 'nickname', 'profile_image', 'comment_like_count','comment_recomments',)
+        fields = ('user_id', 'content', 'id', 'created_at', 'updated_at', 'comment_like', 'review_content', 'nickname', 'profile_image', 'comment_like_count', 'comment_recomments',)
 
 # 댓글 생성 serializer
 class CommentCreateSerializer(serializers.ModelSerializer):
@@ -160,7 +160,7 @@ class ReviewDetailSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Review
-        fields = ('content','author_id', 'review_image_one', 'review_image_two', 'review_image_three', 'created_at', 'updated_at', 'rating_cnt', 'review_like', 'review_like_count', 'nickname', 'profile_image', 'place_name','review_comments' )
+        fields = ('content', 'author_id', 'review_image_one', 'review_image_two', 'review_image_three', 'created_at', 'updated_at', 'rating_cnt', 'review_like', 'review_like_count', 'nickname', 'profile_image', 'place_name', 'review_comments', )
 
 # 신고 생성serializer
 class ReportSerializer(serializers.ModelSerializer):
