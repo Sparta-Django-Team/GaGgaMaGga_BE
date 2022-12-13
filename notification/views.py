@@ -30,6 +30,7 @@ class NotificationDetailView(APIView) :
                 responses={200 : '성공', 400: '입력값 에러' , 403: '접근 권한 없음 ', 404 : '찾을 수 없음', 500 : '서버 에러'})  
     def put(self, request, notification_id) :
         notification = get_object_or_404(Notification, id=notification_id)
+        print('hello')
         if request.user == notification.user :
             serializer = NotificationDetailSerializer(notification, data=request.data, partial=True)
             if serializer.is_valid() :
