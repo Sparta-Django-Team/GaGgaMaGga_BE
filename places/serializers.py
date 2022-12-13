@@ -2,11 +2,6 @@ from rest_framework import serializers
 
 from .models import Place
 
-#맛집 선택 serializer
-class PlaceSelectSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Place
-        fields = '__all__'
 
 #맛집 상세 serializer
 class PlaceSerializer(serializers.ModelSerializer):

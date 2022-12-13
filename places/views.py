@@ -14,7 +14,7 @@ from gaggamagga.permissions import IsAdminOrOntherReadOnly
 from gaggamagga.pagination import PaginationHandlerMixin
 from . import client
 from .models import Place
-from .serializers import PlaceSelectSerializer, PlaceSerializer
+from .serializers import PlaceSerializer
 from .rcm_places import rcm_place_user, rcm_place_new_user
 
 import random
@@ -83,7 +83,7 @@ class PlaceSelectView(APIView):
                 responses={200 : '성공', 500 : '서버 에러'})
     def get(self, request, choice_no):
         place_list = []
-        
+        load_no = random.randint(1, 6)
         # Case1: choice place location
         if choice_no > 12:
             place_list = []
@@ -97,7 +97,7 @@ class PlaceSelectView(APIView):
             # Create list for custom sorting
             preserved = Case(*[When(pk=pk, then=pos) for pos, pk in enumerate(place_list)])
             place = Place.objects.filter(id__in=place_list).order_by(preserved)
-            serializer = PlaceSelectSerializer(place, many=True)
+            serializer = PlaceSerializer(place, many=True)
             return Response(serializer.data, status=status.HTTP_200_OK)
         
         # Case2: choice food group
@@ -105,16 +105,18 @@ class PlaceSelectView(APIView):
             if (choice_no == 3)|(choice_no == 6)|(choice_no == 12):
                 # Merge queryset for 3categories
                 place_list = []
-                pick1 = Place.objects.filter(category=CHOICE_CATEGORY[choice_no-1][1])[0:3]
-                pick2 = Place.objects.filter(category=CHOICE_CATEGORY[choice_no-2][1])[0:3]
-                pick3 = Place.objects.filter(category=CHOICE_CATEGORY[choice_no-3][1])[0:3]
+                pick1 = Place.objects.filter(category=CHOICE_CATEGORY[choice_no-1][1])[load_no-1:load_no+2]
+                pick2 = Place.objects.filter(category=CHOICE_CATEGORY[choice_no-2][1])[load_no-1:load_no+2]
+                pick3 = Place.objects.filter(category=CHOICE_CATEGORY[choice_no-3][1])[load_no-1:load_no+2]
                 pick = (pick1|pick2|pick3)
-                serializer = PlaceSelectSerializer(pick, many=True)
+                print(pick)
+                serializer = PlaceSerializer(pick, many=True)
                 return Response(serializer.data, status=status.HTTP_200_OK)
             else:
                 place_list = []
-                pick = Place.objects.filter(category=CHOICE_CATEGORY[choice_no-1][1])[0:9]
-                serializer = PlaceSelectSerializer(pick, many=True)
+                pick = Place.objects.filter(category=CHOICE_CATEGORY[choice_no-1][1])[load_no-1:load_no+8]
+                print(pick)
+                serializer = PlaceSerializer(pick, many=True)
                 return Response(serializer.data, status=status.HTTP_200_OK)
 
 
@@ -137,7 +139,7 @@ class NewUserPlaceListView(PaginationHandlerMixin, APIView):
 
 ##### 맛집(유저일 경우) #####
 class UserPlaceListView(PaginationHandlerMixin, APIView):
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated]
     pagination_class = PlaceListPagination
 
     # 맛집 리스트 추천
