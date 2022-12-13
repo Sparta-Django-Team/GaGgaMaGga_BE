@@ -7,7 +7,7 @@ class NotificationSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Notification
-        fields = ('user', 'content', 'created_at', 'is_seen', )
+        fields = ('id', 'user', 'content', 'created_at', 'is_seen', )
 
 #알람 상세페이지 serializer
 class NotificationDetailSerializer(serializers.ModelSerializer):
