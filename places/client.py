@@ -10,7 +10,9 @@ def get_index(index_name='cfe_Place'):
 
 def perform_search(qeury, **kwargs):
     index = get_index()
-    params = {}
+    params = {
+    'hitsPerPage': 100
+}
     index_filters = [f"{k}:{v}" for k, v in kwargs.items() if v]
     if len(index_filters) != 0:
         params["facetFilters"] = index_filters
