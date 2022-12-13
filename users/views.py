@@ -416,8 +416,10 @@ class KakaoLoginView(APIView):
                     
                     user_ip= Util.get_client_ip(request)
                     LoggedIn.objects.create(user=user, created_at=timezone.now(), update_ip=user_ip)
+                    profile = Profile.objects.get(user=user)
+                    
                     refresh = RefreshToken.for_user(user)
-                    return Response({'refresh': str(refresh), 'access':str(refresh.access_token), 'nickname':kakao_nickname}, status=status.HTTP_200_OK)
+                    return Response({'refresh': str(refresh), 'access':str(refresh.access_token), 'nickname':kakao_nickname, 'review_cnt':profile.review_cnt}, status=status.HTTP_200_OK)
                 
                 if social_user is None:
                     return Response({"error":"이메일이 존재하지만 , 소셜유저가 아닙니다"}, status=status.HTTP_400_BAD_REQUEST)
@@ -437,7 +439,7 @@ class KakaoLoginView(APIView):
                 LoggedIn.objects.create(user=new_user, created_at=timezone.now(), update_ip=user_ip)
                 
                 refresh = RefreshToken.for_user(new_user)
-                return Response({'refresh': str(refresh), 'access': str(refresh.access_token), 'nickname':kakao_nickname}, status=status.HTTP_200_OK)
+                return Response({'refresh': str(refresh), 'access': str(refresh.access_token), 'nickname':kakao_nickname, 'review_cnt':profile.review_cnt}, status=status.HTTP_200_OK)
             
         except Exception:
             return Response(status=status.HTTP_400_BAD_REQUEST)
