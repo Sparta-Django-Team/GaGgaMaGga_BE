@@ -12,6 +12,7 @@ from drf_yasg.utils import swagger_auto_schema
 from gaggamagga.pagination import PaginationHandlerMixin
 from .models import Review, Comment, Recomment, Report
 from places.models import Place
+from users.models import Profile
 from .serializers import (ReviewListSerializer, ReviewCreateSerializer, ReviewDetailSerializer, 
 CommentSerializer, CommentCreateSerializer , RecommentSerializer, RecommentCreateSerializer, ReportSerializer)
 
@@ -79,8 +80,10 @@ class ReviewListView(APIView):
                     operation_summary="리뷰 작성",
                     responses={201 : '성공', 400 : '인풋값 에러', 401 : '인증 에러', 500 : '서버 에러'})
     def post(self, request, place_id):
+        profile = get_object_or_404(Profile, user=request.user)
         serializer = ReviewCreateSerializer(data=request.data, context={"place_id":place_id, "request":request})
         if serializer.is_valid():
+            profile.review_count_add
             serializer.save(author=request.user, place_id=place_id)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -116,7 +119,9 @@ class ReviewDetailView(APIView):
     def delete(self, request, place_id, review_id):
         review = get_object_or_404(Review, id=review_id)
         place = get_object_or_404(Place, id=place_id)
+        profile = get_object_or_404(Profile, user=request.user)
         if request.user == review.author:
+            profile.review_count_remove
             review_cnt = place.place_review.count()
             place.rating = (place.rating * review_cnt - review.rating_cnt) / (review_cnt - 1)
             place.save()
