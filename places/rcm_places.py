@@ -35,8 +35,8 @@ def rcm_place_new_user(place_id, category):
 
     # Add user data to dataframe
     review_user.loc[len(review_user)] = np.nan
-    review_user = review_user.fillna(0)
     review_user.loc[len(review_user), place_id] = 5
+    review_user = review_user.fillna(0)
 
     # Analyze cosine similarity
     user_sim_np = cosine_similarity(review_user, review_user)
