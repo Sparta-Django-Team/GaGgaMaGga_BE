@@ -34,6 +34,7 @@ CHOICE_CATEGORY = (
         ('13', '제주시'),
         ('14', '서귀포시'),
     )
+
 class PlaceListPagination(PageNumberPagination):
     page_size = 10
 
@@ -116,8 +117,6 @@ class PlaceSelectView(APIView):
                 serializer = PlaceSerializer(pick, many=True)
                 return Response(serializer.data, status=status.HTTP_200_OK)
 
-
-
 ##### 맛집(리뷰가 없거나, 비로그인 계정일 경우) #####
 class NewUserPlaceListView(PaginationHandlerMixin, APIView):
     permission_classes = [AllowAny]
@@ -134,8 +133,6 @@ class NewUserPlaceListView(PaginationHandlerMixin, APIView):
         serializer = self.get_paginated_response(PlaceSerializer(page, many=True).data)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
-
-
 # class PlaceLoadView(APIView):
 #     permission_classes = [AllowAny]
     
@@ -145,11 +142,6 @@ class NewUserPlaceListView(PaginationHandlerMixin, APIView):
 #         page = self.paginate_queryset(context)
 #         serializer = self.get_paginated_response(PlaceSerializer(page, many=True).data)
 #         return Response(serializer.data, status=status.HTTP_200_OK)
-
-
-
-
-
 
 ##### 맛집(유저일 경우) #####
 class UserPlaceListView(PaginationHandlerMixin, APIView):
