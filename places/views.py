@@ -136,20 +136,6 @@ class NewUserPlaceListView(PaginationHandlerMixin, APIView):
 
 
 
-# class PlaceLoadView(APIView):
-#     permission_classes = [AllowAny]
-    
-#     @swagger_auto_schema(operation_summary="맛집 리스트 로드",
-#                     responses={200 : '성공', 500 : '서버 에러'})
-#     def get(self, request, context):
-#         page = self.paginate_queryset(context)
-#         serializer = self.get_paginated_response(PlaceSerializer(page, many=True).data)
-#         return Response(serializer.data, status=status.HTTP_200_OK)
-
-
-
-
-
 
 ##### 맛집(유저일 경우) #####
 class UserPlaceListView(PaginationHandlerMixin, APIView):
