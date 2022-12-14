@@ -15,6 +15,8 @@ django.setup()
 from reviews.models import Review
 from places.models import Place
 
+import random
+
 CHOICE_ONE = ['분식', '한식', '돼지고기구이','치킨,닭강정', '햄버거', '피자', '중식', '일식', '양식',  '태국음식', '인도음식', '베트남음식', '제주시', '서귀포시']
 
 # 유사한 유저 정보 조회 및 추천(기존 사용이력이 없는 사용자)
@@ -70,7 +72,13 @@ def rcm_place_user(user_id, cate_id):
     place_ratings = pd.merge(places, reviews, on='place_id')
 
     review_user = place_ratings.pivot_table('rating_cnt', index='author_id', columns='place_id')
-    review_user = review_user.fillna(0)
+    if (user_id in review_user.index):
+        review_user = review_user.fillna(0)
+    else:
+        col = random.choice(review_user.columns.to_list())
+        review_user.loc[user_id] = np.nan
+        review_user.loc[user_id, col] = 5
+        review_user = review_user.fillna(0)
 
     # Analyze cosine similarity
     user_sim_np = cosine_similarity(review_user, review_user)
