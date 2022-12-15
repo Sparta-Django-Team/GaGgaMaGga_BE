@@ -10,7 +10,7 @@
   - Django Rest Framework과 Javascript를 활용하여 제주도의 맛집 추천 웹 서비스를 구축한다.
   - 유저 데이터를 기반으로 머신러닝 추천시스템을 활용하여 사용자 맞춤형 맛집을 추천해주고,
     사용자간 방문 후기를 서로 공유할 수 있는 플랫폼을 제공한다.
-  - Timeline : 2022.07.07 ~ 2022.08.16
+  - 개발기간 : 2022.11.30 ~ 
 <br>
 
 ## ⚙ ****기능 명세서****
@@ -94,7 +94,28 @@
 
 <br>
 
+## 🐾 ****Main Character****
 
+![ex_screenshot](./img/character.png)
+
+<br>
+
+## 🤙 ****Convention****
+
+# :sparkles:Feat: 새로운 기능 추가
+# :bug:Fix: 버그 수정
+# :ambulance:!HOTFIX: 급한 오류 수정
+# :books:Docs: 문서 수정
+# :umbrella:Test: 테스트 코드 추가
+# :hammer:Refact: 코드 리팩토링
+# :art:Style: 코드 의미에 영향을 주지 않는 변경사항
+# :lipstick:Design: CSS 등 사용자 UI디자인 변경
+# Comment: 필요한 주석 추가 및 변경	
+# Rename: 파일 혹은 폴더명을 수정하거나 옮기는 작업만의 경우
+# Remove: 파일을 삭제하는 작업만 수행한 경우
+# Chore: 빌드 부분 혹은 패키지 매니저 수정사항
+
+<br>
 
 ## 🙏 ****Ground Rules****
 
