@@ -4,6 +4,7 @@
 ![ex_screenshot](./img/main.png)
 
 <br>
+
 ## ****📌 프로젝트 개요****
 
   - Django Rest Framework과 Javascript를 활용하여 제주도의 맛집 추천 웹 서비스를 구축한다.
@@ -44,9 +45,12 @@
 
 <br>
 
-## 🧱 ****Project Architecture****
+## ****⛓ Tech Stack****  
 
-![ex_screenshot](./img/architecture.png)
+### Backend : <img src="https://img.shields.io/badge/python-3776AB?style=for-the-badge&logo=python&logoColor=white"> <img src="https://img.shields.io/badge/django-092E20?style=for-the-badge&logo=django&logoColor=white"> <img src="https://img.shields.io/badge/django rest framework-092E20?style=for-the-badge&logo=django&logoColor=white">
+### Frontend : <img src="https://img.shields.io/badge/html5-E34F26?style=for-the-badge&logo=html5&logoColor=white"> <img src="https://img.shields.io/badge/css-1572B6?style=for-the-badge&logo=css3&logoColor=white"> <img src="https://img.shields.io/badge/javascript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black"> 
+### Server : <img src="https://img.shields.io/badge/AMAZON EC2-FFE900?style=for-the-badge&logo=amazon&logoColor=black"> <img src="https://img.shields.io/badge/DOCKER-3D97FF?style=for-the-badge&logo=docker&logoColor=white"> <img src="https://img.shields.io/badge/GUNICORN-2BB530?style=for-the-badge&logo=gunicorn&logoColor=white"> <img src="https://img.shields.io/badge/NGINX-2F9624?style=for-the-badge&logo=nginx&logoColor=white">
+### Management : <img src="https://img.shields.io/badge/github-181717?style=for-the-badge&logo=github&logoColor=white"> <img src="https://img.shields.io/badge/git-F05032?style=for-the-badge&logo=git&logoColor=white">
 
 <br>
 
@@ -55,12 +59,9 @@
 
 <br>
 
-## ****⛓ Tech Stack****  
+## 🧱 ****Project Architecture****
 
-### Backend : <img src="https://img.shields.io/badge/python-3776AB?style=for-the-badge&logo=python&logoColor=white"> <img src="https://img.shields.io/badge/django-092E20?style=for-the-badge&logo=django&logoColor=white"> <img src="https://img.shields.io/badge/django rest framework-092E20?style=for-the-badge&logo=django&logoColor=white">
-### Frontend : <img src="https://img.shields.io/badge/html5-E34F26?style=for-the-badge&logo=html5&logoColor=white"> <img src="https://img.shields.io/badge/css-1572B6?style=for-the-badge&logo=css3&logoColor=white"> <img src="https://img.shields.io/badge/javascript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black"> 
-### Server : <img src="https://img.shields.io/badge/AMAZON EC2-FFE900?style=for-the-badge&logo=amazon&logoColor=black"> <img src="https://img.shields.io/badge/DOCKER-3D97FF?style=for-the-badge&logo=docker&logoColor=white"> <img src="https://img.shields.io/badge/GUNICORN-2BB530?style=for-the-badge&logo=gunicorn&logoColor=white"> <img src="https://img.shields.io/badge/NGINX-2F9624?style=for-the-badge&logo=nginx&logoColor=white">
-### Management : <img src="https://img.shields.io/badge/github-181717?style=for-the-badge&logo=github&logoColor=white"> <img src="https://img.shields.io/badge/git-F05032?style=for-the-badge&logo=git&logoColor=white">
+![ex_screenshot](./img/architecture.png)
 
 <br>
 
@@ -77,11 +78,19 @@
 ## 🎯 ****API****
 ### [USER API](https://www.notion.so/ea5288cd6b724843aba84b78b367cf2a)
 
+![ex_screenshot](./img/user_api.png)
+
 ### [PLACE API](https://www.notion.so/77cdb6c85d724d59a46e38b6d4f307ee)
+
+![ex_screenshot](./img/place_api.png)
 
 ### [REVIEW API](https://www.notion.so/6699ab1af4524a04ac4d44bad3294938)
 
+![ex_screenshot](./img/review_api.png)
+
 ### [NOTIFICATION API](https://www.notion.so/783dbdb9d49d413ea8167fa98b5dc4ea)
+
+![ex_screenshot](./img/notification_api.png)
 
 <br>
 
