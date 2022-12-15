@@ -64,8 +64,12 @@
 
 <br>
 
-## 📚 ****Used Dataset****
-  - 네이버 지도 v4 웹 크롤링을 통한 맛집 데이터 확보
+## 📚 ****Used API, Dataset****
+  - **소셜로그인** : KAKAO Oauth2 API
+  - **계정 찾기** : NAVER Cloud SMS API
+  - **지도 App** : NAVER Web Dynamic Map API
+  - **검색 App** : ALGOLIA API
+  - **맛집 Data** : NAVER Map v5.0 crawling Data
 
 <br>
 
