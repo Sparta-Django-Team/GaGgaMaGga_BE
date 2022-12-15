@@ -19,7 +19,7 @@
 
 ## 🥘 ****주요 페이지****
 
-![ex_screenshot](./img/apps.png)
+![ex_screenshot](./img/apps.jpg)
 
 <br>
 
