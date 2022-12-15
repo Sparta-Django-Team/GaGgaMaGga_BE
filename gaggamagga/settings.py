@@ -228,7 +228,7 @@ DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
 # CORS settings
 CORS_ALLOW_ALL_ORIGINS = True
-CORS_ORIGIN_WHITELIST = ['https://www.gaggamagga.tk', ]
+CORS_ORIGIN_WHITELIST = ['http://back-gaggamagga.tk', ]
 
 # CSRF settings
 CSRF_TRUSTED_ORIGINS = CORS_ORIGIN_WHITELIST
@@ -240,3 +240,4 @@ ALGOLIA = {
     'API_KEY': get_secret("SEARCH_KEY"),
     'INDEX_PREFIX' : 'cfe'
 }
+

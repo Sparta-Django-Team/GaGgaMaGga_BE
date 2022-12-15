@@ -1,9 +1,8 @@
-version: '3.8'
-
 volumes:
   postgres: {}
   django_media: {}
   django_static: {}
+  redisdata:
 
 services:
   postgres:
@@ -12,15 +11,23 @@ services:
     volumes:
       - postgres:/var/lib/postgresql/data/
     environment:
-      - POSTGRES_USER
-      - POSTGRES_PASSWORD
-      - POSTGRES_DB
+      - POSTGRES_USER=user
+      - POSTGRES_PASSWORD=P@ssw0rd
+      - POSTGRES_DB=django
     restart: always
+
+  redis:
+    restart: always
+    image: redis:6.2
+    ports :
+      - "6379:6379"
+    volumes:
+      - redisdata:/data
 
   backend:
     container_name: backend
     build: ./backend/
-    entrypoint: sh -c "python manage.py collectstatic --no-input && python manage.py migrate && gunicorn drf_project.wsgi --workers=5 -b 0.0.0.0:8000"
+    entrypoint: sh -c "python manage.py collectstatic --no-input && python manage.py migrate && gunicorn gaggamagga.wsgi --workers=5 -b 0.0.0.0:8000"
     volumes:
       - ./backend/django/:/app/
       - /etc/localtime:/etc/localtime:ro
@@ -28,11 +35,11 @@ services:
       - django_static:/app/static/
     environment:
       - DEBUG=1
-      - POSTGRES_DB
-      - POSTGRES_USER
-      - POSTGRES_PASSWORD
-      - POSTGRES_HOST
-      - POSTGRES_PORT
+      - POSTGRES_DB=django
+      - POSTGRES_USER=user
+      - POSTGRES_PASSWORD=P@ssw0rd
+      - POSTGRES_HOST=postgres
+      - POSTGRES_PORT=5432
     depends_on:
       - postgres
     restart: always
