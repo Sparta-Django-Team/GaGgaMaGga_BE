@@ -102,18 +102,18 @@
 
 ## 🤙 ****Convention****
 
-# :sparkles:Feat: 새로운 기능 추가
-# :bug:Fix: 버그 수정
-# :ambulance:!HOTFIX: 급한 오류 수정
-# :books:Docs: 문서 수정
-# :umbrella:Test: 테스트 코드 추가
-# :hammer:Refact: 코드 리팩토링
-# :art:Style: 코드 의미에 영향을 주지 않는 변경사항
-# :lipstick:Design: CSS 등 사용자 UI디자인 변경
-# Comment: 필요한 주석 추가 및 변경	
-# Rename: 파일 혹은 폴더명을 수정하거나 옮기는 작업만의 경우
-# Remove: 파일을 삭제하는 작업만 수행한 경우
-# Chore: 빌드 부분 혹은 패키지 매니저 수정사항
+- :sparkles:Feat: 새로운 기능 추가
+- :bug:Fix: 버그 수정
+- :ambulance:!HOTFIX: 급한 오류 수정
+- :books:Docs: 문서 수정
+- :umbrella:Test: 테스트 코드 추가
+- :hammer:Refact: 코드 리팩토링
+- :art:Style: 코드 의미에 영향을 주지 않는 변경사항
+- :lipstick:Design: CSS 등 사용자 UI디자인 변경
+- Comment: 필요한 주석 추가 및 변경	
+- Rename: 파일 혹은 폴더명을 수정하거나 옮기는 작업만의 경우
+- Remove: 파일을 삭제하는 작업만 수행한 경우
+- Chore: 빌드 부분 혹은 패키지 매니저 수정사항
 
 <br>
 
