@@ -419,7 +419,6 @@ class KakaoLoginView(APIView):
                     profile = Profile.objects.get(user=user)
                     
                     refresh = RefreshToken.for_user(user)
-                    print(profile.review_cnt)
                     return Response({'refresh': str(refresh), 'access':str(refresh.access_token), 'nickname':kakao_nickname, 'review_cnt':profile.review_cnt}, status=status.HTTP_200_OK)
                 
                 if social_user is None:
