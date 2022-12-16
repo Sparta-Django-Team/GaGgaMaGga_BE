@@ -17,10 +17,8 @@ from places.models import Place
 
 import random
 
-CHOICE_ONE = ['분식', '한식', '돼지고기구이','치킨,닭강정', '햄버거', '피자', '중식', '일식', '양식',  '태국음식', '인도음식', '베트남음식', '제주시', '서귀포시']
-
 # 유사한 유저 정보 조회 및 추천(기존 사용이력이 없는 사용자)
-def rcm_place_new_user(review_user, place_id, category):
+def rcm_place_new_user(review_user, place_id):
 
     # Add user data to dataframe
     new_idx = int(review_user.iloc[len(review_user)-1].name)+1
@@ -44,8 +42,7 @@ def rcm_place_new_user(review_user, place_id, category):
 
 
 # 유사한 유저 정보 조회 및 추천(기존 유저)
-def rcm_place_user(review_user, user_id, cate_id):
-    review_user = review_user.fillna(0)
+def rcm_place_user(review_user, user_id):
 
     # Analyze cosine similarity
     user_sim_np = cosine_similarity(review_user, review_user)

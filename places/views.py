@@ -19,6 +19,7 @@ from .rcm_places import rcm_place_user, rcm_place_new_user
 
 import random
 import pandas as pd
+import numpy as np
 
 CHOICE_ONE = ['분식', '한식', '돼지고기구이','치킨,닭강정', '햄버거', '피자', '중식', '일식', '양식',  '태국음식', '인도음식', '베트남음식', '제주시', '서귀포시']
 
@@ -88,6 +89,7 @@ class PlaceSelectView(APIView):
         place_list = []
         load_no = random.randint(1, 6)
         # Case1: choice place location
+        print(choice_no)
         if choice_no > 12:
             place_list = []
             for i in range(0, 12):
@@ -142,10 +144,11 @@ class NewUserPlaceListView(PaginationHandlerMixin, APIView):
                 place_list = [place1, place2, place3]
                 places = pd.concat(place_list, ignore_index=True)
             else:
-                category = CHOICE_CATEGORY[cate_id-1][1]
-                places = places[places['category'].str.contains(category)]
+                cate = CHOICE_CATEGORY[cate_id-1][1]
+                places = places[places['category'].str.contains(cate)]
         else:                   # Case2: choice place location
-            places = places[places['place_address'].str.contains(category)]
+            cate = CHOICE_CATEGORY[cate_id-1][1]
+            places = places[places['place_address'].str.contains(cate)]
 
         # Create dataframe
         reviews = pd.DataFrame(list(Review.objects.values()))
@@ -153,22 +156,13 @@ class NewUserPlaceListView(PaginationHandlerMixin, APIView):
         places.rename(columns={'id':'place_id'}, inplace=True)
         place_ratings = pd.merge(places, reviews, on='place_id')
         review_user = place_ratings.pivot_table('rating_cnt', index='author_id', columns='place_id')
-
-        place_list = rcm_place_new_user(review_user=review_user, place_id=place_id, category=str(category))
+        place_list = rcm_place_new_user(review_user=review_user, place_id=place_id)
         preserved = Case(*[When(pk=pk, then=pos) for pos, pk in enumerate(place_list)])
         place = Place.objects.filter(id__in=place_list).order_by(preserved)
-
         page = self.paginate_queryset(place)
         serializer = self.get_paginated_response(PlaceSerializer(page, many=True).data)
-        # serializer = PlaceSerializer(place, many=True)
         context = serializer.data
         return Response(context, status=status.HTTP_200_OK)
-
-
-# class PlaceLoadView(APIView):
-#     permission_classes = [AllowAny]
-    
-#     def get(self, request, context, page_no):
 
 
 ##### 맛집(유저일 경우) #####
@@ -195,6 +189,7 @@ class UserPlaceListView(PaginationHandlerMixin, APIView):
                 category = CHOICE_CATEGORY[cate_id-1][1]
                 places = places[places['category'].str.contains(category)]
         else:                   # Case2: choice place location
+            category = CHOICE_CATEGORY[cate_id-1][1]
             places = places[places['place_address'].str.contains(category)]
 
         # Create dataframe
@@ -203,13 +198,17 @@ class UserPlaceListView(PaginationHandlerMixin, APIView):
         place_ratings = pd.merge(places, reviews, on='place_id')
         review_user = place_ratings.pivot_table('rating_cnt', index='author_id', columns='place_id')
 
-        if (request.user.id in review_user.index):
-            place_list = rcm_place_user(review_user=review_user, user_id = request.user.id, cate_id=cate_id)
-            preserved = Case(*[When(pk=pk, then=pos) for pos, pk in enumerate(place_list)])
-            place = Place.objects.filter(id__in=place_list).order_by(preserved)
-            page = self.paginate_queryset(place)
-            serializer = self.get_paginated_response(PlaceSerializer(page, many=True).data)
-            return Response(serializer.data, status=status.HTTP_200_OK)
+        if (request.user.id not in review_user.index):
+            col = random.choice(review_user.columns.to_list())
+            review_user.loc[request.user.id] = np.nan
+            review_user.loc[request.user.id, col] = 5
+        review_user = review_user.fillna(0)
+        place_list = rcm_place_user(review_user=review_user, user_id = request.user.id)
+        preserved = Case(*[When(pk=pk, then=pos) for pos, pk in enumerate(place_list)])
+        place = Place.objects.filter(id__in=place_list).order_by(preserved)
+        page = self.paginate_queryset(place)
+        serializer = self.get_paginated_response(PlaceSerializer(page, many=True).data)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 ##### 검색 #####
