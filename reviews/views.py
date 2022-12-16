@@ -123,7 +123,10 @@ class ReviewDetailView(APIView):
         if request.user == review.author:
             profile.review_count_remove
             review_cnt = place.place_review.count()
-            place.rating = (place.rating * review_cnt - review.rating_cnt) / (review_cnt - 1)
+            if review_cnt == 1:
+                place.rating = 0
+            else:
+                place.rating = (place.rating * review_cnt - review.rating_cnt) / (review_cnt - 1)
             place.save()
             review.delete()
             return Response({"message":"리뷰 삭제"}, status=status.HTTP_200_OK)
