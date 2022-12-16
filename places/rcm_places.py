@@ -20,20 +20,7 @@ import random
 CHOICE_ONE = ['분식', '한식', '돼지고기구이','치킨,닭강정', '햄버거', '피자', '중식', '일식', '양식',  '태국음식', '인도음식', '베트남음식', '제주시', '서귀포시']
 
 # 유사한 유저 정보 조회 및 추천(기존 사용이력이 없는 사용자)
-def rcm_place_new_user(place_id, category):
-    places = pd.DataFrame(list(Place.objects.values()))
-    cate_id = CHOICE_ONE.index(category)
-
-    if cate_id <= 12:       # Case1: choice food group
-        places = places[places['category'].str.contains(category)]
-    else:                   # Case2: choice place location
-        places = places[places['place_address'].str.contains(category)]
-    
-    # Create dataframe
-    reviews = pd.DataFrame(list(Review.objects.values()))
-    places.rename(columns={'id':'place_id'}, inplace=True)
-    place_ratings = pd.merge(places, reviews, on='place_id')
-    review_user = place_ratings.pivot_table('rating_cnt', index='author_id', columns='place_id')
+def rcm_place_new_user(review_user, place_id, category):
 
     # Add user data to dataframe
     new_idx = int(review_user.iloc[len(review_user)-1].name)+1
