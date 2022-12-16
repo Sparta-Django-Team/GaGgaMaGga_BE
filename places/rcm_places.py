@@ -57,28 +57,8 @@ def rcm_place_new_user(place_id, category):
 
 
 # 유사한 유저 정보 조회 및 추천(기존 유저)
-def rcm_place_user(user_id, cate_id):
-    places = pd.DataFrame(list(Place.objects.values()))
-    category = CHOICE_ONE[cate_id-1]
-
-    if cate_id <= 12:       # Case1: choice food group
-        places = places[places['category'].str.contains(category)]
-    else:                   # Case2: choice place location
-        places = places[places['place_address'].str.contains(category)]
-
-    # Create dataframe
-    reviews = pd.DataFrame(list(Review.objects.values()))
-    places.rename(columns={'id':'place_id'}, inplace=True)
-    place_ratings = pd.merge(places, reviews, on='place_id')
-
-    review_user = place_ratings.pivot_table('rating_cnt', index='author_id', columns='place_id')
-    if (user_id in review_user.index):
-        review_user = review_user.fillna(0)
-    else:
-        col = random.choice(review_user.columns.to_list())
-        review_user.loc[user_id] = np.nan
-        review_user.loc[user_id, col] = 5
-        review_user = review_user.fillna(0)
+def rcm_place_user(review_user, user_id, cate_id):
+    review_user = review_user.fillna(0)
 
     # Analyze cosine similarity
     user_sim_np = cosine_similarity(review_user, review_user)
