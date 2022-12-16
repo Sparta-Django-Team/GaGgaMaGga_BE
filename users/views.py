@@ -54,8 +54,8 @@ class UserView(APIView):
 
             ConfirmEmail.objects.create(secured_key=secured_key, expired_at=expired_at, user=user)
 
-            frontend_site = "127.0.0.1:5500" 
-            absurl = f'http://{frontend_site}/confirm_email.html?secured_key={str(secured_key)}'
+            frontend_site = "www.gaggamagga.shop" 
+            absurl = f'https://{frontend_site}/confirm_email.html?secured_key={str(secured_key)}'
             email_body = '안녕하세요!' + user.username +"고객님 이메일인증을 하시려면 아래 사이트를 접속해주세요 \n" + absurl
             message = {'email_body': email_body,'to_email':user.email, 'email_subject':'이메일 인증' }
             Util.send_email(message)
@@ -164,8 +164,8 @@ class ReSendEmailView(APIView):
 
         ConfirmEmail.objects.create(secured_key=secured_key, expired_at=expired_at, user=user)
 
-        frontend_site = "127.0.0.1:5500" 
-        absurl = f'http://{frontend_site}/confirm_email.html?secured_key={str(secured_key)}'
+        frontend_site = "www.gaggamagga.shop" 
+        absurl = f'https://{frontend_site}/confirm_email.html?secured_key={str(secured_key)}'
         email_body = '안녕하세요!' + user.username +"고객님 이메일인증을 하시려면 아래 사이트를 접속해주세요 \n" + absurl
         message = {'email_body': email_body,'to_email':user.email, 'email_subject':'이메일 인증' }
         Util.send_email(message)
@@ -385,7 +385,7 @@ class KakaoLoginView(APIView):
                 data={
                     "grant_type": "authorization_code",
                     "client_id": get_secret("SOCIAL_AUTH_KAKAO_CLIENT_ID"),
-                    "redirect_uri": "http://127.0.0.1:5500",
+                    "redirect_uri": "https://www.gaggamagga.shop/index.html",
                     "code": code,
                 },
             )
