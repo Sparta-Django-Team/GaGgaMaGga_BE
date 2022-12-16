@@ -118,6 +118,19 @@ CHANNEL_LAYERS = {
 
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
+POSTGRES_DB = os.environ.get('POSTGRES_DB', '')
+if POSTGRES_DB:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': POSTGRES_DB,
+            'USER': os.environ.get('POSTGRES_USER', ''),
+            'PASSWORD': os.environ.get('POSTGRES_PASSWORD', ''),
+            'HOST': os.environ.get('POSTGRES_HOST', ''),
+            'PORT': os.environ.get('POSTGRES_PORT', ''),
+        }
+   }
+
 
 POSTGRES_DB = os.environ.get('POSTGRES_DB', '')
 if POSTGRES_DB:
@@ -131,6 +144,7 @@ if POSTGRES_DB:
             'PORT': os.environ.get('POSTGRES_PORT', ''),
         }
     }
+
 
 
 else:
@@ -228,7 +242,8 @@ DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
 # CORS settings
 CORS_ALLOW_ALL_ORIGINS = True
-CORS_ORIGIN_WHITELIST = ['http://back-gaggamagga.tk', ]
+
+CORS_ORIGIN_WHITELIST = ['https://www.back-gaggamagga.tk', ]
 
 # CSRF settings
 CSRF_TRUSTED_ORIGINS = CORS_ORIGIN_WHITELIST
