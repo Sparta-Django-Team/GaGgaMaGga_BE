@@ -131,6 +131,22 @@ if POSTGRES_DB:
         }
    }
 
+
+POSTGRES_DB = os.environ.get('POSTGRES_DB', '')
+if POSTGRES_DB:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': POSTGRES_DB,
+            'USER': os.environ.get('POSTGRES_USER', ''),
+            'PASSWORD': os.environ.get('POSTGRES_PASSWORD', ''),
+            'HOST': os.environ.get('POSTGRES_HOST', ''),
+            'PORT': os.environ.get('POSTGRES_PORT', ''),
+        }
+    }
+
+
+
 else:
     DATABASES = {
         'default': {
@@ -226,6 +242,7 @@ DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
 # CORS settings
 CORS_ALLOW_ALL_ORIGINS = True
+
 CORS_ORIGIN_WHITELIST = ['https://www.back-gaggamagga.tk', ]
 
 # CSRF settings
