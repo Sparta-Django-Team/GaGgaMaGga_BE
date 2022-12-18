@@ -92,7 +92,6 @@ class ReviewDetailViewTest(APITestCase):
         cls.review2 = Review.objects.create(content="내용", rating_cnt="5", author=cls.user1, place=cls.place)
         cls.report = Report.objects.create(content="신고내용", category='욕설이 들어갔어요.', author=cls.user1, review=cls.review2)
 
-
     def setUp(self):
         self.access_token = self.client.post(reverse('token_obtain_pair_view'), self.user1_data).data['access']
 
@@ -424,7 +423,6 @@ class CommentLikeAPIViewTest(APITestCase):
             data=self.comment_data)
         self.assertEqual(response.status_code, 401)
 
-
 #### 대댓글 ####
 # 대댓글 조회/작성
 class RecommentAPIViewTestCase(APITestCase):
@@ -617,7 +615,3 @@ class RecommentLikeAPIViewTest(APITestCase):
             path=reverse("recomment_like_view", kwargs={'recomment_id':1}),
             data=self.comment_data)
         self.assertEqual(response.status_code, 401)
-
-
-
-

@@ -40,8 +40,6 @@ class NotificationConsumer(AsyncWebsocketConsumer):
         # 그룹에 메시지 보내기
         await self.channel_layer.group_send(self.room_name, event)         
 
-
-
     # 그룹에서 메시지 받기
     async def send_message(self, event):
         message = event["message"]

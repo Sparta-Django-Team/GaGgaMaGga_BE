@@ -2,7 +2,6 @@ from rest_framework import serializers
 
 from .models import Place
 
-
 #맛집 serializer
 class PlaceSerializer(serializers.ModelSerializer):
     class Meta:

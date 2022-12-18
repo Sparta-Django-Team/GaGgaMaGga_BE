@@ -163,7 +163,6 @@ class NewUserPlaceListView(PaginationHandlerMixin, APIView):
         serializer = self.get_paginated_response(PlaceSerializer(page, many=True).data)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
-
 ##### 맛집(유저일 경우) #####
 class UserPlaceListView(PaginationHandlerMixin, APIView):
     permission_classes = [IsAuthenticated]
@@ -208,7 +207,6 @@ class UserPlaceListView(PaginationHandlerMixin, APIView):
         page = self.paginate_queryset(place)
         serializer = self.get_paginated_response(PlaceSerializer(page, many=True).data)
         return Response(serializer.data, status=status.HTTP_200_OK)
-
 
 ##### 검색 #####
 class SearchListView(APIView):

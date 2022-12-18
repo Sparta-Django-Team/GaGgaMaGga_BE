@@ -56,6 +56,7 @@ INSTALLED_APPS = [
     'reviews',
     'users',
 ]
+
 # RestFramework
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
@@ -115,7 +116,6 @@ CHANNEL_LAYERS = {
     },
 }
 
-
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 POSTGRES_DB = os.environ.get('POSTGRES_DB', '')
@@ -129,23 +129,7 @@ if POSTGRES_DB:
             'HOST': os.environ.get('POSTGRES_HOST', ''),
             'PORT': os.environ.get('POSTGRES_PORT', ''),
         }
-   }
-
-
-POSTGRES_DB = os.environ.get('POSTGRES_DB', '')
-if POSTGRES_DB:
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.postgresql',
-            'NAME': POSTGRES_DB,
-            'USER': os.environ.get('POSTGRES_USER', ''),
-            'PASSWORD': os.environ.get('POSTGRES_PASSWORD', ''),
-            'HOST': os.environ.get('POSTGRES_HOST', ''),
-            'PORT': os.environ.get('POSTGRES_PORT', ''),
-        }
-    }
-
-
+}
 
 else:
     DATABASES = {
@@ -153,7 +137,7 @@ else:
             'ENGINE': 'django.db.backends.sqlite3',
             'NAME': BASE_DIR / 'db.sqlite3',
             'TEST' : {
-              'NAME' : BASE_DIR / "db.sqlite3",  
+            'NAME' : BASE_DIR / "db.sqlite3",  
             },
         }
     }
@@ -245,7 +229,6 @@ DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
 # CORS settings
 CORS_ALLOW_ALL_ORIGINS = True
-
 CORS_ORIGIN_WHITELIST = ['https://www.back-gaggamagga.tk', ]
 
 # CSRF settings
