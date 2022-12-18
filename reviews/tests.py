@@ -4,6 +4,18 @@ from users.models import User, Profile
 from reviews.models import Review, Comment, Recomment, Report
 from places.models import Place
 
+# 이미지 업로드
+from django.test.client import MULTIPART_CONTENT, encode_multipart, BOUNDARY
+from PIL import Image
+import tempfile
+
+def get_temporary_image(temp_file):
+    size = (200,200)
+    color = (255, 0, 0, 0)
+    image = Image.new("RGBA", size, color)
+    image.save(temp_file, 'png')
+    return temp_file
+
 #### 리뷰 ####
 # 전체 리뷰 조회
 class ReviewRankAPIViewTest(APITestCase):
@@ -50,6 +62,37 @@ class ReviewAPIViewTest(APITestCase):
             path=reverse("review_list_view", kwargs={'place_id':1}),
             HTTP_AUTHORIZATION=f"Bearer {self.access_token}",
             data=self.review_data)
+        self.assertEqual(response.status_code, 201)
+
+    # 이미지 포함 리뷰 작성 성공
+    def test_create_review_with_image(self):
+        # 첫번째 이미지
+        # 임시 이미지 파일 생성
+        temp_file = tempfile.NamedTemporaryFile()
+        temp_file.name = "image.png"
+        image_file = get_temporary_image(temp_file)
+        image_file.seek(0)  # 첫번째 프레임을 받아옴
+        self.review_data["review_image_one"] = image_file
+        # 두번째 이미지
+        temp_file = tempfile.NamedTemporaryFile()
+        temp_file.name = "image.png"
+        image_file = get_temporary_image(temp_file)
+        image_file.seek(0)  
+        self.review_data["review_image_two"] = image_file
+        # 세번째 이미지
+        temp_file = tempfile.NamedTemporaryFile()
+        temp_file.name = "image.png"
+        image_file = get_temporary_image(temp_file)
+        image_file.seek(0) 
+        self.review_data["review_image_three"] = image_file
+
+        # 전송
+        response = self.client.post(
+            path=reverse("review_list_view", kwargs={'place_id':1}),
+            HTTP_AUTHORIZATION=f"Bearer {self.access_token}",
+            content_type=MULTIPART_CONTENT,
+            data=encode_multipart(data = self.review_data, boundary=BOUNDARY)
+        )
         self.assertEqual(response.status_code, 201)
 
     # 로그인 안된 유저가 시도했을때 에러
@@ -108,6 +151,37 @@ class ReviewDetailViewTest(APITestCase):
             path=reverse("review_detail_view", kwargs={'place_id':1, 'review_id':1}),
             HTTP_AUTHORIZATION=f"Bearer {self.access_token}",
             data={'content':'edit content', "rating_cnt": "5"})
+        self.assertEqual(response.status_code, 200)
+
+    # 이미지 포함 리뷰 수정 성공
+    def test_edit_review_with_image(self):
+        # 첫번째 이미지
+        # 임시 이미지 파일 생성
+        temp_file = tempfile.NamedTemporaryFile()
+        temp_file.name = "image.png"
+        image_file = get_temporary_image(temp_file)
+        image_file.seek(0)  # 첫번째 프레임을 받아옴
+        self.review_data["review_image_one"] = image_file
+        # 두번째 이미지
+        temp_file = tempfile.NamedTemporaryFile()
+        temp_file.name = "image.png"
+        image_file = get_temporary_image(temp_file)
+        image_file.seek(0)  
+        self.review_data["review_image_two"] = image_file
+        # 세번째 이미지
+        temp_file = tempfile.NamedTemporaryFile()
+        temp_file.name = "image.png"
+        image_file = get_temporary_image(temp_file)
+        image_file.seek(0) 
+        self.review_data["review_image_three"] = image_file
+
+        # 전송
+        response = self.client.put(
+            path=reverse("review_detail_view", kwargs={'place_id':1, 'review_id':1}),
+            HTTP_AUTHORIZATION=f"Bearer {self.access_token}",
+            content_type=MULTIPART_CONTENT,
+            data=encode_multipart(data={'content':'edit content', "rating_cnt": "5"}, boundary=BOUNDARY)
+        )
         self.assertEqual(response.status_code, 200)
 
     # 로그인 안된 유저가 시도했을때 에러
