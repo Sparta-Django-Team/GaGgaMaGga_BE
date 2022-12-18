@@ -1,6 +1,6 @@
 from django.db import models
 from django.core.validators import MaxValueValidator, validate_image_file_extension
-
+from django.utils import timezone
 from users.models import User
 from places.models import Place
 
@@ -9,8 +9,8 @@ class Review(models.Model):
     review_image_one = models.ImageField('이미지 1', upload_to='review_pics', blank=True, validators=[validate_image_file_extension])
     review_image_two = models.ImageField('이미지 2', upload_to='review_pics', blank=True, validators=[validate_image_file_extension])
     review_image_three = models.ImageField('이미지 3', upload_to='review_pics', blank=True, validators=[validate_image_file_extension])
-    created_at = models.DateTimeField('후기 생성 시간', auto_now_add=True)
-    updated_at = models.DateTimeField('후기 수정 시간', auto_now=True)
+    created_at = models.DateTimeField('후기 생성 시간', default=timezone.now())
+    updated_at = models.DateTimeField('후기 수정 시간', default=timezone.now())
     rating_cnt = models.PositiveIntegerField('별점', validators=[MaxValueValidator(5)])
     
     review_like = models.ManyToManyField(User, verbose_name='후기 좋아요', related_name="like_review", blank=True)
