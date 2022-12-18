@@ -58,8 +58,8 @@ class User(AbstractBaseUser):
     is_confirmed = models.BooleanField('이메일 확인', default=False)
     withdraw = models.BooleanField('회원 비활성화', default=False)
     password_expired = models.BooleanField('비밀번호 만료', default=False)
-    last_password_changed = models.DateTimeField('비밀번호 마지막 변경일', auto_now=True)
-    created_at = models.DateTimeField('계정 생성일', auto_now_add=True)
+    last_password_changed = models.DateTimeField('비밀번호 마지막 변경일', default=timezone.now())
+    created_at = models.DateTimeField('계정 생성일', default=timezone.now())
     withdraw_at = models.DateTimeField('계정 탈퇴일', null=True)
 
     objects = UserManager()
