@@ -22,7 +22,7 @@ class Place(models.Model):
     place_name = models.CharField('장소명', max_length=50)
     category = models.CharField('카테고리', max_length=20)
     rating = models.DecimalField('별점', max_digits=3, decimal_places=2, default=0, validators=[MaxValueValidator(5)])
-    menu = models.CharField('메뉴', max_length=255, null=True)
+    menu = models.TextField('메뉴', null=True)
     place_desc = models.CharField('소개글', max_length=255, null=True)
     place_address = models.CharField('주소', max_length=100)
     place_number = models.CharField('장소 전화번호', max_length=20)
