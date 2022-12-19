@@ -5,8 +5,18 @@ from django.urls import reverse
 from django.utils.http import urlsafe_base64_encode
 from django.utils.encoding import smart_bytes
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
+from django.test.client import MULTIPART_CONTENT, encode_multipart, BOUNDARY
 
 from .models import User, ConfirmPhoneNumber, Profile
+from PIL import Image
+import tempfile
+
+def get_temporary_image(temp_file):
+    size = (200,200)
+    color = (255, 0, 0, 0)
+    image = Image.new("RGBA", size, color)
+    image.save(temp_file, 'png')
+    return temp_file
 
 class UserSignupAPIViewTestCase(APITestCase):
     
@@ -449,8 +459,10 @@ class UserResendEmailAPIViewTest(APITestCase):
 class PrivateProfileAPIViewTestCase(APITestCase):
     def setUp(self):
         self.data = {"username": "test12341", "password":"Test1234!"}
-        self.user = User.objects.create_user("test12341","test1@test.com", "01012351234","Test1234!")
-        Profile.objects.create(user=self.user, nickname="test", intro='test')
+        self.user1 = User.objects.create_user("test12341","test1@test.com", "01012351234","Test1234!")
+        self.user2 = User.objects.create_user("test1234","test@test.com", "01012341234","Test1234!")
+        self.profile1 = Profile.objects.create(user=self.user1, nickname="test", intro='test')
+        self.profile2 = Profile.objects.create(user=self.user2, nickname="test1", intro='test1')
     
     # 개인 프로필
     def test_private_profile_get_success(self):
@@ -461,26 +473,23 @@ class PrivateProfileAPIViewTestCase(APITestCase):
         )
         self.assertEqual(response.status_code, 200)
 
-class PrivateProfileAPIViewTestCase(APITestCase):
-    def setUp(self):
-        self.data = {"username": "test12341", "password":"Test1234!"}
-        self.user1 = User.objects.create_user("test12341","test1@test.com", "01012351234","Test1234!")
-        self.user2 = User.objects.create_user("test1234","test@test.com", "01012341234","Test1234!")
-        
-        self.profile1 = Profile.objects.create(user=self.user1, nickname="test", intro='test')
-        self.profile2 = Profile.objects.create(user=self.user2, nickname="test1", intro='test1')
-    
-    # 회원정보 수정 성공
+    # 프로필 수정 성공
     def test_profile_update_success(self):
+        temp_file = tempfile.NamedTemporaryFile()
+        temp_file.name = "image.png"
+        image_file = get_temporary_image(temp_file)
+        image_file.seek(0)
+        
         access_token = self.client.post(reverse('token_obtain_pair_view'), self.data).data['access']
         response = self.client.put(
             path=reverse("private_profile_view"),
+            content_type=MULTIPART_CONTENT,
             HTTP_AUTHORIZATION=f"Bearer {access_token}",
-            data={"nickname":"test111", "intro":"testtest"} 
+            data=encode_multipart(data={"nickname":"test111", "intro":"testtest", "profile_image":image_file}, boundary=BOUNDARY) 
         )
         self.assertEqual(response.status_code, 200)
         
-    # 회원정보 수정 실패(닉네임 유효성검사)
+    # 프로필 수정 실패(닉네임 유효성검사)
     def test_profile_update_nickname_validation_fail(self):
         access_token = self.client.post(reverse('token_obtain_pair_view'), self.data).data['access']
         response = self.client.put(
@@ -490,7 +499,7 @@ class PrivateProfileAPIViewTestCase(APITestCase):
         )
         self.assertEqual(response.status_code, 400)
     
-    # 회원정보 수정 실패(닉네임 중복)
+    # 프로필 수정 실패(닉네임 중복)
     def test_profile_update_nickname_unique_fail(self):
         access_token = self.client.post(reverse('token_obtain_pair_view'), self.data).data['access']
         response = self.client.put(
