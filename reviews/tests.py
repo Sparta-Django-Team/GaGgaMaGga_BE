@@ -125,6 +125,7 @@ class ReviewDetailViewTest(APITestCase):
         cls.user1_data = {'username':'test1234', 'password':'Test1234!'}
         cls.user2_data = {'username':'test1235', 'password':'Test1234!'}
         cls.review_data = {'content':'some content', "rating_cnt": "5"}
+        cls.edit_review_data={'content':'edit content', "rating_cnt": "5"}
         cls.report_data = {'content':'report content', "category": '욕설이 들어갔어요.'}
         cls.user1 = User.objects.create_user("test1234","test1@test.com", "01012341234","Test1234!")
         cls.user2 = User.objects.create_user("test1235","test2@test.com", "01012341235","Test1234!")
@@ -161,26 +162,26 @@ class ReviewDetailViewTest(APITestCase):
         temp_file.name = "image.png"
         image_file = get_temporary_image(temp_file)
         image_file.seek(0)  # 첫번째 프레임을 받아옴
-        self.review_data["review_image_one"] = image_file
+        self.edit_review_data["review_image_one"] = image_file
         # 두번째 이미지
         temp_file = tempfile.NamedTemporaryFile()
         temp_file.name = "image.png"
         image_file = get_temporary_image(temp_file)
         image_file.seek(0)  
-        self.review_data["review_image_two"] = image_file
+        self.edit_review_data["review_image_two"] = image_file
         # 세번째 이미지
         temp_file = tempfile.NamedTemporaryFile()
         temp_file.name = "image.png"
         image_file = get_temporary_image(temp_file)
         image_file.seek(0) 
-        self.review_data["review_image_three"] = image_file
+        self.edit_review_data["review_image_three"] = image_file
 
         # 전송
         response = self.client.put(
             path=reverse("review_detail_view", kwargs={'place_id':1, 'review_id':1}),
             HTTP_AUTHORIZATION=f"Bearer {self.access_token}",
             content_type=MULTIPART_CONTENT,
-            data=encode_multipart(data={'content':'edit content', "rating_cnt": "5"}, boundary=BOUNDARY)
+            data=encode_multipart(data=self.edit_review_data, boundary=BOUNDARY)
         )
         self.assertEqual(response.status_code, 200)
 
