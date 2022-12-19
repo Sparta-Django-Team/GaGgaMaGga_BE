@@ -162,7 +162,7 @@ class OauthId(models.Model):
 
 # 프로필
 class Profile(models.Model):
-    profile_image = models.ImageField('프로필 사진', default='default_profile_pic.jpg', upload_to='profile_pics', validators=[validate_image_file_extension])
+    profile_image = models.ImageField('프로필 사진', default='default_profile_pic.png', upload_to='profile_pics', validators=[validate_image_file_extension])
     nickname = models.CharField('닉네임', max_length=10, null=True, unique=True, error_messages={"unique": "이미 사용중인 닉네임 이거나 탈퇴한 닉네임입니다."})
     intro = models.CharField('자기소개', max_length=100, null=True)
     review_cnt = models.PositiveIntegerField('리뷰수', default=0)
