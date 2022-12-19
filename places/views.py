@@ -161,8 +161,7 @@ class NewUserPlaceListView(PaginationHandlerMixin, APIView):
         place = Place.objects.filter(id__in=place_list).order_by(preserved)
         page = self.paginate_queryset(place)
         serializer = self.get_paginated_response(PlaceSerializer(page, many=True).data)
-        context = serializer.data
-        return Response(context, status=status.HTTP_200_OK)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 ##### 맛집(유저일 경우) #####
