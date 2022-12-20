@@ -28,7 +28,7 @@ SECRET_KEY = get_secret("SECRET_KEY")
 
 DEBUG = os.environ.get('DEBUG', '0') == '1'
 
-ALLOWED_HOSTS = ['backend', ]
+ALLOWED_HOSTS = ['backend', 'channels','redis']
 
 # Application definition
 INSTALLED_APPS = [
@@ -77,7 +77,7 @@ SWAGGER_SETTINGS = {
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
-    'corsheaders.middleware.CorsMiddleware',
+    'corsheaders.middleware.CorsMiddleware',    
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -230,6 +230,7 @@ DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 # CORS settings
 CORS_ALLOW_ALL_ORIGINS = True
 CORS_ORIGIN_WHITELIST = ['https://www.back-gaggamagga.tk', ]
+
 
 # CSRF settings
 CSRF_TRUSTED_ORIGINS = CORS_ORIGIN_WHITELIST
