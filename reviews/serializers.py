@@ -58,14 +58,16 @@ class ReviewCreateSerializer(serializers.ModelSerializer):
         review_cnt = place.place_review.count()
     
         # 이미지 용량 예외 처리
-        if review_image_one or review_image_two or review_image_three:
+        if review_image_one:
             if review_image_one.size > 1024**2:
                 raise serializers.ValidationError(detail={"error":"이미지는 1MB미만만 업로드 가능합니다."})
-
-            elif review_image_two.size > 1024**2:
+            
+        if review_image_two:
+            if review_image_two.size > 1024**2:
                 raise serializers.ValidationError(detail={"error":"이미지는 1MB미만만 업로드 가능합니다."})
-
-            elif review_image_three.size > 1024**2:     
+            
+        if review_image_three:
+            if review_image_three.size > 1024**2:     
                 raise serializers.ValidationError(detail={"error":"이미지는 1MB미만만 업로드 가능합니다."})
 
         # 리뷰 생성시(별점 계산)
