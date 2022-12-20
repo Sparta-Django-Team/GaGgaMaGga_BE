@@ -4,6 +4,10 @@ from .models import Review, Comment, Recomment, Report
 from places.models import Place
 from places.serializers import PlaceSerializer
 
+import os
+
+from users.utils import Util
+
 # 후기 전체 serializer
 class ReviewListSerializer(serializers.ModelSerializer):
     nickname = serializers.SerializerMethodField()
@@ -47,8 +51,22 @@ class ReviewCreateSerializer(serializers.ModelSerializer):
     def validate(self, data):
         http_method = self.context.get("request").method
         new_review_rating = data.get('rating_cnt')
+        review_image_one = data.get('review_image_one')
+        review_image_two = data.get('review_image_two')
+        review_image_three = data.get('review_image_three')
         place = Place.objects.get(id=self.context.get("place_id"))
         review_cnt = place.place_review.count()
+    
+        # 이미지 용량 예외 처리
+        if review_image_one or review_image_two or review_image_three:
+            if review_image_one.size > 1024**2:
+                raise serializers.ValidationError(detail={"error":"이미지는 1MB미만만 업로드 가능합니다."})
+
+            elif review_image_two.size > 1024**2:
+                raise serializers.ValidationError(detail={"error":"이미지는 1MB미만만 업로드 가능합니다."})
+
+            elif review_image_three.size > 1024**2:     
+                raise serializers.ValidationError(detail={"error":"이미지는 1MB미만만 업로드 가능합니다."})
 
         # 리뷰 생성시(별점 계산)
         if http_method == "POST":

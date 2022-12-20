@@ -190,10 +190,16 @@ class ProfileUpdateSerializer(serializers.ModelSerializer):
 
     def validate(self, data):        
         nickname = data.get('nickname')
+        profile_image = data.get('profile_image')
         
         # 닉네임 유효성 검사
         if nickname_validator(nickname):
             raise serializers.ValidationError(detail={"nickname":"닉네임은 3자이상 10자 이하로 작성해야하며 특수문자는 포함할 수 없습니다."})
+        
+        # 이미지 용량 예외 처리
+        if profile_image:
+            if profile_image.size > 1024**2: 
+                raise serializers.ValidationError(detail={"error":"이미지는 1MB미만만 업로드 가능합니다."})
         
         return data
 

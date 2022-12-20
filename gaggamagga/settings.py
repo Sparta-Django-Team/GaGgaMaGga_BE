@@ -242,4 +242,3 @@ ALGOLIA = {
     'API_KEY': get_secret("SEARCH_KEY"),
     'INDEX_PREFIX' : 'cfe'
 }
-
