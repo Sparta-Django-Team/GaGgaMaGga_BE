@@ -1,5 +1,4 @@
 from django.core.mail import EmailMessage
-from django.core.files import File
 
 import requests
 import tempfile

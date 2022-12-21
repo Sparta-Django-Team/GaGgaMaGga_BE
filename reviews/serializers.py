@@ -4,10 +4,6 @@ from .models import Review, Comment, Recomment, Report
 from places.models import Place
 from places.serializers import PlaceSerializer
 
-import os
-
-from users.utils import Util
-
 # 후기 전체 serializer
 class ReviewListSerializer(serializers.ModelSerializer):
     nickname = serializers.SerializerMethodField()

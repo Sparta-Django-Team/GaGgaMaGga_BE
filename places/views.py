@@ -90,7 +90,6 @@ class PlaceSelectView(APIView):
         place_list = []
         load_no = random.randint(1, 6)
         # Case1: choice place location
-        print(choice_no)
         if choice_no > 12:
             place_list = []
             for i in range(0, 12):
