@@ -272,6 +272,42 @@ path('search/', views.SearchListView.as_view(), name='search'),
 #         self.assertEqual(response.status_code, 200)
 
 
+# class PlaceDetailAPIViewTestCase(APITestCase):
+#     @classmethod
+#     def setUpTestData(cls):
+#         cls.user_normal_data = {'username':'test1234', 'password':'Test1234!'}
+#         cls.user_admin_data = {'username':'admin', 'password':'Test1234!'}
+#         cls.user_normal = User.objects.create_user("test1234", "test1@test.com", "01012341234", "Test1234!")
+#         cls.user_admin = User.objects.create_user("admin", "admin@test.com", "01012341235", "Test1234!")
+#         cls.user_admin.is_admin = True
+#         cls.user_admin.save()
+#         Profile.objects.create(user=cls.user_normal)
+#         Profile.objects.create(user=cls.user_admin)
+#         cls.place = Place.objects.create(place_name="장소", category="한식", rating=5, place_address="제주시", place_time="영업시간", place_img="img_url")
+
+#     def setUp(self):
+#         self.access_token_normal = self.client.post(reverse('token_obtain_pair_view'), self.user_normal_data).data['access']     # 일반 계정
+#         self.access_token_admin = self.client.post(reverse('token_obtain_pair_view'), self.user_admin_data).data['access']     # 어드민 계정
+
+#     def test_place_detail_get_success(self):
+#         response = self.client.get(
+#             path=reverse("place_detail_view", kwargs={'place_id':1}), 
+#             HTTP_AUTHORIZATION=f"Bearer {self.access_token_normal}")
+#         print(response.data)
+#         self.assertEqual(response.status_code, 200)
+
+#     def test_delete_place_success(self):
+#         response = self.client.delete(
+#             path=reverse("place_detail_view", kwargs={'place_id':1}), 
+#             HTTP_AUTHORIZATION=f"Bearer {self.access_token_admin}")
+#         self.assertEqual(response.status_code, 200)
+
+#     def test_delete_place_fail(self):
+#         response = self.client.delete(
+#             path=reverse("place_detail_view", kwargs={'place_id':1}), 
+#             HTTP_AUTHORIZATION=f"Bearer {self.access_token_normal}")
+#         self.assertEqual(response.status_code, 403)
+
 
 
 # '''
@@ -292,68 +328,30 @@ path('search/', views.SearchListView.as_view(), name='search'),
 # path('search/', views.SearchListView.as_view(), name='search'),
 # '''
 
-class PlaceDetailAPIViewTestCase(APITestCase):
+
+# 장소 북마크
+class PlaceBookmarkAPIViewTestCase(APITestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.user_normal_data = {'username':'test1234', 'password':'Test1234!'}
-        cls.user_admin_data = {'username':'admin', 'password':'Test1234!'}
-        cls.user_normal = User.objects.create_user("test1234", "test1@test.com", "01012341234", "Test1234!")
-        cls.user_admin = User.objects.create_user("admin", "admin@test.com", "01012341235", "Test1234!")
-
-        cls.user_admin.is_admin = True
-        cls.user_admin.save()
-        print(cls.user_admin.is_admin)
-        Profile.objects.create(user=cls.user_normal)
-        Profile.objects.create(user=cls.user_admin)
+        cls.user_data = {'username':'test1234', 'password':'Test1234!'}
+        cls.user = User.objects.create_user("test1234", "test1@test.com", "01012341234", "Test1234!")
+        Profile.objects.create(user=cls.user)
         cls.place = Place.objects.create(place_name="장소", category="한식", rating=5, place_address="제주시", place_time="영업시간", place_img="img_url")
         
     def setUp(self):
-        self.access_token_normal = self.client.post(reverse('token_obtain_pair_view'), self.user_normal_data).data['access']     # 일반 계정
-        self.access_token_admin = self.client.post(reverse('token_obtain_pair_view'), self.user_admin_data).data['access']     # 어드민 계정
+        self.access_token = self.client.post(reverse('token_obtain_pair_view'), self.user_data).data['access']     # 일반 계정
 
-    def test_place_detail_get_success(self):
-        response = self.client.get(
-            path=reverse("place_detail_view", kwargs={'place_id':1}), 
-            HTTP_AUTHORIZATION=f"Bearer {self.access_token_normal}")
-        print(response.data)
-        self.assertEqual(response.status_code, 200)
+    def test_bookmark_success(self):
+        response_execute = self.client.post(
+            path=reverse("place_bookmark_view", kwargs={"place_id":1}),
+            HTTP_AUTHORIZATION=f"Bearer {self.access_token}",
+        )
+        self.assertEqual(response_execute.status_code, 200)
 
-    def test_delete_place_success(self):
-        response = self.client.delete(
-            path=reverse("place_detail_view", kwargs={'place_id':1}), 
-            HTTP_AUTHORIZATION=f"Bearer {self.access_token_admin}")
-        self.assertEqual(response.status_code, 200)
-
-    def test_delete_place_fail(self):
-        response = self.client.delete(
-            path=reverse("place_detail_view", kwargs={'place_id':1}), 
-            HTTP_AUTHORIZATION=f"Bearer {self.access_token_normal}")
-        self.assertEqual(response.status_code, 403)
-
-
-
-# class PlaceBookmarkAPIViewTestCase(APITestCase):
-
-#     @classmethod
-#     def setUpTestData(cls):
-#         self.user1 = User.objects.create_user("test12341","test1@test.com", "01012351234","Test1234!")
-#         self.profile1 = Profile.objects.create
-#         Place.objects.create(place_name="장소명", category="카테고리", rating="5", place_address="주소", place_time="시간", place_img="이미지")
-#         self.user = {"username": "test12341", "password":"Test1234!"}
-        
-#     def test_follow_success(self):
-#         access_token = self.client.post(reverse('token_obtain_pair_view'), self.user).data['access']
-#         response_case_1 = self.client.post(
-#             path=reverse("process_follow_view", kwargs={"nickname":"test1"}),
-#             HTTP_AUTHORIZATION=f"Bearer {access_token}",
-#         )
-#         self.assertEqual(response_case_1.status_code, 200)
-        
-#         response_case_2 = self.client.post(
-#             path=reverse("process_follow_view", kwargs={"nickname":"test1"}),
-#             HTTP_AUTHORIZATION=f"Bearer {access_token}",
-#         )
-#         self.assertEqual(response_case_2.status_code, 200)
+        response_cancel = self.client.post(
+            path=reverse("place_bookmark_view", kwargs={'place_id':1}), 
+            HTTP_AUTHORIZATION=f"Bearer {self.access_token}")
+        self.assertEqual(response_cancel.status_code, 200)
 
 
 
