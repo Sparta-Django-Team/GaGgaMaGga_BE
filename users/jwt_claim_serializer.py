@@ -98,7 +98,6 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
         token["nickname"] = user.user_profile.nickname
         token["review_cnt"] = user.user_profile.review_cnt
         token["password_expired"] = user.password_expired
-        token["is_confirmed"] = user.is_confirmed
         token["is_admin"] = user.is_admin
 
         return token
