@@ -144,6 +144,7 @@ class LogoutSerializer(serializers.Serializer):
 class PrivateProfileSerializer(serializers.ModelSerializer):
     email = serializers.SerializerMethodField()
     username = serializers.SerializerMethodField()
+    is_confirmed = serializers.SerializerMethodField()
 
     def get_email(self, obj):
         return obj.user.email
@@ -151,9 +152,12 @@ class PrivateProfileSerializer(serializers.ModelSerializer):
     def get_username(self, obj):
         return obj.user.username
 
+    def get_is_confirmed(self, obj):
+        return obj.user.is_confirmed
+
     class Meta:
         model = Profile
-        fields = ('id', 'nickname', 'profile_image', 'email', 'username', 'intro',)
+        fields = ('id', 'nickname', 'profile_image', 'email', 'username', 'intro', 'is_confirmed',)
 
 # 공개 프로필 serializer
 class PublicProfileSerializer(serializers.ModelSerializer):
