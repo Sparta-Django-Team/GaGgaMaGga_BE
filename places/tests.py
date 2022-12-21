@@ -4,7 +4,8 @@ from django.urls import reverse
 
 from users.models import User, Profile
 from reviews.models import Review, Comment, Recomment, Report
-from .models import Place
+from places.models import Place
+from places.views import CHOICE_CATEGORY
 
 import random
 '''
@@ -46,53 +47,14 @@ path('search/', views.SearchListView.as_view(), name='search'),
 
 '''
 
-CHOICE_CATEGORY = (
-        ('1', '분식'),
-        ('2', '한식'),
-        ('3', '돼지고기구이'),
-        ('4', '치킨,닭강정'),
-        ('5', '햄버거'),
-        ('6', '피자'),
-        ('7', '중식'),
-        ('8', '일식'),
-        ('9', '양식'),
-        ('10', '태국음식'),
-        ('11', '인도음식'),
-        ('12', '베트남음식'),
-        ('13', '제주시'),
-        ('14', '서귀포시'),
-    )
-
-
 
 #### 장소 ####
 class PlaceSelectAPIViewTestCase(APITestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.place = Place.objects.create(place_name="장소01", category="분식", rating="5", place_address="제주시", place_time="시간", place_img="이미지")
-        cls.place = Place.objects.create(place_name="장소02", category="한식", rating="5", place_address="제주시", place_time="시간", place_img="이미지")
-        cls.place = Place.objects.create(place_name="장소03", category="돼지고기구이", rating="5", place_address="서귀포시", place_time="시간", place_img="이미지")
-        cls.place = Place.objects.create(place_name="장소04", category="치킨,닭강정", rating="3", place_address="서귀포시", place_time="시간", place_img="이미지")
-        cls.place = Place.objects.create(place_name="장소05", category="햄버거", rating="4", place_address="제주시", place_time="시간", place_img="이미지")
-        cls.place = Place.objects.create(place_name="장소06", category="피자", rating="5", place_address="서귀포시", place_time="시간", place_img="이미지")
-        cls.place = Place.objects.create(place_name="장소07", category="중식", rating="3", place_address="제주시", place_time="시간", place_img="이미지")
-        cls.place = Place.objects.create(place_name="장소08", category="일식", rating="5", place_address="제주시", place_time="시간", place_img="이미지")
-        cls.place = Place.objects.create(place_name="장소09", category="양식", rating="3", place_address="제주시", place_time="시간", place_img="이미지")
-        cls.place = Place.objects.create(place_name="장소10", category="태국음식", rating="2", place_address="서귀포시", place_time="시간", place_img="이미지")
-        cls.place = Place.objects.create(place_name="장소11", category="인도음식", rating="4", place_address="제주시", place_time="시간", place_img="이미지")
-        cls.place = Place.objects.create(place_name="장소12", category="베트남음식", rating="3", place_address="서귀포시", place_time="시간", place_img="이미지")
-        cls.place = Place.objects.create(place_name="장소13", category="분식", rating="5", place_address="제주시", place_time="시간", place_img="이미지")
-        cls.place = Place.objects.create(place_name="장소14", category="한식", rating="5", place_address="서귀포시", place_time="시간", place_img="이미지")
-        cls.place = Place.objects.create(place_name="장소15", category="돼지고기구이", rating="5", place_address="서귀포시", place_time="시간", place_img="이미지")
-        cls.place = Place.objects.create(place_name="장소16", category="치킨,닭강정", rating="4", place_address="서귀포시", place_time="시간", place_img="이미지")
-        cls.place = Place.objects.create(place_name="장소17", category="햄버거", rating="5", place_address="서귀포시", place_time="시간", place_img="이미지")
-        cls.place = Place.objects.create(place_name="장소18", category="피자", rating="2", place_address="제주시", place_time="시간", place_img="이미지")
-        cls.place = Place.objects.create(place_name="장소19", category="중식", rating="4", place_address="서귀포시", place_time="시간", place_img="이미지")
-        cls.place = Place.objects.create(place_name="장소20", category="일식", rating="4", place_address="제주시", place_time="시간", place_img="이미지")
-        cls.place = Place.objects.create(place_name="장소21", category="양식", rating="5", place_address="제주시", place_time="시간", place_img="이미지")
-        cls.place = Place.objects.create(place_name="장소22", category="태국음식", rating="5", place_address="서귀포시", place_time="시간", place_img="이미지")
-        cls.place = Place.objects.create(place_name="장소23", category="인도음식", rating="4", place_address="제주시", place_time="시간", place_img="이미지")
-        cls.place = Place.objects.create(place_name="장소24", category="베트남음식", rating="2", place_address="서귀포시", place_time="시간", place_img="이미지")
+        for i in range(24):
+            j = round(i/2)
+            cls.place = Place.objects.create(place_name=f"장소{i}", category=CHOICE_CATEGORY[j][1], rating=random.randint(1, 5), place_address=random.choice(["제주시", "서귀포시"]), place_time="영업시간", place_img="img_url")
         for i in range(30):
             cls.user = User.objects.create_user(f"user{i+1}",f"user{i+1}@test.com","01000000000","Test1234!")
         for i in range(100):  
@@ -117,30 +79,9 @@ class PlaceSelectAPIViewTestCase(APITestCase):
 class PlaceListNewUserAPIViewTestCase(APITestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.place = Place.objects.create(place_name="장소01", category="분식", rating="5", place_address="제주시", place_time="시간", place_img="이미지")
-        cls.place = Place.objects.create(place_name="장소02", category="한식", rating="5", place_address="제주시", place_time="시간", place_img="이미지")
-        cls.place = Place.objects.create(place_name="장소03", category="돼지고기구이", rating="5", place_address="서귀포시", place_time="시간", place_img="이미지")
-        cls.place = Place.objects.create(place_name="장소04", category="치킨,닭강정", rating="3", place_address="서귀포시", place_time="시간", place_img="이미지")
-        cls.place = Place.objects.create(place_name="장소05", category="햄버거", rating="4", place_address="제주시", place_time="시간", place_img="이미지")
-        cls.place = Place.objects.create(place_name="장소06", category="피자", rating="5", place_address="서귀포시", place_time="시간", place_img="이미지")
-        cls.place = Place.objects.create(place_name="장소07", category="중식", rating="3", place_address="제주시", place_time="시간", place_img="이미지")
-        cls.place = Place.objects.create(place_name="장소08", category="일식", rating="5", place_address="제주시", place_time="시간", place_img="이미지")
-        cls.place = Place.objects.create(place_name="장소09", category="양식", rating="3", place_address="제주시", place_time="시간", place_img="이미지")
-        cls.place = Place.objects.create(place_name="장소10", category="태국음식", rating="2", place_address="서귀포시", place_time="시간", place_img="이미지")
-        cls.place = Place.objects.create(place_name="장소11", category="인도음식", rating="4", place_address="제주시", place_time="시간", place_img="이미지")
-        cls.place = Place.objects.create(place_name="장소12", category="베트남음식", rating="3", place_address="서귀포시", place_time="시간", place_img="이미지")
-        cls.place = Place.objects.create(place_name="장소13", category="분식", rating="5", place_address="제주시", place_time="시간", place_img="이미지")
-        cls.place = Place.objects.create(place_name="장소14", category="한식", rating="5", place_address="서귀포시", place_time="시간", place_img="이미지")
-        cls.place = Place.objects.create(place_name="장소15", category="돼지고기구이", rating="5", place_address="서귀포시", place_time="시간", place_img="이미지")
-        cls.place = Place.objects.create(place_name="장소16", category="치킨,닭강정", rating="4", place_address="서귀포시", place_time="시간", place_img="이미지")
-        cls.place = Place.objects.create(place_name="장소17", category="햄버거", rating="5", place_address="서귀포시", place_time="시간", place_img="이미지")
-        cls.place = Place.objects.create(place_name="장소18", category="피자", rating="2", place_address="제주시", place_time="시간", place_img="이미지")
-        cls.place = Place.objects.create(place_name="장소19", category="중식", rating="4", place_address="서귀포시", place_time="시간", place_img="이미지")
-        cls.place = Place.objects.create(place_name="장소20", category="일식", rating="4", place_address="제주시", place_time="시간", place_img="이미지")
-        cls.place = Place.objects.create(place_name="장소21", category="양식", rating="5", place_address="제주시", place_time="시간", place_img="이미지")
-        cls.place = Place.objects.create(place_name="장소22", category="태국음식", rating="5", place_address="서귀포시", place_time="시간", place_img="이미지")
-        cls.place = Place.objects.create(place_name="장소23", category="인도음식", rating="4", place_address="제주시", place_time="시간", place_img="이미지")
-        cls.place = Place.objects.create(place_name="장소24", category="베트남음식", rating="2", place_address="서귀포시", place_time="시간", place_img="이미지")
+        for i in range(24):
+            j = round(i/2)
+            cls.place = Place.objects.create(place_name=f"장소{i}", category=CHOICE_CATEGORY[j][1], rating=random.randint(1, 5), place_address=random.choice(["제주시", "서귀포시"]), place_time="영업시간", place_img="img_url")
         for i in range(30):
             cls.user = User.objects.create_user(f"user{i+1}",f"user{i+1}@test.com","01000000000","Test1234!")
         for i in range(100):  
@@ -253,31 +194,9 @@ class PlaceListNewUserAPIViewTestCase(APITestCase):
 class PlaceListUserAPIViewTestCase(APITestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.place = Place.objects.create(place_name="장소01", category="분식", rating="5", place_address="제주시", place_time="시간", place_img="이미지")
-        cls.place = Place.objects.create(place_name="장소02", category="한식", rating="5", place_address="제주시", place_time="시간", place_img="이미지")
-        cls.place = Place.objects.create(place_name="장소03", category="돼지고기구이", rating="5", place_address="서귀포시", place_time="시간", place_img="이미지")
-        cls.place = Place.objects.create(place_name="장소04", category="치킨,닭강정", rating="3", place_address="서귀포시", place_time="시간", place_img="이미지")
-        cls.place = Place.objects.create(place_name="장소05", category="햄버거", rating="4", place_address="제주시", place_time="시간", place_img="이미지")
-        cls.place = Place.objects.create(place_name="장소06", category="피자", rating="5", place_address="서귀포시", place_time="시간", place_img="이미지")
-        cls.place = Place.objects.create(place_name="장소07", category="중식", rating="3", place_address="제주시", place_time="시간", place_img="이미지")
-        cls.place = Place.objects.create(place_name="장소08", category="일식", rating="5", place_address="제주시", place_time="시간", place_img="이미지")
-        cls.place = Place.objects.create(place_name="장소09", category="양식", rating="3", place_address="제주시", place_time="시간", place_img="이미지")
-        cls.place = Place.objects.create(place_name="장소10", category="태국음식", rating="2", place_address="서귀포시", place_time="시간", place_img="이미지")
-        cls.place = Place.objects.create(place_name="장소11", category="인도음식", rating="4", place_address="제주시", place_time="시간", place_img="이미지")
-        cls.place = Place.objects.create(place_name="장소12", category="베트남음식", rating="3", place_address="서귀포시", place_time="시간", place_img="이미지")
-        cls.place = Place.objects.create(place_name="장소13", category="분식", rating="5", place_address="제주시", place_time="시간", place_img="이미지")
-        cls.place = Place.objects.create(place_name="장소14", category="한식", rating="5", place_address="서귀포시", place_time="시간", place_img="이미지")
-        cls.place = Place.objects.create(place_name="장소15", category="돼지고기구이", rating="5", place_address="서귀포시", place_time="시간", place_img="이미지")
-        cls.place = Place.objects.create(place_name="장소16", category="치킨,닭강정", rating="4", place_address="서귀포시", place_time="시간", place_img="이미지")
-        cls.place = Place.objects.create(place_name="장소17", category="햄버거", rating="5", place_address="서귀포시", place_time="시간", place_img="이미지")
-        cls.place = Place.objects.create(place_name="장소18", category="피자", rating="2", place_address="제주시", place_time="시간", place_img="이미지")
-        cls.place = Place.objects.create(place_name="장소19", category="중식", rating="4", place_address="서귀포시", place_time="시간", place_img="이미지")
-        cls.place = Place.objects.create(place_name="장소20", category="일식", rating="4", place_address="제주시", place_time="시간", place_img="이미지")
-        cls.place = Place.objects.create(place_name="장소21", category="양식", rating="5", place_address="제주시", place_time="시간", place_img="이미지")
-        cls.place = Place.objects.create(place_name="장소22", category="태국음식", rating="5", place_address="서귀포시", place_time="시간", place_img="이미지")
-        cls.place = Place.objects.create(place_name="장소23", category="인도음식", rating="4", place_address="제주시", place_time="시간", place_img="이미지")
-        cls.place = Place.objects.create(place_name="장소24", category="베트남음식", rating="2", place_address="서귀포시", place_time="시간", place_img="이미지")
-
+        for i in range(24):
+            j = round(i/2)
+            cls.place = Place.objects.create(place_name=f"장소{i}", category=CHOICE_CATEGORY[j][1], rating=random.randint(1, 5), place_address=random.choice(["제주시", "서귀포시"]), place_time="영업시간", place_img="img_url")
         for i in range(30):
             cls.user = User.objects.create_user(f"user{i+1}",f"user{i+1}@test.com","01000000000","Test1234!")
             Profile.objects.create(user=cls.user, review_cnt=1)
