@@ -1,7 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import BaseUserManager, AbstractBaseUser
 from django.core.validators import MaxValueValidator, validate_image_file_extension, validate_ipv46_address
-
 from django.utils import timezone
 
 from gaggamagga.settings import get_secret

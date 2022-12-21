@@ -55,8 +55,8 @@ class ReviewListView(APIView):
             return [IsAuthenticated(),]
         return super(ReviewListView, self).get_permissions()
 
-    #장소 리뷰 리스트
-    @swagger_auto_schema(operation_summary="장소 리뷰 리스트",
+    #맛집 리뷰 리스트
+    @swagger_auto_schema(operation_summary="맛집 리뷰 리스트",
                     responses={200 : '성공', 404 : '찾을 수 없음', 500 : '서버 에러'})
     def get(self, request, place_id):
 
@@ -139,7 +139,7 @@ class ReviewDetailView(APIView):
     def post(self, request, place_id, review_id):
         try :
             Report.objects.get(author=request.user.id, review=review_id)
-            return Response({"message":"이미 신고를 한 후기입니다."}, status=status.HTTP_208_ALREADY_REPORTED)
+            return Response({"message":"이미 신고를 한 리뷰입니다."}, status=status.HTTP_208_ALREADY_REPORTED)
         
         except Report.DoesNotExist:
             serializer = ReportSerializer(data=request.data)
@@ -221,7 +221,7 @@ class CommentDetailView(APIView):
     def post(self, request, review_id, comment_id):
         try :
             Report.objects.get(author=request.user.id, comment=comment_id)
-            return Response({"message":"이미 신고를 한 후기입니다."}, status=status.HTTP_208_ALREADY_REPORTED)
+            return Response({"message":"이미 신고를 한 리뷰입니다."}, status=status.HTTP_208_ALREADY_REPORTED)
         
         except Report.DoesNotExist:
             serializer = ReportSerializer(data=request.data)
@@ -303,7 +303,7 @@ class RecommentDetailView(APIView):
     def post(self, request, review_id, comment_id, recomment_id):
         try :
             Report.objects.get(author=request.user.id, recomment=recomment_id)
-            return Response({"message":"이미 신고를 한 후기입니다."}, status=status.HTTP_208_ALREADY_REPORTED)
+            return Response({"message":"이미 신고를 한 리뷰입니다."}, status=status.HTTP_208_ALREADY_REPORTED)
         
         except Report.DoesNotExist:
             serializer = ReportSerializer(data=request.data)

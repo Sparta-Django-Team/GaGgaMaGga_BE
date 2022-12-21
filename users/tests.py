@@ -8,6 +8,7 @@ from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from django.test.client import MULTIPART_CONTENT, encode_multipart, BOUNDARY
 
 from .models import User, ConfirmPhoneNumber, Profile
+
 from PIL import Image
 import tempfile
 
@@ -134,7 +135,7 @@ class UserSignupAPIViewTestCase(APITestCase):
         response = self.client.post(url, user_data)
         self.assertEqual(response.status_code, 400)
     
-    # 회원가입 실패(아이디 중복)
+    # 회원가입 실패(전화번호 중복)
     def test_signup_phone_number_unique_fail(self):
         User.objects.create_user("test1234","test@test.com", "01012341234","Test1234!")
         url = reverse("user_view")
@@ -257,7 +258,7 @@ class UserUpdateAPIViewTestCase(APITestCase):
         )
         self.assertEqual(response.status_code, 400)
         
-    # 회원정보 수정 실패(이메일 중복)
+    # 회원정보 수정 실패(이메일 형식)
     def test_user_update_email_invalid_fail(self):
         access_token = self.client.post(reverse('token_obtain_pair_view'), self.data).data['access']
         response = self.client.put(
@@ -410,51 +411,44 @@ class UserResendEmailAPIViewTest(APITestCase):
         )
         self.assertEqual(response.status_code, 401)
         
-# # class SendPhoneNumberAPIViewTest(APITestCase):
-# '''
-# 휴대폰 인증번호가 진짜 발송됨으로 주의하기
-# '''
-# #     def setUp(self):
-# #         User.objects.create_user("test1234","test@test.com", "01012341234","Test1234!")
+class SendPhoneNumberAPIViewTest(APITestCase):
+    def setUp(self):
+        User.objects.create_user("test1234","test@test.com", "01012341234","Test1234!")
     
-# #     def test_resend_email_success(self):
-# #         response = self.client.post(
-# #             path=reverse("send_phone_number_view"),
-# #             data={"phone_number":"01012341234"}
-# #         )
-# #         self.assertEqual(response.status_code, 200)
+    def test_send_phone_number_success(self):
+        response = self.client.post(
+            path=reverse("send_phone_number_view"),
+            data={"phone_number":"01012341234"}
+        )
+        self.assertEqual(response.status_code, 200)
 
-# #     def test_resend_email_fail(self):
-# #         response = self.client.post(
-# #             path=reverse("send_phone_number_view"),
-# #             data={"phone_number":"01012341235"}
-# #         )
-# #         self.assertEqual(response.status_code, 400)
+    def test_send_phone_number_fail(self):
+        response = self.client.post(
+            path=reverse("send_phone_number_view"),
+            data={"phone_number":"01012341235"}
+        )
+        self.assertEqual(response.status_code, 400)
 
-# # class UserConfirmPhoneNumberAPIViewTest(APITestCase):
-# '''
-# 휴대폰 인증번호가 진짜 발송됨으로 주의하기
-# '''
-# #     def setUp(self):
-# #         self.user = User.objects.create_user("test1234","test@test.com", "00000000000","Test1234!")
-# #         self.confirm_phone_number_data = ConfirmPhoneNumber.objects.create(user=self.user)
+class UserConfirmPhoneNumberAPIViewTest(APITestCase):
+    def setUp(self):
+        self.user = User.objects.create_user("test1234","test@test.com", "00000000000","Test1234!")
+        self.confirm_phone_number_data = ConfirmPhoneNumber.objects.create(user=self.user)
         
+    def test_confirm_phone_number_success(self):
+        response = self.client.post(
+            path=reverse("confirm_phone_number_view"),
+            data={"phone_number":self.user.phone_number,
+                "auth_number":self.confirm_phone_number_data.auth_number}
+        )
+        self.assertEqual(response.status_code, 200)
         
-# #     def test_confirm_phone_number_success(self):
-# #         response = self.client.post(
-# #             path=reverse("confirm_phone_number_view"),
-# #             data={"phone_number":self.user.phone_number,
-# #                 "auth_number":self.confirm_phone_number_data.auth_number}
-# #         )
-# #         self.assertEqual(response.status_code, 200)
-        
-# #     def test_confirm_phone_number_auth_number_invalid_fail(self):
-# #         response = self.client.post(
-# #             path=reverse("confirm_phone_number_view"),
-# #             data={"phone_number":self.user.phone_number,
-# #                 "auth_number":1234}
-# #         )
-# #         self.assertEqual(response.status_code, 400)
+    def test_confirm_phone_number_auth_number_invalid_fail(self):
+        response = self.client.post(
+            path=reverse("confirm_phone_number_view"),
+            data={"phone_number":self.user.phone_number,
+                "auth_number":1234}
+        )
+        self.assertEqual(response.status_code, 400)
 
 class PrivateProfileAPIViewTestCase(APITestCase):
     def setUp(self):
@@ -830,7 +824,7 @@ class FollowAPIViewTestCase(APITestCase):
         self.profile2 = Profile.objects.create(user=self.user2, nickname="test1", intro="test")
         
         self.user = {"username": "test12341", "password":"Test1234!"}
-        
+    
     def test_follow_success(self):
         access_token = self.client.post(reverse('token_obtain_pair_view'), self.user).data['access']
         response_case_1 = self.client.post(

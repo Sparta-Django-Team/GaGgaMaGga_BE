@@ -1,9 +1,9 @@
 from rest_framework.test import APITestCase
+
 from django.urls import reverse
 
 from users.models import User, Profile
 from .models import Notification
-
 
 # 로그인한 사용자가 읽지 않은 알람 불러오기
 class NotificationViewTest(APITestCase):
