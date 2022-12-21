@@ -20,6 +20,13 @@
   - **개발기간** : '22.11.30 ~ 12.29
 <br>
 
+## 🐾 ****Main Character****
+
+![ex_screenshot](./img/character.png)
+
+<br>
+
+
 ## 🥘 ****주요 페이지****
 
 ![ex_screenshot](./img/apps.jpg)
@@ -108,26 +115,24 @@
 
 <br>
 
-## 🕸 ****Wireframe****
+## 🕸 ****[Wireframe](https://www.figma.com/file/dlmax1N0WmxIWkeoxWMWCs/%EC%B5%9C%EC%A2%85-%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8?node-id=0%3A1&t=0TMnEGrfJz1zCmk7-0)****
 ![ex_screenshot](./img/wireframe.png)
 
 <br>
 
-## 🛢 ****Database ERD****
+## 🛢 ****[Database ERD](https://www.erdcloud.com/d/RvXb4PCLq3t3CPb3e)****
 
 ![ex_screenshot](./img/erd.png)
-### [ERD cloud link](https://www.erdcloud.com/d/RvXb4PCLq3t3CPb3e)
+
 
 <br>
 
-## 🎯 ****API****
+## 🎯 ****[API](https://bolder-starburst-a73.notion.site/API-101c8f2002fb4257a34b6fb6a81798d2)****
 
 
 <details>
 <summary>USER API</summary>
 <div markdown="1">
-
-### [USER API](https://www.notion.so/ea5288cd6b724843aba84b78b367cf2a)
 
 ![ex_screenshot](./img/user_api.png)
 
@@ -139,8 +144,6 @@
 <summary>PLACE API</summary>
 <div markdown="1">
 
-### [PLACE API](https://www.notion.so/77cdb6c85d724d59a46e38b6d4f307ee)
-
 ![ex_screenshot](./img/place_api.png)
 
 </div>
@@ -149,9 +152,6 @@
 <details>
 <summary>REVIEW API</summary>
 <div markdown="1">
-
-### [REVIEW API](https://www.notion.so/6699ab1af4524a04ac4d44bad3294938)
-
 
 ![ex_screenshot](./img/review_api.png)
 
@@ -163,18 +163,10 @@
 <summary>NOTIFICATION API</summary>
 <div markdown="1">
 
-### [NOTIFICATION API](https://www.notion.so/783dbdb9d49d413ea8167fa98b5dc4ea)
-
 ![ex_screenshot](./img/notification_api.png)
 
 </div>
 </details>
-
-<br>
-
-## 🐾 ****Main Character****
-
-![ex_screenshot](./img/character.png)
 
 <br>
 
