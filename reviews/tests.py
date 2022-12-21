@@ -1,11 +1,12 @@
-from django.urls import reverse
 from rest_framework.test import APITestCase
-from users.models import User, Profile
-from reviews.models import Review, Comment, Recomment, Report
-from places.models import Place
 
-# 이미지 업로드
+from django.urls import reverse
 from django.test.client import MULTIPART_CONTENT, encode_multipart, BOUNDARY
+
+from users.models import User, Profile
+from places.models import Place
+from .models import Review, Comment, Recomment, Report
+
 from PIL import Image
 import tempfile
 
@@ -49,7 +50,7 @@ class ReviewAPIViewTest(APITestCase):
     def setUp(self):
         self.access_token = self.client.post(reverse('token_obtain_pair_view'), self.user_data).data['access']
     
-    # 해당 장소 리뷰 조회 성공
+    # 해당 맛집 리뷰 조회 성공
     def test_review_list_success(self):  
         response = self.client.get(
             path=reverse("review_list_view", kwargs={'place_id':1}),

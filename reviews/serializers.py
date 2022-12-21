@@ -4,11 +4,7 @@ from .models import Review, Comment, Recomment, Report
 from places.models import Place
 from places.serializers import PlaceSerializer
 
-import os
-
-from users.utils import Util
-
-# 후기 전체 serializer
+# 리뷰 전체 serializer
 class ReviewListSerializer(serializers.ModelSerializer):
     nickname = serializers.SerializerMethodField()
     profile_image = serializers.SerializerMethodField()
@@ -32,7 +28,7 @@ class ReviewListSerializer(serializers.ModelSerializer):
         model = Review
         fields = ('content', 'review_image_one', 'created_at', 'updated_at', 'rating_cnt', 'review_like_count', 'review_like', 'author_id' , 'nickname', 'profile_image', 'place_name', 'id', 'author_id', 'place_id', 'place',)
 
-# 후기 생성, 수정 serializer
+# 리뷰 생성, 수정 serializer
 class ReviewCreateSerializer(serializers.ModelSerializer):
 
     class Meta:
@@ -142,7 +138,7 @@ class CommentCreateSerializer(serializers.ModelSerializer):
                         'required':'내용을 입력해주세요.',
                         'blank':'내용을 입력해주세요.',}},}
 
-# 후기 상세페이지 serializer
+# 리뷰 상세페이지 serializer
 class ReviewDetailSerializer(serializers.ModelSerializer):
     nickname = serializers.SerializerMethodField()
     profile_image = serializers.SerializerMethodField()

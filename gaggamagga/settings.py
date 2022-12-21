@@ -28,7 +28,7 @@ SECRET_KEY = get_secret("SECRET_KEY")
 
 DEBUG = os.environ.get('DEBUG', '0') == '1'
 
-ALLOWED_HOSTS = ['backend', 'channels','redis']
+ALLOWED_HOSTS = ['backend', 'channels', 'redis']
 
 # Application definition
 INSTALLED_APPS = [
@@ -231,10 +231,8 @@ DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 CORS_ALLOW_ALL_ORIGINS = True
 CORS_ORIGIN_WHITELIST = ['https://www.back-gaggamagga.tk', ]
 
-
 # CSRF settings
 CSRF_TRUSTED_ORIGINS = CORS_ORIGIN_WHITELIST
-
 
 # Search Engine ALGOLIA settings
 ALGOLIA = {
@@ -242,4 +240,3 @@ ALGOLIA = {
     'API_KEY': get_secret("SEARCH_KEY"),
     'INDEX_PREFIX' : 'cfe'
 }
-

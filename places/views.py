@@ -90,7 +90,6 @@ class PlaceSelectView(APIView):
         place_list = []
         load_no = random.randint(1, 6)
         # Case1: choice place location
-        print(choice_no)
         if choice_no > 12:
             place_list = []
             for i in range(0, 12):
@@ -213,10 +212,12 @@ class SearchListView(APIView):
     permission_classes = [AllowAny]
     
     @swagger_auto_schema(operation_summary="검색",
-                    responses={200 : '성공', 400:'쿼리값 없음', 500 : '서버 에러'})
+                    responses={200 : '성공', 400:'쿼리 에러', 500 : '서버 에러'})
     def get(self, request):
         query = request.GET.get('keyword')
+        if query == "":
+            return Response({"message":"공백은 입력 불가"}, status=status.HTTP_400_BAD_REQUEST)
         if not query:
-            return Response('', status=status.HTTP_400_BAD_REQUEST)
+            return Response({"message":"쿼리 아님"}, status=status.HTTP_400_BAD_REQUEST)
         results = client.perform_search(query)
         return Response(results, status=status.HTTP_200_OK)

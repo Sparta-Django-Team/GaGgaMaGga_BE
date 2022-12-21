@@ -56,7 +56,7 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
             self.now_today_time = timezone.now()
 
             if self.is_active == False:
-                target_user_lock_time = self.target_user.lock_time + timezone.timedelta(minutes=5)
+                target_user_lock_time = self.target_user.lock_time + timezone.timedelta(minutes=3)
                 
                 if self.now_today_time >= target_user_lock_time:
                     self.target_user.is_active = True
@@ -75,7 +75,7 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
             
             # is_active False 계정잠금 
             if self.is_active == False:
-                raise serializers.ValidationError("로그인 시도가 너무 많습니다. 나중에 다시 시도해 주세요.")
+                raise serializers.ValidationError("로그인 시도가 너무 많습니다. 3분 후 다시 시도해 주세요. ")
             
         # login error
         if not api_settings.USER_AUTHENTICATION_RULE(self.user):
