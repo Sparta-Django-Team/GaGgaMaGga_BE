@@ -69,9 +69,6 @@ CHOICE_CATEGORY = (
 class PlaceSelectAPIViewTestCase(APITestCase):
     @classmethod
     def setUpTestData(cls):
-        # cls.user_data = {'username':'test1234', 'password':'Test1234!'}
-        # cls.user = User.objects.create_user("test1234","test@test.com", "01012341234","Test1234!")
-        # Profile.objects.create(user=cls.user)
         cls.place = Place.objects.create(place_name="장소01", category="분식", rating="5", place_address="제주시", place_time="시간", place_img="이미지")
         cls.place = Place.objects.create(place_name="장소02", category="한식", rating="5", place_address="제주시", place_time="시간", place_img="이미지")
         cls.place = Place.objects.create(place_name="장소03", category="돼지고기구이", rating="5", place_address="서귀포시", place_time="시간", place_img="이미지")
@@ -96,13 +93,10 @@ class PlaceSelectAPIViewTestCase(APITestCase):
         cls.place = Place.objects.create(place_name="장소22", category="태국음식", rating="5", place_address="서귀포시", place_time="시간", place_img="이미지")
         cls.place = Place.objects.create(place_name="장소23", category="인도음식", rating="4", place_address="제주시", place_time="시간", place_img="이미지")
         cls.place = Place.objects.create(place_name="장소24", category="베트남음식", rating="2", place_address="서귀포시", place_time="시간", place_img="이미지")
-        print("---장소 등록 완료1---\n")
         for i in range(30):
             cls.user = User.objects.create_user(f"user{i+1}",f"user{i+1}@test.com","01000000000","Test1234!")
-        print("---유저 등록 완료1---\n")
         for i in range(100):  
             cls.review = Review.objects.create(content="some content", rating_cnt = random.randint(1, 5), author=cls.user, place_id=random.randint(1, 24))
-        print("---리뷰 등록 완료1---\n")
 
     # 1. [비로그인] 카테고리 선택(place_preference.html, 음식 선택)
     def test_place_select1(self):
@@ -110,7 +104,6 @@ class PlaceSelectAPIViewTestCase(APITestCase):
         response = self.client.get(
             path=reverse("place_select_view", kwargs={'choice_no':category_no1}))
         self.assertEqual(response.status_code, 200)
-        print("---카테고리 선택 1---\n")
 
     # 2. [비로그인] 카테고리 선택(place_preference.html, 장소 선택)
     def test_place_select2(self):
@@ -118,16 +111,12 @@ class PlaceSelectAPIViewTestCase(APITestCase):
         response = self.client.get(
             path=reverse("place_select_view", kwargs={'choice_no':category_no2}))
         self.assertEqual(response.status_code, 200)
-        print("---카테고리 선택 2---\n")
 
 
 # 3/4. [비로그인] 장소 리스트 불러오기(place_list.html, index에서 음식/장소 선택 > 선호도 선택)
-class PlaceListAPIViewTestCase(APITestCase):
+class PlaceListNewUserAPIViewTestCase(APITestCase):
     @classmethod
     def setUpTestData(cls):
-        # cls.user_data = {'username':'test1234', 'password':'Test1234!'}
-        # cls.user = User.objects.create_user("test1234","test@test.com", "01012341234","Test1234!")
-        # Profile.objects.create(user=cls.user)
         cls.place = Place.objects.create(place_name="장소01", category="분식", rating="5", place_address="제주시", place_time="시간", place_img="이미지")
         cls.place = Place.objects.create(place_name="장소02", category="한식", rating="5", place_address="제주시", place_time="시간", place_img="이미지")
         cls.place = Place.objects.create(place_name="장소03", category="돼지고기구이", rating="5", place_address="서귀포시", place_time="시간", place_img="이미지")
@@ -152,13 +141,10 @@ class PlaceListAPIViewTestCase(APITestCase):
         cls.place = Place.objects.create(place_name="장소22", category="태국음식", rating="5", place_address="서귀포시", place_time="시간", place_img="이미지")
         cls.place = Place.objects.create(place_name="장소23", category="인도음식", rating="4", place_address="제주시", place_time="시간", place_img="이미지")
         cls.place = Place.objects.create(place_name="장소24", category="베트남음식", rating="2", place_address="서귀포시", place_time="시간", place_img="이미지")
-        print("---장소 등록 완료2---\n")
         for i in range(30):
             cls.user = User.objects.create_user(f"user{i+1}",f"user{i+1}@test.com","01000000000","Test1234!")
-        print("---유저 등록 완료2---\n")
         for i in range(100):  
             cls.review = Review.objects.create(content="some content", rating_cnt = random.randint(1, 5), author=cls.user, place_id=random.randint(1, 24))
-        print("---리뷰 등록 완료2---\n")
 
     
     # 음식 선택(1~12)
@@ -168,7 +154,6 @@ class PlaceListAPIViewTestCase(APITestCase):
         response = self.client.get(
             path=reverse("new_user_place_list_view", kwargs={'place_id':place_id, 'category':category}))
         self.assertEqual(response.status_code, 200)
-        print("---음식 선택 1---\n")
 
     def test_place_list2(self):        # 한식
         place_id = 2
@@ -176,7 +161,6 @@ class PlaceListAPIViewTestCase(APITestCase):
         response = self.client.get(
             path=reverse("new_user_place_list_view", kwargs={'place_id':place_id, 'category':category}))
         self.assertEqual(response.status_code, 200)
-        print("---음식 선택 2---\n")
 
     def test_place_list3(self):        # 돼지고기구이
         place_id = 3
@@ -184,7 +168,6 @@ class PlaceListAPIViewTestCase(APITestCase):
         response = self.client.get(
             path=reverse("new_user_place_list_view", kwargs={'place_id':place_id, 'category':category}))
         self.assertEqual(response.status_code, 200)
-        print("---음식 선택 3---\n")
 
     def test_place_list4(self):        # 치킨,닭강정
         place_id = 4
@@ -192,7 +175,6 @@ class PlaceListAPIViewTestCase(APITestCase):
         response = self.client.get(
             path=reverse("new_user_place_list_view", kwargs={'place_id':place_id, 'category':category}))
         self.assertEqual(response.status_code, 200)
-        print("---음식 선택 4---\n")
 
     def test_place_list5(self):        # 햄버거
         place_id = 5
@@ -200,7 +182,6 @@ class PlaceListAPIViewTestCase(APITestCase):
         response = self.client.get(
             path=reverse("new_user_place_list_view", kwargs={'place_id':place_id, 'category':category}))
         self.assertEqual(response.status_code, 200)
-        print("---음식 선택 5---\n")
 
     def test_place_list6(self):        # 피자
         place_id = 6
@@ -208,7 +189,6 @@ class PlaceListAPIViewTestCase(APITestCase):
         response = self.client.get(
             path=reverse("new_user_place_list_view", kwargs={'place_id':place_id, 'category':category}))
         self.assertEqual(response.status_code, 200)
-        print("---음식 선택 6---\n")
 
     def test_place_list7(self):        # 중식
         place_id = 7
@@ -216,7 +196,6 @@ class PlaceListAPIViewTestCase(APITestCase):
         response = self.client.get(
             path=reverse("new_user_place_list_view", kwargs={'place_id':place_id, 'category':category}))
         self.assertEqual(response.status_code, 200)
-        print("---음식 선택 7---\n")
 
     def test_place_list8(self):        # 일식
         place_id = 8
@@ -224,7 +203,6 @@ class PlaceListAPIViewTestCase(APITestCase):
         response = self.client.get(
             path=reverse("new_user_place_list_view", kwargs={'place_id':place_id, 'category':category}))
         self.assertEqual(response.status_code, 200)
-        print("---음식 선택 8---\n")
 
     def test_place_list9(self):        # 양식
         place_id = 9
@@ -232,7 +210,6 @@ class PlaceListAPIViewTestCase(APITestCase):
         response = self.client.get(
             path=reverse("new_user_place_list_view", kwargs={'place_id':place_id, 'category':category}))
         self.assertEqual(response.status_code, 200)
-        print("---음식 선택 9---\n")
 
     def test_place_list10(self):        # 태국음식
         place_id = 10
@@ -240,7 +217,6 @@ class PlaceListAPIViewTestCase(APITestCase):
         response = self.client.get(
             path=reverse("new_user_place_list_view", kwargs={'place_id':place_id, 'category':category}))
         self.assertEqual(response.status_code, 200)
-        print("---음식 선택 10---\n")
 
     def test_place_list11(self):        # 인도음식
         place_id = 11
@@ -248,7 +224,6 @@ class PlaceListAPIViewTestCase(APITestCase):
         response = self.client.get(
             path=reverse("new_user_place_list_view", kwargs={'place_id':place_id, 'category':category}))
         self.assertEqual(response.status_code, 200)
-        print("---음식 선택 11---\n")
 
     def test_place_list12(self):        # 베트남음식
         place_id = 12
@@ -256,7 +231,6 @@ class PlaceListAPIViewTestCase(APITestCase):
         response = self.client.get(
             path=reverse("new_user_place_list_view", kwargs={'place_id':place_id, 'category':category}))
         self.assertEqual(response.status_code, 200)
-        print("---음식 선택 12---\n")
 
     # 장소 선택(13~14)
     def test_place_list13(self):        # 제주시
@@ -265,7 +239,6 @@ class PlaceListAPIViewTestCase(APITestCase):
         response = self.client.get(
             path=reverse("new_user_place_list_view", kwargs={'place_id':place_id, 'category':category}))
         self.assertEqual(response.status_code, 200)
-        print("---장소 선택 13---\n")
 
     def test_place_list14(self):        # 서귀포시
         place_id = 14
@@ -273,7 +246,112 @@ class PlaceListAPIViewTestCase(APITestCase):
         response = self.client.get(
             path=reverse("new_user_place_list_view", kwargs={'place_id':place_id, 'category':category}))
         self.assertEqual(response.status_code, 200)
-        print("---장소 선택 14---\n")
+
+
+
+# 5/6. [로그인] 장소 리스트 불러오기(place_list.html, index에서 음식/장소 선택)
+class PlaceListUserAPIViewTestCase(APITestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.place = Place.objects.create(place_name="장소01", category="분식", rating="5", place_address="제주시", place_time="시간", place_img="이미지")
+        cls.place = Place.objects.create(place_name="장소02", category="한식", rating="5", place_address="제주시", place_time="시간", place_img="이미지")
+        cls.place = Place.objects.create(place_name="장소03", category="돼지고기구이", rating="5", place_address="서귀포시", place_time="시간", place_img="이미지")
+        cls.place = Place.objects.create(place_name="장소04", category="치킨,닭강정", rating="3", place_address="서귀포시", place_time="시간", place_img="이미지")
+        cls.place = Place.objects.create(place_name="장소05", category="햄버거", rating="4", place_address="제주시", place_time="시간", place_img="이미지")
+        cls.place = Place.objects.create(place_name="장소06", category="피자", rating="5", place_address="서귀포시", place_time="시간", place_img="이미지")
+        cls.place = Place.objects.create(place_name="장소07", category="중식", rating="3", place_address="제주시", place_time="시간", place_img="이미지")
+        cls.place = Place.objects.create(place_name="장소08", category="일식", rating="5", place_address="제주시", place_time="시간", place_img="이미지")
+        cls.place = Place.objects.create(place_name="장소09", category="양식", rating="3", place_address="제주시", place_time="시간", place_img="이미지")
+        cls.place = Place.objects.create(place_name="장소10", category="태국음식", rating="2", place_address="서귀포시", place_time="시간", place_img="이미지")
+        cls.place = Place.objects.create(place_name="장소11", category="인도음식", rating="4", place_address="제주시", place_time="시간", place_img="이미지")
+        cls.place = Place.objects.create(place_name="장소12", category="베트남음식", rating="3", place_address="서귀포시", place_time="시간", place_img="이미지")
+        cls.place = Place.objects.create(place_name="장소13", category="분식", rating="5", place_address="제주시", place_time="시간", place_img="이미지")
+        cls.place = Place.objects.create(place_name="장소14", category="한식", rating="5", place_address="서귀포시", place_time="시간", place_img="이미지")
+        cls.place = Place.objects.create(place_name="장소15", category="돼지고기구이", rating="5", place_address="서귀포시", place_time="시간", place_img="이미지")
+        cls.place = Place.objects.create(place_name="장소16", category="치킨,닭강정", rating="4", place_address="서귀포시", place_time="시간", place_img="이미지")
+        cls.place = Place.objects.create(place_name="장소17", category="햄버거", rating="5", place_address="서귀포시", place_time="시간", place_img="이미지")
+        cls.place = Place.objects.create(place_name="장소18", category="피자", rating="2", place_address="제주시", place_time="시간", place_img="이미지")
+        cls.place = Place.objects.create(place_name="장소19", category="중식", rating="4", place_address="서귀포시", place_time="시간", place_img="이미지")
+        cls.place = Place.objects.create(place_name="장소20", category="일식", rating="4", place_address="제주시", place_time="시간", place_img="이미지")
+        cls.place = Place.objects.create(place_name="장소21", category="양식", rating="5", place_address="제주시", place_time="시간", place_img="이미지")
+        cls.place = Place.objects.create(place_name="장소22", category="태국음식", rating="5", place_address="서귀포시", place_time="시간", place_img="이미지")
+        cls.place = Place.objects.create(place_name="장소23", category="인도음식", rating="4", place_address="제주시", place_time="시간", place_img="이미지")
+        cls.place = Place.objects.create(place_name="장소24", category="베트남음식", rating="2", place_address="서귀포시", place_time="시간", place_img="이미지")
+
+        for i in range(30):
+            cls.user = User.objects.create_user(f"user{i+1}",f"user{i+1}@test.com","01000000000","Test1234!")
+            Profile.objects.create(user=cls.user, review_cnt=1)
+        for i in range(100):  
+            cls.review = Review.objects.create(content="some content", rating_cnt = random.randint(1, 5), author=cls.user, place_id=random.randint(1, 24))
+
+    def setUp(self):
+        self.user_data = {'username':'test1234', 'password':'Test1234!'}
+        self.user = User.objects.create_user("test1234","test1@test.com","01012341234","Test1234!")
+        Profile.objects.create(user=self.user, review_cnt=100)
+        for i in range(24):  
+            self.review = Review.objects.create(content="some content", rating_cnt = random.randint(1, 5), author=self.user, place_id=i+1)
+        self.access_token = self.client.post(reverse('token_obtain_pair_view'), self.user_data).data['access']
+
+    
+    # 음식 선택(1~12)
+    def test_place_list1(self):        # 분식, 한식, 돼지고기
+        cate_id = 3
+        response = self.client.get(
+            path=reverse("user_place_list_view", kwargs={'cate_id':cate_id}),
+            HTTP_AUTHORIZATION=f"Bearer {self.access_token}")
+        self.assertEqual(response.status_code, 200)
+
+    def test_place_list2(self):        # 치킨,닭강정, 햄버거, 피자
+        cate_id = 6
+        response = self.client.get(
+            path=reverse("user_place_list_view", kwargs={'cate_id':cate_id}),
+            HTTP_AUTHORIZATION=f"Bearer {self.access_token}")
+        self.assertEqual(response.status_code, 200)
+
+    def test_place_list3(self):        # 중식
+        cate_id = 7
+        response = self.client.get(
+            path=reverse("user_place_list_view", kwargs={'cate_id':cate_id}),
+            HTTP_AUTHORIZATION=f"Bearer {self.access_token}")
+        self.assertEqual(response.status_code, 200)
+
+    def test_place_list4(self):        # 일식
+        cate_id = 8
+        response = self.client.get(
+            path=reverse("user_place_list_view", kwargs={'cate_id':cate_id}),
+            HTTP_AUTHORIZATION=f"Bearer {self.access_token}")
+        self.assertEqual(response.status_code, 200)
+
+    def test_place_list5(self):        # 양식
+        cate_id = 9
+        response = self.client.get(
+            path=reverse("user_place_list_view", kwargs={'cate_id':cate_id}),
+            HTTP_AUTHORIZATION=f"Bearer {self.access_token}")
+        self.assertEqual(response.status_code, 200)
+
+    def test_place_list6(self):        # 태국음식, 인도음식, 베트남음식
+        cate_id = 12
+        response = self.client.get(
+            path=reverse("user_place_list_view", kwargs={'cate_id':cate_id}),
+            HTTP_AUTHORIZATION=f"Bearer {self.access_token}")
+        self.assertEqual(response.status_code, 200)
+
+    # 장소 선택(13~14)
+    def test_place_list7(self):        # 제주시
+        cate_id = 13
+        response = self.client.get(
+            path=reverse("user_place_list_view", kwargs={'cate_id':cate_id}),
+            HTTP_AUTHORIZATION=f"Bearer {self.access_token}")
+        self.assertEqual(response.status_code, 200)
+
+    def test_place_list8(self):        # 서귀포시
+        cate_id = 14
+        response = self.client.get(
+            path=reverse("user_place_list_view", kwargs={'cate_id':cate_id}),
+            HTTP_AUTHORIZATION=f"Bearer {self.access_token}")
+        self.assertEqual(response.status_code, 200)
+
+
 
 
 
@@ -299,3 +377,4 @@ class PlaceListAPIViewTestCase(APITestCase):
 #             HTTP_AUTHORIZATION=f"Bearer {access_token}",
 #         )
 #         self.assertEqual(response_case_2.status_code, 200)
+
