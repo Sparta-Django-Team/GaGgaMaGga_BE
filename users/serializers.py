@@ -145,6 +145,7 @@ class PrivateProfileSerializer(serializers.ModelSerializer):
     email = serializers.SerializerMethodField()
     username = serializers.SerializerMethodField()
     is_confirmed = serializers.SerializerMethodField()
+    phone_number = serializers.SerializerMethodField()
 
     def get_email(self, obj):
         return obj.user.email
@@ -154,10 +155,12 @@ class PrivateProfileSerializer(serializers.ModelSerializer):
 
     def get_is_confirmed(self, obj):
         return obj.user.is_confirmed
-
+    
+    def get_phone_number(self, obj):
+        return obj.user.phone_number
     class Meta:
         model = Profile
-        fields = ('id', 'nickname', 'profile_image', 'email', 'username', 'intro', 'is_confirmed',)
+        fields = ('id', 'nickname', 'profile_image', 'email', 'username', 'intro', 'is_confirmed', 'phone_number', )
 
 # 공개 프로필 serializer
 class PublicProfileSerializer(serializers.ModelSerializer):
