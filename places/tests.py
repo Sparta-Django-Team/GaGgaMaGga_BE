@@ -26,7 +26,6 @@ import random
 6. 장소 리스트 불러오기(place_list.html, index에서 장소 선택 - 제주시, 서귀포시)
 
 
-
 # 공통
 7. 맛집 상세페이지
 8. 맛집 북마크(유저일 때)
@@ -34,18 +33,6 @@ import random
 
 # 어드민 계정
 10. 맛집 삭제 (어드민 일 때, 어드민이 아닐 때)
-
-# Place
-path('<int:place_id>/', views.PlaceDetailView.as_view(), name='place_detail_view'),
-path('<int:place_id>/bookmarks/',views.PlaceBookmarkView.as_view(), name='place_bookmark_view'),
-
-#Recommendation
-path('selection/<int:choice_no>/', views.PlaceSelectView.as_view(), name="place_select_view"),
-path('new/<int:place_id>/<str:category>/', views.NewUserPlaceListView.as_view(), name='new_user_place_list_view'),
-path('list/<int:cate_id>/', views.UserPlaceListView.as_view(), name='user_place_list_view'),
-
-# Search
-path('search/', views.SearchListView.as_view(), name='search'),
 
 '''
 
@@ -310,50 +297,50 @@ path('search/', views.SearchListView.as_view(), name='search'),
 
 
 
-# '''
-# # 공통
-# 7. 맛집 상세페이지
-# 8. 맛집 북마크(유저일 때)
-# 9. 검색
-
-# # 어드민 계정
-# 10. 맛집 삭제 (어드민 일 때, 어드민이 아닐 때)
-
-
-# # Place
-# path('<int:place_id>/', views.PlaceDetailView.as_view(), name='place_detail_view'),
-# path('<int:place_id>/bookmarks/',views.PlaceBookmarkView.as_view(), name='place_bookmark_view'),
-
-# # Search
-# path('search/', views.SearchListView.as_view(), name='search'),
-# '''
-
-
-# 장소 북마크
-class PlaceBookmarkAPIViewTestCase(APITestCase):
-    @classmethod
-    def setUpTestData(cls):
-        cls.user_data = {'username':'test1234', 'password':'Test1234!'}
-        cls.user = User.objects.create_user("test1234", "test1@test.com", "01012341234", "Test1234!")
-        Profile.objects.create(user=cls.user)
-        cls.place = Place.objects.create(place_name="장소", category="한식", rating=5, place_address="제주시", place_time="영업시간", place_img="img_url")
+# # 장소 북마크
+# class PlaceBookmarkAPIViewTestCase(APITestCase):
+#     @classmethod
+#     def setUpTestData(cls):
+#         cls.user_data = {'username':'test1234', 'password':'Test1234!'}
+#         cls.user = User.objects.create_user("test1234", "test1@test.com", "01012341234", "Test1234!")
+#         Profile.objects.create(user=cls.user)
+#         cls.place = Place.objects.create(place_name="장소", category="한식", rating=5, place_address="제주시", place_time="영업시간", place_img="img_url")
         
-    def setUp(self):
-        self.access_token = self.client.post(reverse('token_obtain_pair_view'), self.user_data).data['access']     # 일반 계정
-
-    def test_bookmark_success(self):
-        response_execute = self.client.post(
-            path=reverse("place_bookmark_view", kwargs={"place_id":1}),
-            HTTP_AUTHORIZATION=f"Bearer {self.access_token}",
-        )
-        self.assertEqual(response_execute.status_code, 200)
-
-        response_cancel = self.client.post(
-            path=reverse("place_bookmark_view", kwargs={'place_id':1}), 
-            HTTP_AUTHORIZATION=f"Bearer {self.access_token}")
-        self.assertEqual(response_cancel.status_code, 200)
-
-
-
-# class PlaceSearchAPIViewTestCase(APITestCase):
 #     def setUp(self):
+#         self.access_token = self.client.post(reverse('token_obtain_pair_view'), self.user_data).data['access']     # 일반 계정
+
+#     def test_bookmark_success(self):
+#         response_execute = self.client.post(
+#             path=reverse("place_bookmark_view", kwargs={"place_id":1}),
+#             HTTP_AUTHORIZATION=f"Bearer {self.access_token}",
+#         )
+#         self.assertEqual(response_execute.status_code, 200)
+
+#         response_cancel = self.client.post(
+#             path=reverse("place_bookmark_view", kwargs={'place_id':1}), 
+#             HTTP_AUTHORIZATION=f"Bearer {self.access_token}")
+#         self.assertEqual(response_cancel.status_code, 200)
+
+
+# 검색
+class PlaceSearchAPIViewTestCase(APITestCase):
+    def test_search_success(self):
+        response = self.client.get(
+            path=reverse("search"),
+            data={"keyword":"양식"},
+        )
+        self.assertEqual(response.status_code, 200)
+
+    def test_search_blank_fail(self):
+        response = self.client.get(
+            path=reverse("search"),
+            data={"keyword":""},
+        )
+        self.assertEqual(response.status_code, 400)
+
+    def test_search_query_fail(self):
+        response = self.client.get(
+            path=reverse("search"),
+            data={"xeyword":""},
+        )
+        self.assertEqual(response.status_code, 400)
