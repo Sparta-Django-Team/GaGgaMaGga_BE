@@ -156,6 +156,7 @@ class NewUserPlaceListView(PaginationHandlerMixin, APIView):
         places.rename(columns={'id':'place_id'}, inplace=True)
         place_ratings = pd.merge(places, reviews, on='place_id')
         review_user = place_ratings.pivot_table('rating_cnt', index='author_id', columns='place_id')
+        print(review_user)
         place_list = rcm_place_new_user(review_user=review_user, place_id=place_id)
         preserved = Case(*[When(pk=pk, then=pos) for pos, pk in enumerate(place_list)])
         place = Place.objects.filter(id__in=place_list).order_by(preserved)

@@ -144,6 +144,8 @@ class LogoutSerializer(serializers.Serializer):
 class PrivateProfileSerializer(serializers.ModelSerializer):
     email = serializers.SerializerMethodField()
     username = serializers.SerializerMethodField()
+    is_confirmed = serializers.SerializerMethodField()
+    phone_number = serializers.SerializerMethodField()
 
     def get_email(self, obj):
         return obj.user.email
@@ -151,9 +153,14 @@ class PrivateProfileSerializer(serializers.ModelSerializer):
     def get_username(self, obj):
         return obj.user.username
 
+    def get_is_confirmed(self, obj):
+        return obj.user.is_confirmed
+    
+    def get_phone_number(self, obj):
+        return obj.user.phone_number
     class Meta:
         model = Profile
-        fields = ('id', 'nickname', 'profile_image', 'email', 'username', 'intro',)
+        fields = ('id', 'nickname', 'profile_image', 'email', 'username', 'intro', 'is_confirmed', 'phone_number', )
 
 # 공개 프로필 serializer
 class PublicProfileSerializer(serializers.ModelSerializer):
@@ -194,7 +201,8 @@ class ProfileUpdateSerializer(serializers.ModelSerializer):
         # 닉네임 유효성 검사
         if nickname_validator(nickname):
             raise serializers.ValidationError(detail={"nickname":"닉네임은 3자이상 10자 이하로 작성해야하며 특수문자는 포함할 수 없습니다."})
-        
+
+
         return data
 
     def update(self, instance, validated_data):
