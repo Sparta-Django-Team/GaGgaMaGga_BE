@@ -137,10 +137,14 @@ class ReviewDetailView(APIView):
                 operation_summary="리뷰 신고", 
                 responses={200 : '성공', 208 : '중복 데이터', 401 : '인증 에러', 404 : '인풋값 에러',  500 : '서버 에러'})
     def post(self, request, place_id, review_id):
+        review_author = get_object_or_404(Review, id=review_id).author
+        if review_author == request.user:
+            return Response({"message":"작성자는 신고를 할 수 없습니다."}, status=status.HTTP_400_BAD_REQUEST)
+
         try :
             Report.objects.get(author=request.user.id, review=review_id)
             return Response({"message":"이미 신고를 한 리뷰입니다."}, status=status.HTTP_208_ALREADY_REPORTED)
-        
+
         except Report.DoesNotExist:
             serializer = ReportSerializer(data=request.data)
             if serializer.is_valid():
@@ -219,6 +223,10 @@ class CommentDetailView(APIView):
                     operation_summary="댓글 신고", 
                     responses={ 200 : '성공', 208 : '중복 데이터', 401 : '인증 에러', 404:'인풋값 에러',  500:'서버 에러'})
     def post(self, request, review_id, comment_id):
+        comment_author = get_object_or_404(Comment, id=comment_id).author
+        if comment_author == request.user:
+            return Response({"message":"작성자는 신고를 할 수 없습니다."}, status=status.HTTP_400_BAD_REQUEST)
+
         try :
             Report.objects.get(author=request.user.id, comment=comment_id)
             return Response({"message":"이미 신고를 한 리뷰입니다."}, status=status.HTTP_208_ALREADY_REPORTED)
@@ -301,6 +309,10 @@ class RecommentDetailView(APIView):
             operation_summary="대댓글 신고", 
             responses={200 : '성공', 208 : '중복 데이터', 401 : '인증 에러', 404 : '인풋값 에러',  500 : '서버 에러'})
     def post(self, request, review_id, comment_id, recomment_id):
+        recomment_author = get_object_or_404(Recomment, id=recomment_id).author
+        if recomment_author == request.user:
+            return Response({"message":"작성자는 신고를 할 수 없습니다."}, status=status.HTTP_400_BAD_REQUEST)
+        
         try :
             Report.objects.get(author=request.user.id, recomment=recomment_id)
             return Response({"message":"이미 신고를 한 리뷰입니다."}, status=status.HTTP_208_ALREADY_REPORTED)
