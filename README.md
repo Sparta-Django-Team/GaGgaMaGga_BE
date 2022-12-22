@@ -1,4 +1,4 @@
-# B6팀(나이사)_가까?마까?(GaggaMagga) 프로젝트
+# 가까?마까?(GaggaMagga) 프로젝트
 
 ### [Front-end Page](https://github.com/1TEAM12/GaGgaMaGga_FE)
 ### [Swagger API Docs](http://3.36.51.98/)
