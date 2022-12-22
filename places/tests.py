@@ -3,7 +3,7 @@ from rest_framework.test import APITestCase
 from django.urls import reverse
 
 from users.models import User, Profile
-from reviews.models import Review, Comment, Recomment, Report
+from reviews.models import Review
 from .models import Place
 from .views import CHOICE_CATEGORY
 

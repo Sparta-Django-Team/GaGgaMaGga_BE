@@ -12,12 +12,6 @@ sys.path.append(BASE_DIR)
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'gaggamagga.settings')
 django.setup()
 
-from reviews.models import Review
-from places.models import Place
-
-import random
-
-
 # 유사한 유저 정보 조회 및 추천(기존 사용이력이 없는 사용자)
 def rcm_place_new_user(review_user, place_id):
 

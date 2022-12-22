@@ -222,11 +222,12 @@ class LoginLogListSerializer(serializers.ModelSerializer):
 
 # 비밀번호 변경 serializer
 class ChangePasswordSerializer(serializers.ModelSerializer):
-    repassword= serializers.CharField(error_messages={'required':'비밀번호를 입력해주세요.', 'blank':'비밀번호를 입력해주세요.', 'write_only':True})    
-
+    confirm_password = serializers.CharField(error_messages={'required':'비밀번호를 입력해주세요.', 'blank':'비밀번호를 입력해주세요.', 'write_only':True})
+    repassword= serializers.CharField(error_messages={'required':'비밀번호를 입력해주세요.', 'blank':'비밀번호를 입력해주세요.', 'write_only':True})        
+    
     class Meta:
         model = User
-        fields = ('password', 'repassword',)
+        fields = ('password', 'repassword', 'confirm_password', )
         extra_kwargs = {'password':{'write_only':True,
                         'error_messages': {
                         'required':'비밀번호를 입력해주세요.',
@@ -234,8 +235,13 @@ class ChangePasswordSerializer(serializers.ModelSerializer):
 
     def validate(self, data):
         current_password = self.context.get("request").user.password
+        confirm_password = data.get('confirm_password')
         password = data.get('password')
         repassword = data.get('repassword')
+
+        # 현재 비밀번호 예외 처리
+        if not check_password(confirm_password, current_password):
+            raise serializers.ValidationError(detail={"password":"현재 비밀번호가 일치하지 않습니다."})
 
         # 현재 비밀번호와 바꿀 비밀번호 비교
         if check_password(password, current_password):

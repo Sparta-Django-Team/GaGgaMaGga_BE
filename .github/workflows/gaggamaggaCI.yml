@@ -1,8 +1,9 @@
-name: Django Test CI
+name: gaggamagga CI
 
 on:
   push:
     branches: [ "main" ]
+  
   pull_request:
     branches: [ "main" ]
 
