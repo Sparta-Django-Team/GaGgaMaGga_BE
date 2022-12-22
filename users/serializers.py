@@ -240,7 +240,7 @@ class ChangePasswordSerializer(serializers.ModelSerializer):
         repassword = data.get('repassword')
 
         # 현재 비밀번호 예외 처리
-        if check_password(confirm_password, current_password):
+        if not check_password(confirm_password, current_password):
             raise serializers.ValidationError(detail={"password":"현재 비밀번호가 일치하지 않습니다."})
 
         # 현재 비밀번호와 바꿀 비밀번호 비교
