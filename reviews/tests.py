@@ -125,33 +125,38 @@ class ReviewDetailViewTest(APITestCase):
     def setUpTestData(cls):
         cls.user1_data = {'username':'test1234', 'password':'Test1234!'}
         cls.user2_data = {'username':'test1235', 'password':'Test1234!'}
+        cls.user3_data = {'username':'test1236', 'password':'Test1234!'}
         cls.review_data = {'content':'some content', "rating_cnt": "5"}
         cls.edit_review_data={'content':'edit content', "rating_cnt": "5"}
         cls.report_data = {'content':'report content', "category": '욕설이 들어갔어요.'}
         cls.user1 = User.objects.create_user("test1234","test1@test.com", "01012341234","Test1234!")
         cls.user2 = User.objects.create_user("test1235","test2@test.com", "01012341235","Test1234!")
+        cls.user3 = User.objects.create_user("test1236","test3@test.com", "01012341236","Test1234!")
         Profile.objects.create(user=cls.user1, review_cnt=1)
         Profile.objects.create(user=cls.user2)
+        Profile.objects.create(user=cls.user3)
         cls.place = Place.objects.create(place_name="장소명", rating="5", category="카테고리", place_address="주소", place_time="시간", place_img="이미지")
         cls.review = Review.objects.create(content="내용", rating_cnt="5", author=cls.user1, place=cls.place)
         cls.review2 = Review.objects.create(content="내용", rating_cnt="5", author=cls.user1, place=cls.place)
-        cls.report = Report.objects.create(content="신고내용", category='욕설이 들어갔어요.', author=cls.user1, review=cls.review2)
+        cls.report = Report.objects.create(content="신고내용", category='욕설이 들어갔어요.', author=cls.user2, review=cls.review2)
 
     def setUp(self):
-        self.access_token = self.client.post(reverse('token_obtain_pair_view'), self.user1_data).data['access']
+        self.access_token_1 = self.client.post(reverse('token_obtain_pair_view'), self.user1_data).data['access']
+        self.access_token_2 = self.client.post(reverse('token_obtain_pair_view'), self.user2_data).data['access']
+        self.access_token_3 = self.client.post(reverse('token_obtain_pair_view'), self.user3_data).data['access']
 
     # 해당 리뷰 조회 성공
     def test_review_detail_success(self):  
         response = self.client.get(
             path=reverse("review_detail_view", kwargs={'place_id':1, 'review_id':1}),
-            HTTP_AUTHORIZATION=f"Bearer {self.access_token}")
+            HTTP_AUTHORIZATION=f"Bearer {self.access_token_1}")
         self.assertEqual(response.status_code, 200)
 
     #리뷰 수정 성공
     def test_review_edit_success(self):  
         response = self.client.put(
             path=reverse("review_detail_view", kwargs={'place_id':1, 'review_id':1}),
-            HTTP_AUTHORIZATION=f"Bearer {self.access_token}",
+            HTTP_AUTHORIZATION=f"Bearer {self.access_token_1}",
             data={'content':'edit content', "rating_cnt": "5"})
         self.assertEqual(response.status_code, 200)
 
@@ -180,7 +185,7 @@ class ReviewDetailViewTest(APITestCase):
         # 전송
         response = self.client.put(
             path=reverse("review_detail_view", kwargs={'place_id':1, 'review_id':1}),
-            HTTP_AUTHORIZATION=f"Bearer {self.access_token}",
+            HTTP_AUTHORIZATION=f"Bearer {self.access_token_1}",
             content_type=MULTIPART_CONTENT,
             data=encode_multipart(data=self.edit_review_data, boundary=BOUNDARY)
         )
@@ -197,7 +202,7 @@ class ReviewDetailViewTest(APITestCase):
     def test_review_edit_content_fail(self):  
         response = self.client.put(
             path=reverse("review_detail_view", kwargs={'place_id':1, 'review_id':1}),
-            HTTP_AUTHORIZATION=f"Bearer {self.access_token}",
+            HTTP_AUTHORIZATION=f"Bearer {self.access_token_1}",
             data= {'content':'', "rating_cnt": "5"})
         self.assertEqual(response.status_code, 400)
     
@@ -205,7 +210,7 @@ class ReviewDetailViewTest(APITestCase):
     def test_review_edit_rating_fail(self):  
         response = self.client.put(
             path=reverse("review_detail_view", kwargs={'place_id':1, 'review_id':1}),
-            HTTP_AUTHORIZATION=f"Bearer {self.access_token}",
+            HTTP_AUTHORIZATION=f"Bearer {self.access_token_1}",
             data= {'content':'edit content', "rating_cnt": ""})
         self.assertEqual(response.status_code, 400)
 
@@ -213,7 +218,7 @@ class ReviewDetailViewTest(APITestCase):
     def test_review_edit_author_fail(self):
         response = self.client.put(
             path=reverse("review_detail_view", kwargs={'place_id':1, 'review_id':1}),
-            HTTP_AUTHORIZATION=f"Bearer {self.client.post(reverse('token_obtain_pair_view'), self.user2_data).data['access']}",
+            HTTP_AUTHORIZATION=f"Bearer {self.access_token_2}",
             data= {'content':'edit content', "rating_cnt": "5"})
         self.assertEqual(response.status_code, 403)
 
@@ -221,7 +226,7 @@ class ReviewDetailViewTest(APITestCase):
     def test_review_delete_success(self): 
         response = self.client.delete(
             path=reverse("review_detail_view", kwargs={'place_id':1, 'review_id':1}), 
-            HTTP_AUTHORIZATION=f"Bearer {self.access_token}",
+            HTTP_AUTHORIZATION=f"Bearer {self.access_token_1}",
             data=self.review_data)
         self.assertEqual(response.status_code, 200)
 
@@ -236,7 +241,7 @@ class ReviewDetailViewTest(APITestCase):
     def test_review_delete_fail(self):  
         response = self.client.delete(
             path=reverse("review_detail_view", kwargs={'place_id':1, 'review_id':1}), 
-            HTTP_AUTHORIZATION=f"Bearer {self.client.post(reverse('token_obtain_pair_view'), self.user2_data).data['access']}",
+            HTTP_AUTHORIZATION=f"Bearer {self.access_token_2}",
             data=self.review_data)
         self.assertEqual(response.status_code, 403)
 
@@ -244,7 +249,7 @@ class ReviewDetailViewTest(APITestCase):
     def test_review_report_success(self):  
         response = self.client.post(
             path=reverse("review_detail_view", kwargs={'place_id':1, 'review_id':1}), 
-            HTTP_AUTHORIZATION=f"Bearer {self.access_token}",
+            HTTP_AUTHORIZATION=f"Bearer {self.access_token_3}",
             data=self.report_data)
         self.assertEqual(response.status_code, 200)
     
@@ -254,12 +259,20 @@ class ReviewDetailViewTest(APITestCase):
             path=reverse("review_detail_view", kwargs={'place_id':1, 'review_id':1}), 
             data=self.report_data)
         self.assertEqual(response.status_code, 401)
+        
+    # 리뷰 신고 실패(작성자가 신고)
+    def test_review_same_author_report_fail(self):  
+        response = self.client.post(
+            path=reverse("review_detail_view", kwargs={'place_id':1, 'review_id':1}), 
+            HTTP_AUTHORIZATION=f"Bearer {self.access_token_1}",
+            data=self.report_data)
+        self.assertEqual(response.status_code, 400)
 
     # 리뷰 신고 실패(중복 데이터)
     def test_review_report_already_reported_fail(self):  
         response = self.client.post(
             path=reverse("review_detail_view", kwargs={'place_id':1, 'review_id':2}), 
-            HTTP_AUTHORIZATION=f"Bearer {self.access_token}",
+            HTTP_AUTHORIZATION=f"Bearer {self.access_token_2}",
             data=self.report_data)
         self.assertEqual(response.status_code, 208)
 
@@ -267,7 +280,7 @@ class ReviewDetailViewTest(APITestCase):
     def test_review_report_content_fail(self):  
         response = self.client.post(
             path=reverse("review_detail_view", kwargs={'place_id':1, 'review_id':1}), 
-            HTTP_AUTHORIZATION=f"Bearer {self.access_token}",
+            HTTP_AUTHORIZATION=f"Bearer {self.access_token_2}",
             data={'content':'', "category": '욕설이 들어갔어요.'})
         self.assertEqual(response.status_code, 400)
 
@@ -275,7 +288,7 @@ class ReviewDetailViewTest(APITestCase):
     def test_review_report_category_fail(self):  
         response = self.client.post(
             path=reverse("review_detail_view", kwargs={'place_id':1, 'review_id':1}), 
-            HTTP_AUTHORIZATION=f"Bearer {self.access_token}",
+            HTTP_AUTHORIZATION=f"Bearer {self.access_token_2}",
             data={'content':'report content', "category": ''})
         self.assertEqual(response.status_code, 400)
 
@@ -307,7 +320,6 @@ class ReviewLikeAPIViewTest(APITestCase):
             path=reverse("review_like_view", kwargs={'review_id':1}),
             data=self.review_data)
         self.assertEqual(response.status_code, 401)
-
 
 #### 댓글 ####
 # 댓글 조회/작성
@@ -360,27 +372,32 @@ class CommentDetailViewTest(APITestCase):
     def setUpTestData(cls):
         cls.user1_data = {'username':'test1234', 'password':'Test1234!'}
         cls.user2_data = {'username':'test1235', 'password':'Test1234!'}
+        cls.user3_data = {'username':'test1236', 'password':'Test1234!'}
         cls.comment_data = {'content':'some content'}
         cls.report_data = {'content':'report content', "category": '욕설이 들어갔어요.'}
         cls.user1 = User.objects.create_user("test1234","test1@test.com", "01012341234","Test1234!")
         cls.user2 = User.objects.create_user("test1235","test2@test.com", "01012341235","Test1234!")
+        cls.user3 = User.objects.create_user("test1236","test3@test.com", "01012341236","Test1234!")
         Profile.objects.create(user=cls.user1)
         Profile.objects.create(user=cls.user2)
+        Profile.objects.create(user=cls.user3)
         cls.place = Place.objects.create(place_name="장소명", category="카테고리", rating="5", place_address="주소", place_time="시간", place_img="이미지")
         cls.review = Review.objects.create(content="내용", rating_cnt="5", author=cls.user1, place=cls.place)
         cls.comment = Comment.objects.create(content="내용", author=cls.user1, review=cls.review)
         cls.comment2 = Comment.objects.create(content="내용", author=cls.user1, review=cls.review)
-        cls.report = Report.objects.create(content="신고내용", category='욕설이 들어갔어요.', author=cls.user1, comment=cls.comment2)
+        cls.report = Report.objects.create(content="신고내용", category='욕설이 들어갔어요.', author=cls.user2, comment=cls.comment2)
         
 
     def setUp(self):
-        self.access_token = self.client.post(reverse('token_obtain_pair_view'), self.user1_data).data['access']
+        self.access_token_1 = self.client.post(reverse('token_obtain_pair_view'), self.user1_data).data['access']
+        self.access_token_2 = self.client.post(reverse('token_obtain_pair_view'), self.user2_data).data['access']
+        self.access_token_3 = self.client.post(reverse('token_obtain_pair_view'), self.user3_data).data['access']
 
     # 댓글 수정 성공
     def test_comment_edit_success(self):  
         response = self.client.put(
             path=reverse("comment_detail_view", kwargs={'review_id':1, 'comment_id':1}),
-            HTTP_AUTHORIZATION=f"Bearer {self.access_token}",
+            HTTP_AUTHORIZATION=f"Bearer {self.access_token_1}",
             data={'content':'edit content'})
         self.assertEqual(response.status_code, 200)
 
@@ -395,7 +412,7 @@ class CommentDetailViewTest(APITestCase):
     def test_comment_edit_content_fail(self):  
         response = self.client.put(
             path=reverse("comment_detail_view", kwargs={'review_id':1, 'comment_id':1}),
-            HTTP_AUTHORIZATION=f"Bearer {self.access_token}",
+            HTTP_AUTHORIZATION=f"Bearer {self.access_token_1}",
             data= {'content':''})
         self.assertEqual(response.status_code, 400)
     
@@ -403,7 +420,7 @@ class CommentDetailViewTest(APITestCase):
     def test_comment_edit_author_fail(self):
         response = self.client.put(
             path=reverse("comment_detail_view", kwargs={'review_id':1, 'comment_id':1}),
-            HTTP_AUTHORIZATION=f"Bearer {self.client.post(reverse('token_obtain_pair_view'), self.user2_data).data['access']}",
+            HTTP_AUTHORIZATION=f"Bearer {self.access_token_2}",
             data= {'content':'edit content'})
         self.assertEqual(response.status_code, 403)
 
@@ -411,7 +428,7 @@ class CommentDetailViewTest(APITestCase):
     def test_comment_delete_success(self): 
         response = self.client.delete(
             path=reverse("comment_detail_view", kwargs={'review_id':1, 'comment_id':1}), 
-            HTTP_AUTHORIZATION=f"Bearer {self.access_token}",
+            HTTP_AUTHORIZATION=f"Bearer {self.access_token_1}",
             data=self.comment_data)
         self.assertEqual(response.status_code, 200)
 
@@ -426,7 +443,7 @@ class CommentDetailViewTest(APITestCase):
     def test_comment_delete_fail(self): 
         response = self.client.delete(
             path=reverse("comment_detail_view", kwargs={'review_id':1, 'comment_id':1}), 
-            HTTP_AUTHORIZATION=f"Bearer {self.client.post(reverse('token_obtain_pair_view'), self.user2_data).data['access']}",
+            HTTP_AUTHORIZATION=f"Bearer {self.access_token_2}",
             data=self.comment_data)
         self.assertEqual(response.status_code, 403)
 
@@ -434,7 +451,7 @@ class CommentDetailViewTest(APITestCase):
     def test_comment_report_success(self):  
         response = self.client.post(
             path=reverse("comment_detail_view", kwargs={'review_id':1, 'comment_id':1}), 
-            HTTP_AUTHORIZATION=f"Bearer {self.access_token}",
+            HTTP_AUTHORIZATION=f"Bearer {self.access_token_3}",
             data=self.report_data)
         self.assertEqual(response.status_code, 200)
     
@@ -444,12 +461,20 @@ class CommentDetailViewTest(APITestCase):
             path=reverse("comment_detail_view", kwargs={'review_id':1, 'comment_id':1}), 
             data=self.report_data)
         self.assertEqual(response.status_code, 401)
+        
+    # 댓글 신고 실패(작성자가 신고)
+    def test_comment_same_author_report_fail(self):  
+        response = self.client.post(
+            path=reverse("comment_detail_view", kwargs={'review_id':1, 'comment_id':2}), 
+            HTTP_AUTHORIZATION=f"Bearer {self.access_token_1}",
+            data=self.report_data)
+        self.assertEqual(response.status_code, 400)
 
     # 댓글 신고 실패(중복 데이터)
     def test_comment_report_already_reported_fail(self):  
         response = self.client.post(
             path=reverse("comment_detail_view", kwargs={'review_id':1, 'comment_id':2}), 
-            HTTP_AUTHORIZATION=f"Bearer {self.access_token}",
+            HTTP_AUTHORIZATION=f"Bearer {self.access_token_2}",
             data=self.report_data)
         self.assertEqual(response.status_code, 208)
 
@@ -457,7 +482,7 @@ class CommentDetailViewTest(APITestCase):
     def test_comment_report_content_fail(self):  
         response = self.client.post(
             path=reverse("comment_detail_view", kwargs={'review_id':1, 'comment_id':1}), 
-            HTTP_AUTHORIZATION=f"Bearer {self.access_token}",
+            HTTP_AUTHORIZATION=f"Bearer {self.access_token_2}",
             data={'content':'', "category": '욕설이 들어갔어요.'})
         self.assertEqual(response.status_code, 400)
 
@@ -465,7 +490,7 @@ class CommentDetailViewTest(APITestCase):
     def test_comment_report_category_fail(self):  
         response = self.client.post(
             path=reverse("comment_detail_view", kwargs={'review_id':1, 'comment_id':1}), 
-            HTTP_AUTHORIZATION=f"Bearer {self.access_token}",
+            HTTP_AUTHORIZATION=f"Bearer {self.access_token_2}",
             data={'content':'report content', "category": ''})
         self.assertEqual(response.status_code, 400)
 
@@ -552,27 +577,32 @@ class RecommentDetailViewTest(APITestCase):
     def setUpTestData(cls):
         cls.user1_data = {'username':'test1234', 'password':'Test1234!'}
         cls.user2_data = {'username':'test1235', 'password':'Test1234!'}
+        cls.user3_data = {'username':'test1236', 'password':'Test1234!'}
         cls.recomment_data = {'content':'some content'}
         cls.report_data = {'content':'report content', "category": '욕설이 들어갔어요.'}
         cls.user1 = User.objects.create_user("test1234","test1@test.com", "01012341234","Test1234!")
         cls.user2 = User.objects.create_user("test1235","test2@test.com", "01012341235","Test1234!")
+        cls.user3 = User.objects.create_user("test1236","test3@test.com", "01012341236","Test1234!")
         Profile.objects.create(user=cls.user1)
         Profile.objects.create(user=cls.user2)
+        Profile.objects.create(user=cls.user3)
         cls.place = Place.objects.create(place_name="장소명", category="카테고리", rating="5", place_address="주소", place_time="시간", place_img="이미지")
         cls.review = Review.objects.create(content="내용", rating_cnt="5", author=cls.user1, place=cls.place)
         cls.comment = Comment.objects.create(content="내용", author=cls.user1, review=cls.review)
         cls.recomment = Recomment.objects.create(content="내용", author=cls.user1, comment=cls.comment)
         cls.recomment2 = Recomment.objects.create(content="내용", author=cls.user1, comment=cls.comment)
-        cls.report = Report.objects.create(content="신고내용", category='욕설이 들어갔어요.', author=cls.user1, recomment=cls.recomment2)
+        cls.report = Report.objects.create(content="신고내용", category='욕설이 들어갔어요.', author=cls.user2, recomment=cls.recomment2)
 
     def setUp(self):
-        self.access_token = self.client.post(reverse('token_obtain_pair_view'), self.user1_data).data['access']
+        self.access_token_1 = self.client.post(reverse('token_obtain_pair_view'), self.user1_data).data['access']
+        self.access_token_2 = self.client.post(reverse('token_obtain_pair_view'), self.user2_data).data['access']
+        self.access_token_3 = self.client.post(reverse('token_obtain_pair_view'), self.user3_data).data['access']
 
     # 대댓글 수정 성공
     def test_recomment_edit_success(self):  
         response = self.client.put(
             path=reverse("recomment_detail_view", kwargs={'review_id':1, 'comment_id':1, 'recomment_id':1}),
-            HTTP_AUTHORIZATION=f"Bearer {self.access_token}",
+            HTTP_AUTHORIZATION=f"Bearer {self.access_token_1}",
             data={'content':'edit content'})
         self.assertEqual(response.status_code, 200)
 
@@ -587,7 +617,7 @@ class RecommentDetailViewTest(APITestCase):
     def test_recomment_edit_content_fail(self):  
         response = self.client.put(
             path=reverse("recomment_detail_view", kwargs={'review_id':1, 'comment_id':1, 'recomment_id':1}),
-            HTTP_AUTHORIZATION=f"Bearer {self.access_token}",
+            HTTP_AUTHORIZATION=f"Bearer {self.access_token_1}",
             data= {'content':''})
         self.assertEqual(response.status_code, 400)
     
@@ -595,7 +625,7 @@ class RecommentDetailViewTest(APITestCase):
     def test_recomment_edit_author_fail(self):
         response = self.client.put(
             path=reverse("recomment_detail_view", kwargs={'review_id':1, 'comment_id':1, 'recomment_id':1}),
-            HTTP_AUTHORIZATION=f"Bearer {self.client.post(reverse('token_obtain_pair_view'), self.user2_data).data['access']}",
+            HTTP_AUTHORIZATION=f"Bearer {self.access_token_2}",
             data= {'content':'edit content'})
         self.assertEqual(response.status_code, 403)
 
@@ -603,7 +633,7 @@ class RecommentDetailViewTest(APITestCase):
     def test_recomment_delete_success(self): 
         response = self.client.delete(
             path=reverse("recomment_detail_view", kwargs={'review_id':1, 'comment_id':1, 'recomment_id':1}),
-            HTTP_AUTHORIZATION=f"Bearer {self.access_token}",
+            HTTP_AUTHORIZATION=f"Bearer {self.access_token_1}",
             data= {'content':'edit content'})
         self.assertEqual(response.status_code, 200)
 
@@ -618,7 +648,7 @@ class RecommentDetailViewTest(APITestCase):
     def test_recomment_delete_fail(self): 
         response = self.client.delete(
             path=reverse("recomment_detail_view", kwargs={'review_id':1, 'comment_id':1, 'recomment_id':1}), 
-            HTTP_AUTHORIZATION=f"Bearer {self.client.post(reverse('token_obtain_pair_view'), self.user2_data).data['access']}",
+            HTTP_AUTHORIZATION=f"Bearer {self.access_token_2}",
             data= {'content':'edit content'})
         self.assertEqual(response.status_code, 403)
 
@@ -626,7 +656,7 @@ class RecommentDetailViewTest(APITestCase):
     def test_recomment_report_success(self):  
         response = self.client.post(
             path=reverse("recomment_detail_view", kwargs={'review_id':1, 'comment_id':1, 'recomment_id':1}), 
-            HTTP_AUTHORIZATION=f"Bearer {self.access_token}",
+            HTTP_AUTHORIZATION=f"Bearer {self.access_token_2}",
             data=self.report_data)
         self.assertEqual(response.status_code, 200)
     
@@ -636,12 +666,20 @@ class RecommentDetailViewTest(APITestCase):
             path=reverse("recomment_detail_view", kwargs={'review_id':1, 'comment_id':1, 'recomment_id':1}),
             data=self.report_data)
         self.assertEqual(response.status_code, 401)
+        
+    # 댓글 신고 실패(작성자가 신고)
+    def test_recomment_same_author_report_fail(self):  
+        response = self.client.post(
+            path=reverse("recomment_detail_view", kwargs={'review_id':1, 'comment_id':1, 'recomment_id':1}), 
+            HTTP_AUTHORIZATION=f"Bearer {self.access_token_1}",
+            data=self.report_data)
+        self.assertEqual(response.status_code, 400)
 
     # 대댓글 신고 실패(중복 데이터)
     def test_recomment_report_already_reported_fail(self):  
         response = self.client.post(
             path=reverse("recomment_detail_view", kwargs={'review_id':1, 'comment_id':1, 'recomment_id':2}),
-            HTTP_AUTHORIZATION=f"Bearer {self.access_token}",
+            HTTP_AUTHORIZATION=f"Bearer {self.access_token_2}",
             data=self.report_data)
         self.assertEqual(response.status_code, 208)
 
@@ -649,7 +687,7 @@ class RecommentDetailViewTest(APITestCase):
     def test_recomment_report_content_fail(self):  
         response = self.client.post(
             path=reverse("recomment_detail_view", kwargs={'review_id':1, 'comment_id':1, 'recomment_id':1}),
-            HTTP_AUTHORIZATION=f"Bearer {self.access_token}",
+            HTTP_AUTHORIZATION=f"Bearer {self.access_token_1}",
             data={'content':'', "category": '욕설이 들어갔어요.'})
         self.assertEqual(response.status_code, 400)
 
@@ -657,7 +695,7 @@ class RecommentDetailViewTest(APITestCase):
     def test_recomment_report_category_fail(self):  
         response = self.client.post(
             path=reverse("recomment_detail_view", kwargs={'review_id':1, 'comment_id':1, 'recomment_id':1}),
-            HTTP_AUTHORIZATION=f"Bearer {self.access_token}",
+            HTTP_AUTHORIZATION=f"Bearer {self.access_token_1}",
             data={'content':'report content', "category": ''})
         self.assertEqual(response.status_code, 400)
 
