@@ -51,7 +51,10 @@
     <div markdown="1"></div>
   
   - 유저 관리, 프로필, 개인설정 및 추가 기능
+  - user 테스트 코드
   - Docker, AWS 배포
+  - CI/CD 구축
+  - 코드 리팩토링/Swagger 적용
 
   </details>
   
@@ -60,7 +63,8 @@
     <div markdown="2"></div>
   
   - 머신러닝 장소 추천 기능, 후기 조회수, 페이지네이션
-  - Docker, AWS 배포
+  - place 테스트 코드
+  - CI/CD 구축
 
   </details>
   
@@ -77,6 +81,8 @@
   <div markdown="4"></div>
   
   - 북마크 기능, 좋아요 기능, 댓글/대댓글 기능 
+  - review 테스트 코드
+
 
   </details>
   
@@ -85,6 +91,7 @@
   <div markdown="5"></div>
   
   - 리뷰 생성 페이지, 팔로우 기능, 알림 기능, 검색 기능
+  - notification 테스트 코드
   - Docker, AWS 배포
 
   </details>

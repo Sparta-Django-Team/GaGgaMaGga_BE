@@ -23,6 +23,7 @@ jobs:
           key: ${{ secrets.EC2_KEY }}
           host: ${{ secrets.EC2_IP }}
           username: ${{ secrets.EC2_NAME }}
+          port: ${{ secrets.EC2_PORT }}
           script: |
             cd ${{ secrets.EC2_PATH }}
             git pull origin main
