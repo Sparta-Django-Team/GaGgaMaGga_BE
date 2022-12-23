@@ -363,12 +363,14 @@ class ProcessFollowView(APIView):
     def post(self, request, nickname):
         you = get_object_or_404(Profile, nickname=nickname)
         me = request.user.user_profile
-        if me in you.followers.all():
-            you.followers.remove(me)
-            return Response({"message":"팔로우를 했습니다."}, status=status.HTTP_200_OK)
-        else:
-            you.followers.add(me)
-            return Response({"message":"팔로우를 취소했습니다."}, status=status.HTTP_200_OK)
+        if me != you:
+            if me in you.followers.all():
+                you.followers.remove(me)
+                return Response({"message":"팔로우를 했습니다."}, status=status.HTTP_200_OK)
+            else:
+                you.followers.add(me)
+                return Response({"message":"팔로우를 취소했습니다."}, status=status.HTTP_200_OK)
+        return Response({"message":"본인은 팔로우 할 수 없습니다."}, status=status.HTTP_400_BAD_REQUEST)
 
 # 카카오 로그인
 class KakaoLoginView(APIView):
