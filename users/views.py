@@ -359,7 +359,7 @@ class ProcessFollowView(APIView):
     permission_classes = [IsAuthenticated]
 
     @swagger_auto_schema(operation_summary="팔로우", 
-                        responses={200 : '성공', 401 : '인증오류', 404 : '찾을 수 없음', 500 : '서버 에러'})
+                        responses={200 : '성공', 400 : '인풋값 에러',401 : '인증오류', 404 : '찾을 수 없음', 500 : '서버 에러'})
     def post(self, request, nickname):
         you = get_object_or_404(Profile, nickname=nickname)
         me = request.user.user_profile
