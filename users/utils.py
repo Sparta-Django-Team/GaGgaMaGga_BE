@@ -1,8 +1,11 @@
 from django.core.mail import EmailMessage
 
+import urllib.request
 import requests
 import tempfile
 import threading
+
+from gaggamagga.settings import get_secret
 
 class EmailThread(threading.Thread):
     
@@ -37,3 +40,10 @@ class Util:
                 break
             temp_image.write(block)
         return {"temp_image": temp_image, "file_name": file_name}
+    
+    def find_ip_country(user_ip):
+        serviceKey = get_secret("WHOIS_KEY")
+        url = "http://apis.data.go.kr/B551505/whois/ip_address?serviceKey=" + serviceKey + "&query=" + user_ip + "&answer=json"
+        request = urllib.request.urlopen(url).read().decode("utf-8")
+        return dict(eval(request))["response"]["whois"]["countryCode"]
+

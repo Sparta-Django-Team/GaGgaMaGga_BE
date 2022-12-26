@@ -138,7 +138,8 @@ class ConfirmPhoneNumber(models.Model):
 
 # 로그 기록
 class LoggedIn(models.Model):
-    update_ip = models.GenericIPAddressField('로그인한 IP', null=True, validators=[validate_ipv46_address])
+    updated_ip = models.GenericIPAddressField('로그인한 IP', null=True, validators=[validate_ipv46_address])
+    country = models.CharField('로그인한 국가', max_length=255, null=True)
     created_at = models.DateTimeField('로그인 기록', auto_now_add=True)
 
     user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name="회원")
@@ -146,6 +147,19 @@ class LoggedIn(models.Model):
     def __str__(self):
         return f"[아이디]{self.user.username}, [접속 기록]{self.created_at}"
 
+    class Meta:
+        ordering = ['-created_at']
+
+#차단할 IP 국가코드
+class BlockedCountryIP(models.Model):
+    country = models.CharField('차단한 국가', max_length=255, null=True, unique=True, error_messages={"unique": "이미 차단된 국가코드입니다."})
+    created_at = models.DateTimeField('차단한 일자', auto_now_add=True)
+
+    user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name="회원")
+    
+    def __str__(self):
+        return f"[아이디]{self.user.username}, [차단한 국가]{self.country}"
+    
     class Meta:
         ordering = ['-created_at']
 

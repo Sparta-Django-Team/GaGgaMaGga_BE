@@ -27,6 +27,10 @@ urlpatterns = [
     # Log
     path('logs/', views.LoginLogListView.as_view(), name='login_log_view'),
     
+    # County IP Block
+    path('county-ip-block/', views.CountyIPBlockView.as_view(), name='country_ip_block_view'),
+    path('county-ip-block/<int:country_id>/', views.CountyIPBlockDeleteView.as_view(), name='country_ip_block_delete_view'),
+    
     # Follow
     path('follow/<str:nickname>/', views.ProcessFollowView.as_view(), name='process_follow_view'),
     
