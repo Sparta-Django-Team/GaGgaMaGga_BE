@@ -7,6 +7,7 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.views import TokenViewBase
 from rest_framework_simplejwt.exceptions import TokenError, InvalidToken
 from rest_framework_simplejwt.settings import api_settings
+from rest_framework_simplejwt.token_blacklist.models import BlacklistedToken, OutstandingToken
 
 from django.core.files import File
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
@@ -125,6 +126,21 @@ class LogoutView(APIView):
             serializer.save()
             return Response({"message":"로그아웃 성공되었습니다."}, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+class BulkLogoutView(APIView):
+    permission_classes = [IsAuthenticated]
+    
+    @swagger_auto_schema(operation_summary="일괄 로그아웃",
+                    responses={200 : '성공',  401 : '인증 에러', 404 : '찾을 수 없음', 500 : '서버 에러'})
+    def post(self, request):
+        outstanding_token = get_list_or_404(OutstandingToken, user=request.user)
+        for black_token in outstanding_token:
+            try:
+                RefreshToken(black_token.token).blacklist()
+            
+            except TokenError:
+                pass
+        return Response({'message':'일괄 로그아웃 성공되었습니다.'}, status=status.HTTP_200_OK)
 
 class ConfirmEmailView(APIView):
     permission_classes = [AllowAny]
@@ -444,7 +460,7 @@ class KakaoLoginView(APIView):
                 user = User.objects.get(email=kakao_email)
                 social_user = OauthId.objects.filter(user=user).first()
                 
-                # Oauth User exist
+                # 소셜로그인 존재하면
                 if social_user:
                     if social_user.provider !="kakao":
                         return Response({"error":"카카오로 가입한 유저가 아닙니다."}, status=status.HTTP_400_BAD_REQUEST)
@@ -452,13 +468,13 @@ class KakaoLoginView(APIView):
                     user.withdraw = False
                     user.save()
                     
-                    # User ip Block
+                    # IP 국가코드 차단 확인 
                     user_ip= Util.get_client_ip(request)
                     country =  Util.find_ip_country(user_ip)
                     if BlockedCountryIP.objects.filter(user=self.target_user, country=country).exists():
                         return Response({"error":"해당 IP를 차단한 계정입니다."}, status=status.HTTP_400_BAD_REQUEST)
                     
-                    # User ip Log 
+                    # 로그인 로그 저장
                     LoggedIn.objects.create(user=user, created_at=timezone.now(), updated_ip=user_ip, country=country)
                     
                     review_cnt = Profile.objects.get(user=user).review_cnt
@@ -469,7 +485,7 @@ class KakaoLoginView(APIView):
                     return Response({"error":"이메일이 존재하지만 , 소셜유저가 아닙니다"}, status=status.HTTP_400_BAD_REQUEST)
             
             except User.DoesNotExist:
-                # User Related Create
+                # 유저 관련 생성
                 new_user = User.objects.create(username=kakao_nickname, email=kakao_email)
                 new_user.set_unusable_password()
                 new_user.save()
@@ -480,13 +496,13 @@ class KakaoLoginView(APIView):
                 util_image = Util.profile_image_download(kakao_profile_image)
                 profile.profile_image.save(util_image["file_name"], File(util_image["temp_image"]))
                 
-                # User ip Block
+                # IP 국가코드 차단 확인
                 user_ip= Util.get_client_ip(request)
                 country =  Util.find_ip_country(user_ip)
                 if BlockedCountryIP.objects.filter(user=self.target_user, country=country).exists():
                     return Response({"error":"해당 IP를 차단한 계정입니다."}, status=status.HTTP_400_BAD_REQUEST)
                 
-                # User ip Log 
+                # 로그인 로그 저장
                 LoggedIn.objects.create(user=user, created_at=timezone.now(), updated_ip=user_ip, country=country)
                 
                 refresh = RefreshToken.for_user(new_user)

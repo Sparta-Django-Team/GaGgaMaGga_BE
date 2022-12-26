@@ -31,33 +31,31 @@ DEBUG = os.environ.get('DEBUG', '0') == '1'
 ALLOWED_HOSTS = ['backend', 'channels', 'redis']
 
 # Application definition
-# Application definition
 INSTALLED_APPS = [
     'daphne',
-    'corsheaders',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-
+    
     # third party api services
     'algoliasearch_django',
-
+    
     # thrid party packages
     'rest_framework',
     'rest_framework_simplejwt.token_blacklist',
     'drf_yasg',
+    'corsheaders',
     'channels',
-
+    
     # internal apps
     'notification',
     'places',
     'reviews',
     'users',
 ]
-
 
 # RestFramework
 REST_FRAMEWORK = {
@@ -77,9 +75,9 @@ SWAGGER_SETTINGS = {
 }
 
 MIDDLEWARE = [
-    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'corsheaders.middleware.CorsMiddleware',    
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -113,7 +111,7 @@ CHANNEL_LAYERS = {
     "default": {
         "BACKEND": "channels_redis.core.RedisChannelLayer",
         "CONFIG": {
-            "hosts": [("192.168.48.3", 6379)],
+            "hosts": [("127.0.0.1", 6379)],
         },
     },
 }
@@ -139,7 +137,7 @@ else:
             'ENGINE': 'django.db.backends.sqlite3',
             'NAME': BASE_DIR / 'db.sqlite3',
             'TEST' : {
-            'NAME' : BASE_DIR / "db.sqlite3",
+            'NAME' : BASE_DIR / "db.sqlite3",  
             },
         }
     }
@@ -194,7 +192,7 @@ AUTH_USER_MODEL = 'users.User'
 PASSWORD_RESET_TIMEOUT = 3600
 
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=720),
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=10),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
     'ROTATE_REFRESH_TOKENS': False,
     'BLACKLIST_AFTER_ROTATION': False,
