@@ -152,7 +152,7 @@ class LoggedIn(models.Model):
 
 #차단할 IP 국가코드
 class BlockedCountryIP(models.Model):
-    country = models.CharField('차단한 국가', max_length=255, null=True, unique=True, error_messages={"unique": "이미 차단된 국가코드입니다."})
+    country = models.CharField('차단한 국가', max_length=255, unique=True, error_messages={"unique": "이미 차단된 국가코드입니다."})
     created_at = models.DateTimeField('차단한 일자', auto_now_add=True)
 
     user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name="회원")

@@ -126,7 +126,8 @@ class LogoutView(APIView):
             serializer.save()
             return Response({"message":"로그아웃 성공되었습니다."}, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
+
+#일괄 로그아웃
 class BulkLogoutView(APIView):
     permission_classes = [IsAuthenticated]
     

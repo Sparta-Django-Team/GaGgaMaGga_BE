@@ -383,6 +383,15 @@ class UserLoginLogoutAPIViewTestCase(APITestCase):
             data={"refresh":access_token}
         )
         self.assertEqual(response.status_code, 400)
+        
+    # 일괄 로그아웃 성공
+    def test_bulk_logout_success(self):
+        access_token = self.client.post(reverse('token_obtain_pair_view'), self.success_data).data['access']
+        response = self.client.post(
+            path=reverse("bulk_logout_view"),
+            HTTP_AUTHORIZATION=f"Bearer {access_token}",
+        )
+        self.assertEqual(response.status_code, 200)
 
 class UserConfirmEmailAPIViewTest(APITestCase):
     def setUp(self):
@@ -535,6 +544,62 @@ class PublicProfileAPIViewTestCase(APITestCase):
         access_token = self.client.post(reverse('token_obtain_pair_view'), self.data).data['access']
         response = self.client.get(
             path=reverse("public_profile_view", kwargs={"nickname":"test1"}),
+            HTTP_AUTHORIZATION=f"Bearer {access_token}",
+        )
+        self.assertEqual(response.status_code, 200)
+
+class CountyIPBlockAPIViewTestCase(APITestCase):
+    def setUp(self):
+        self.data = {"username": "test1234", "password":"Test1234!"}
+        self.user = User.objects.create_user("test1234","test1@test.com", "01012351234","Test1234!")
+        Profile.objects.create(user=self.user)
+        BlockedCountryIP.objects.create(country="KR", user=self.user)
+        
+
+    # IP 국가코드 차단 읽기 성공
+    def test_country_ip_block_get_success(self):
+        access_token = self.client.post(reverse('token_obtain_pair_view'), self.data).data['access']
+        response = self.client.get(
+            path=reverse("country_ip_block_view"),
+            HTTP_AUTHORIZATION=f"Bearer {access_token}",
+        )
+        self.assertEqual(response.status_code, 200)
+    
+    # IP 국가코드 차단 성공
+    def test_country_ip_block_success(self):
+        access_token = self.client.post(reverse('token_obtain_pair_view'), self.data).data['access']
+        response = self.client.post(
+            path=reverse("country_ip_block_view"),
+            HTTP_AUTHORIZATION=f"Bearer {access_token}",
+            data={"country":"CN"}
+        )
+        self.assertEqual(response.status_code, 201)
+    
+    # IP 국가코드 차단 실패 (국가코드 중복)
+    def test_country_ip_block_unique_fail(self):
+        access_token = self.client.post(reverse('token_obtain_pair_view'), self.data).data['access']
+        response = self.client.post(
+            path=reverse("country_ip_block_view"),
+            HTTP_AUTHORIZATION=f"Bearer {access_token}",
+            data={"country":"KR"}
+        )
+        self.assertEqual(response.status_code, 400)
+
+    # IP 국가코드 차단 실패 (국가코드 빈칸)
+    def test_country_ip_block_blank_fail(self):
+        access_token = self.client.post(reverse('token_obtain_pair_view'), self.data).data['access']
+        response = self.client.post(
+            path=reverse("country_ip_block_view"),
+            HTTP_AUTHORIZATION=f"Bearer {access_token}",
+            data={"country":""}
+        )
+        self.assertEqual(response.status_code, 400)
+        
+    # IP 국가코드 차단 삭제 
+    def test_country_ip_block_delete_success(self):
+        access_token = self.client.post(reverse('token_obtain_pair_view'), self.data).data['access']
+        response = self.client.delete(
+            path=reverse("country_ip_block_delete_view", kwargs={'country_id':"1"}),
             HTTP_AUTHORIZATION=f"Bearer {access_token}",
         )
         self.assertEqual(response.status_code, 200)
