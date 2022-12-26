@@ -892,3 +892,11 @@ class FollowAPIViewTestCase(APITestCase):
             HTTP_AUTHORIZATION=f"Bearer {access_token}",
         )
         self.assertEqual(response_case_2.status_code, 200)
+        
+    def test_follow_fail(self):
+        access_token = self.client.post(reverse('token_obtain_pair_view'), self.user).data['access']
+        response = self.client.post(
+            path=reverse("process_follow_view", kwargs={"nickname":"test"}),
+            HTTP_AUTHORIZATION=f"Bearer {access_token}",
+        )
+        self.assertEqual(response.status_code, 400)
