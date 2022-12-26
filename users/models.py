@@ -138,8 +138,8 @@ class ConfirmPhoneNumber(models.Model):
 
 # 로그 기록
 class LoggedIn(models.Model):
-    updated_ip = models.GenericIPAddressField('로그인한 IP', null=True, validators=[validate_ipv46_address])
-    country = models.CharField('로그인한 국가', max_length=255, null=True)
+    updated_ip = models.GenericIPAddressField('로그인한 IP', validators=[validate_ipv46_address])
+    country = models.CharField('로그인한 국가', max_length=255)
     created_at = models.DateTimeField('로그인 기록', auto_now_add=True)
 
     user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name="회원")
