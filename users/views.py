@@ -371,10 +371,10 @@ class SetNewPasswordView(APIView):
             return Response({"message":"비밀번호 재설정 완료"}, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-# 비밀번호 변경일시 만료되면 변경
 class ExpiredPasswordChage(APIView):
     permission_classes = [IsAuthenticated]
 
+    # 유저 비밀번호 만료 확인
     @swagger_auto_schema(operation_summary="유저 비밀번호 만료",
                     responses={200 : '성공', 401 : '인증에러', 403 : '접근 권한 에러', 404 : '찾을 수 없음', 500 : '서버 에러'})
     def get(self, request):
@@ -383,6 +383,7 @@ class ExpiredPasswordChage(APIView):
             return Response({"message":"비밀번호 만료일이 지났습니다. 비밀번호를 변경해주세요."}, status=status.HTTP_200_OK)
         return Response({"message":"접근 권한 없음"}, status=status.HTTP_403_FORBIDDEN)
 
+    # 비밀번호 다음에 변경
     @swagger_auto_schema(operation_summary="비밀번호 다음에 변경",
                     responses={200 : '성공' , 401 : '인증에러', 404 : '찾을 수 없음', 500 : '서버 에러'})
     def post(self, request):
@@ -392,6 +393,7 @@ class ExpiredPasswordChage(APIView):
         user.save()
         return Response({"message":"비밀번호 다음에 변경하기"}, status=status.HTTP_200_OK)
 
+    # 만료시 비밀번호 변경
     @swagger_auto_schema(request_body=ChangePasswordSerializer, 
                     operation_summary="비밀번호 인증 만료 시 변경", 
                     responses={200 : '성공', 400 : '인풋값 에러', 401 :'인증 에러', 404 : '찾을 수 없음', 500 : '서버 에러'})

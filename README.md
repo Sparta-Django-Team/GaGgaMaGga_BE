@@ -1,7 +1,7 @@
 # 가까?마까?(GaggaMagga) 프로젝트
 
 ### [Front-end Page](https://github.com/1TEAM12/GaGgaMaGga_FE)
-### [Swagger API Docs](http://3.36.51.98/)
+### [Swagger API Docs](https://www.back-gaggamagga.tk/)
 ### [노션 진행 상황](https://www.notion.so/11-30-12-29-482dc47b71d44e968cf32283bb422238)
 
 ![ex_screenshot](./img/main.png)

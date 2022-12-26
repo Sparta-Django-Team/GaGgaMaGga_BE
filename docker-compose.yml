@@ -64,7 +64,6 @@ services:
     ports:
       - 8001:8001
 
-
   nginx:
     container_name : nginx
     image: nginx:1.23.2-alpine

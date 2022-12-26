@@ -31,7 +31,6 @@ class UserStatusChange:
                 Util.send_email(message)
             user.update(withdraw=True)
 
-
     # 비활성화가 되고 60일이 지나면 삭제
     def user_withdraw_delete(self):
         user = User.objects.filter(is_admin=False,  withdraw_at__lte=self.month, withdraw=True)
