@@ -7,7 +7,7 @@ from django.utils.encoding import smart_bytes
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from django.test.client import MULTIPART_CONTENT, encode_multipart, BOUNDARY
 
-from .models import User, ConfirmPhoneNumber, Profile
+from .models import User, ConfirmPhoneNumber, Profile, BlockedCountryIP
 
 from PIL import Image
 import tempfile
@@ -298,19 +298,29 @@ class UserDeleteAPIViewTestCase(APITestCase):
 class UserLoginLogoutAPIViewTestCase(APITestCase):
     def setUp(self):
         self.success_data = {"username": "test1234", "password":"Test1234!"}
-        self.fail_data = {"username": "test12345", "password":"Test1234!!"}
+        self.fail_data = {"username": "test1234", "password":"Test1234!!"}
         self.user = User.objects.create_user("test1234","test@test.com", "01012341234","Test1234!")
         Profile.objects.create(user=self.user)
         
-    # (access token)로그인 성공
+    # (access_token)로그인 성공
     def test_access_token_login_success(self):
         response = self.client.post(reverse('token_obtain_pair_view'), self.success_data)
         self.assertEqual(response.status_code, 200)
     
-    # (access token)로그인 실패
+    # (access_token)로그인 실패
     def test_access_token_login_fail(self):
         response = self.client.post(reverse('token_obtain_pair_view'), self.fail_data)
         self.assertEqual(response.status_code, 401)
+        
+    # (accss_token 여러번 시도)로그인 실패
+    def test_access_token_login_attempt_fail(self):
+        self.client.post(reverse('token_obtain_pair_view'), self.fail_data)
+        self.client.post(reverse('token_obtain_pair_view'), self.fail_data)
+        self.client.post(reverse('token_obtain_pair_view'), self.fail_data)
+        self.client.post(reverse('token_obtain_pair_view'), self.fail_data)
+        self.client.post(reverse('token_obtain_pair_view'), self.fail_data)
+        response = self.client.post(reverse('token_obtain_pair_view'), self.success_data)
+        self.assertEqual(response.status_code, 400)
         
     # (refresh_token)로그인 성공
     def test_refresh_token_login_success(self):

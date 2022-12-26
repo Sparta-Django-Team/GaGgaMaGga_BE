@@ -210,9 +210,10 @@
 ## 로그인
 21. (access token)로그인 성공
 22. (access token)로그인 실패
-23. (refresh_token)로그인 성공
-24. (refresh_token)로그인 실패(refresh 입력안했을 때)
-25. (refresh_token)로그인 실패(access 토큰 넣었을 때)
+23. (access token 여러번 시도)로그인 실패
+24. (refresh_token)로그인 성공
+25. (refresh_token)로그인 실패(refresh 입력안했을 때)
+26. (refresh_token)로그인 실패(access 토큰 넣었을 때)
 
 ## 로그아웃
 26. (refresh_token)로그아웃 성공
