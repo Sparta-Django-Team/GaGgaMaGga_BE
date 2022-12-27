@@ -5,7 +5,8 @@ from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.contrib.auth.forms import ReadOnlyPasswordHashField
 from django.core.exceptions import ValidationError
 
-from .models import User, ConfirmEmail, ConfirmPhoneNumber, LoggedIn, Profile, OauthId
+from .models import (User, ConfirmEmail, ConfirmPhoneNumber, 
+LoggedIn, Profile, OauthId, BlockedCountryIP)
 
 class UserCreationForm(forms.ModelForm):
     password1 = forms.CharField(label='비밀번호', widget=forms.PasswordInput)
@@ -39,8 +40,11 @@ class ConfirmEmailInline(admin.StackedInline):
 class ConfirmPhoneNumberInline(admin.StackedInline):
     model = ConfirmPhoneNumber
     
-class ProfileInlune(admin.StackedInline):
+class ProfileInline(admin.StackedInline):
     model = Profile
+
+class BlockedCountryIPInline(admin.StackedInline):
+    model = BlockedCountryIP
 
 class UserChangeForm(forms.ModelForm):
     password = ReadOnlyPasswordHashField()
@@ -70,7 +74,8 @@ class UserAdmin(BaseUserAdmin):
     inlines = (
         ConfirmEmailInline,
         ConfirmPhoneNumberInline,
-        ProfileInlune,
+        ProfileInline,
+        BlockedCountryIPInline,
     )
     search_fields = ('username','email', 'phone_number',)
     ordering = ('username',)

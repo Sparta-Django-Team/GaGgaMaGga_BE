@@ -28,7 +28,7 @@ SECRET_KEY = get_secret("SECRET_KEY")
 
 DEBUG = os.environ.get('DEBUG', '0') == '1'
 
-ALLOWED_HOSTS = ['backend', 'channels', 'redis']
+ALLOWED_HOSTS = ['*',]
 
 # Application definition
 INSTALLED_APPS = [
@@ -111,7 +111,7 @@ CHANNEL_LAYERS = {
     "default": {
         "BACKEND": "channels_redis.core.RedisChannelLayer",
         "CONFIG": {
-            "hosts": [("127.0.0.1", 6379)],
+            "hosts": [("redis", 6379)],
         },
     },
 }
