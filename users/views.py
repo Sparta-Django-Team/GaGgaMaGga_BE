@@ -441,7 +441,7 @@ class KakaoLoginView(APIView):
                 data={
                     "grant_type": "authorization_code",
                     "client_id": get_secret("SOCIAL_AUTH_KAKAO_CLIENT_ID"),
-                    "redirect_uri": "http://127.0.0.1:5500/index.html",
+                    "redirect_uri": "https://www.gaggamagga.shop/index.html",
                     "code": code,
                 },
             )
