@@ -6,7 +6,7 @@ from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.encoding import smart_bytes, force_str
 
-from .models import User, Profile, LoggedIn
+from .models import User, Profile, LoggedIn, BlockedCountryIP
 from .utils import Util
 from .validators import password_validator, password_pattern, username_validator, nickname_validator
 
@@ -136,7 +136,7 @@ class LogoutSerializer(serializers.Serializer):
     def save(self, **kwargs):
         try:
             RefreshToken(self.token).blacklist()
-
+        
         except TokenError:
             raise serializers.ValidationError(detail={"만료된 토큰":"유효하지 않거나 만료된 토큰입니다."})
 
@@ -201,8 +201,7 @@ class ProfileUpdateSerializer(serializers.ModelSerializer):
         # 닉네임 유효성 검사
         if nickname_validator(nickname):
             raise serializers.ValidationError(detail={"nickname":"닉네임은 3자이상 10자 이하로 작성해야하며 특수문자는 포함할 수 없습니다."})
-
-
+        
         return data
 
     def update(self, instance, validated_data):
@@ -218,7 +217,25 @@ class LoginLogListSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = LoggedIn
-        fields = ('update_ip', 'created_at', )
+        fields = ('updated_ip', 'country', 'created_at', )
+
+# 국가 코드 Ip차단 serializer
+class CountyIPBlockSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = BlockedCountryIP
+        fields = ('country', 'created_at', )
+        
+class CountyIPBlockCreateSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = BlockedCountryIP
+        fields = ('country', )
+        extra_kwargs = {
+                'country': {
+                'error_messages': {
+                'required': '국가코드를 선택해주세요.',
+                'blank':'국가코드를 선택해주세요.',}},} 
 
 # 비밀번호 변경 serializer
 class ChangePasswordSerializer(serializers.ModelSerializer):

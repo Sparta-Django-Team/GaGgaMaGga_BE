@@ -10,6 +10,7 @@ urlpatterns = [
     path('api/token/', views.CustomTokenObtainPairView.as_view(), name='token_obtain_pair_view'),
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh_view'),
     path('logout/', views.LogoutView.as_view(), name='logout_view'),
+    path('bulk-logout/', views.BulkLogoutView.as_view(), name='bulk_logout_view'),
     path("kakao/", views.KakaoLoginView.as_view(), name='kakao_login_view'),
     
     # Email
@@ -26,6 +27,10 @@ urlpatterns = [
     
     # Log
     path('logs/', views.LoginLogListView.as_view(), name='login_log_view'),
+    
+    # County IP Block
+    path('county-ip-block/', views.CountyIPBlockView.as_view(), name='country_ip_block_view'),
+    path('county-ip-block/<int:country_id>/', views.CountyIPBlockDeleteView.as_view(), name='country_ip_block_delete_view'),
     
     # Follow
     path('follow/<str:nickname>/', views.ProcessFollowView.as_view(), name='process_follow_view'),

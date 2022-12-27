@@ -8,13 +8,12 @@ from django.contrib.auth.models import update_last_login
 from django.utils.translation import gettext_lazy as _
 from django.utils import timezone
 
-from .models import User
+from .utils import Util
+from .models import User, BlockedCountryIP
 
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
     username_field = get_user_model().USERNAME_FIELD
     token_class = RefreshToken
-
-    default_error_messages = {"no_active_account": _("아이디와 비밀번호를 확인해주세요. ")}
     
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -54,32 +53,38 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
                 
             # is_active False 제한 시간 확인 후 True
             self.now_today_time = timezone.now()
-
+            
             if self.is_active == False:
-                target_user_lock_time = self.target_user.lock_time + timezone.timedelta(minutes=3)
+                target_user_lock_time = self.target_user.account_lock_time + timezone.timedelta(minutes=3)
                 
                 if self.now_today_time >= target_user_lock_time:
                     self.target_user.is_active = True
-                    self.target_user.lock_count = 0
+                    self.target_user.account_lock_count = 0
                     self.target_user.save()
 
-            # withdraw True이면 로그인 시 False
+            #(회원비활성화) withdraw True이면 로그인 시 False
             if self.withdraw == True:
                 self.target_user.withdraw = False
                 self.target_user.save()
             
-        except:
+        except: 
             pass
         
         if User.objects.filter(username=username).exists():
             
             # is_active False 계정잠금 
             if self.is_active == False:
-                raise serializers.ValidationError("로그인 시도가 너무 많습니다. 3분 후 다시 시도해 주세요. ")
+                raise serializers.ValidationError(detail={"error":"로그인 시도가 너무 많습니다. 3분 후 다시 시도해 주세요."})
+
+        # IP 국가코드 차단 확인
+            user_ip= Util.get_client_ip(self.context.get("request"))
+            country =  Util.find_ip_country(user_ip)
+            if BlockedCountryIP.objects.filter(user=self.target_user, country=country).exists():
+                raise serializers.ValidationError(detail={"error":"해당 IP를 차단한 계정입니다."})
             
         # login error
         if not api_settings.USER_AUTHENTICATION_RULE(self.user):
-            raise exceptions.AuthenticationFailed(self.error_messages["no_active_account"],"no_active_account",)
+            raise exceptions.AuthenticationFailed(detail={"error":"아이디와 비밀번호를 확인해주세요."})
         
         # login token 
         refresh = self.get_token(self.user)

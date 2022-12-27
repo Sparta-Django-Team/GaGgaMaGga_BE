@@ -7,6 +7,7 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.views import TokenViewBase
 from rest_framework_simplejwt.exceptions import TokenError, InvalidToken
 from rest_framework_simplejwt.settings import api_settings
+from rest_framework_simplejwt.token_blacklist.models import OutstandingToken
 
 from django.core.files import File
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
@@ -26,8 +27,10 @@ from gaggamagga.settings import get_secret
 from .jwt_claim_serializer import CustomTokenObtainPairSerializer
 from .serializers import (SignupSerializer,UserUpdateSerializer, PublicProfileSerializer,
 LogoutSerializer, ProfileUpdateSerializer, ChangePasswordSerializer, SetNewPasswordSerializer, 
-PasswordResetSerializer, LoginLogListSerializer, PrivateProfileSerializer)
-from .models import User, ConfirmEmail, ConfirmPhoneNumber, Profile, LoggedIn, OauthId
+PasswordResetSerializer, LoginLogListSerializer, PrivateProfileSerializer,
+CountyIPBlockSerializer, CountyIPBlockCreateSerializer)
+from .models import (User, ConfirmEmail, ConfirmPhoneNumber, 
+Profile, LoggedIn, OauthId, BlockedCountryIP)
 from .utils import Util
 
 class UserView(APIView):
@@ -93,14 +96,14 @@ class CustomTokenObtainPairView(TokenViewBase):
                     operation_summary="로그인",
                     responses={200 : '성공', 400 : '인풋값 에러', 500 : '서버에러'})
     def post(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
+        serializer = self.get_serializer(data=request.data, context={'request': request})
         try:
             serializer.is_valid(raise_exception=True)
-
             # 로그인 로그 저장
             user_ip= Util.get_client_ip(request)
+            country =  Util.find_ip_country(user_ip)
             user = User.objects.get(username=request.data["username"])
-            LoggedIn.objects.create(user=user, created_at=timezone.now(), update_ip=user_ip)
+            LoggedIn.objects.create(user=user, created_at=timezone.now(), updated_ip=user_ip, country=country)
 
         except TokenError as e:
             raise InvalidToken(e.args[0])
@@ -123,6 +126,22 @@ class LogoutView(APIView):
             serializer.save()
             return Response({"message":"로그아웃 성공되었습니다."}, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+#일괄 로그아웃
+class BulkLogoutView(APIView):
+    permission_classes = [IsAuthenticated]
+    
+    @swagger_auto_schema(operation_summary="일괄 로그아웃",
+                    responses={200 : '성공',  401 : '인증 에러', 404 : '찾을 수 없음', 500 : '서버 에러'})
+    def post(self, request):
+        outstanding_token = get_list_or_404(OutstandingToken, user=request.user)
+        for black_token in outstanding_token:
+            try:
+                RefreshToken(black_token.token).blacklist()
+            
+            except TokenError:
+                pass
+        return Response({'message':'일괄 로그아웃 성공되었습니다.'}, status=status.HTTP_200_OK)
 
 class ConfirmEmailView(APIView):
     permission_classes = [AllowAny]
@@ -244,7 +263,7 @@ class PublicProfileView(APIView):
     permission_classes = [IsAuthenticated]
 
     @swagger_auto_schema(operation_summary="공개 프로필", 
-                    responses={200 : '성공', 401:'인증 오류', 404 : '찾을 수 없음', 500 : '서버 에러'}) 
+                    responses={200 : '성공', 401 : '인증 오류', 404 : '찾을 수 없음', 500 : '서버 에러'}) 
     def get(self, request, nickname):
         profile = get_object_or_404(Profile, nickname=nickname)
         serializer = PublicProfileSerializer(profile)
@@ -255,11 +274,43 @@ class LoginLogListView(APIView):
     permission_classes = [IsAuthenticated]
 
     @swagger_auto_schema(operation_summary="로그인 로그기록", 
-                    responses={200 : '성공', 401: '인증 오류', 404 : '찾을 수 없음', 500 : '서버 에러'}) 
+                    responses={200 : '성공', 401 : '인증 오류', 404 : '찾을 수 없음', 500 : '서버 에러'}) 
     def get(self, request):
         logged_in = get_list_or_404(LoggedIn, user=request.user)[:10]
         serializer = LoginLogListSerializer(logged_in, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+class CountyIPBlockView(APIView):
+    permission_classes = [IsAuthenticated]
+    
+    # 차단된 IP 국가코드
+    @swagger_auto_schema(operation_summary="차단된 IP 국가코드", 
+                    responses={200 : '성공', 401 : '인증 오류', 404 : '찾을 수 없음', 500 : '서버 에러'}) 
+    def get(self, request):
+        blocked_country_ip = get_list_or_404(BlockedCountryIP, user=request.user)
+        serializer = CountyIPBlockSerializer(blocked_country_ip, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    # IP 국가코드 차단
+    @swagger_auto_schema(operation_summary="IP 국가코드 차단", 
+                responses={201 : '성공', 400 : '인풋값 오류', 401 : '인증 오류', 500 : '서버 에러'}) 
+    def post(self, request):
+        serializer = CountyIPBlockCreateSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save(user=request.user)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class CountyIPBlockDeleteView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    # IP 국가코드 삭제
+    @swagger_auto_schema(operation_summary="IP 국가코드 삭제", 
+                responses={200 : '성공', 400 : '인풋값 오류', 401 : '인증 오류', 404 : '찾을 수 없음', 500 : '서버 에러'}) 
+    def delete(self, request, country_id):
+        blocked_country_ip = get_object_or_404(BlockedCountryIP, id=country_id)
+        blocked_country_ip.delete()
+        return Response({"message": f"{blocked_country_ip.country} 국가 코드 삭제 완료"},status=status.HTTP_200_OK)
 
 class ChangePasswordView(APIView):
     permission_classes = [IsAuthenticated]
@@ -320,10 +371,10 @@ class SetNewPasswordView(APIView):
             return Response({"message":"비밀번호 재설정 완료"}, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-# 비밀번호 변경일시 만료되면 변경
 class ExpiredPasswordChage(APIView):
     permission_classes = [IsAuthenticated]
 
+    # 유저 비밀번호 만료 확인
     @swagger_auto_schema(operation_summary="유저 비밀번호 만료",
                     responses={200 : '성공', 401 : '인증에러', 403 : '접근 권한 에러', 404 : '찾을 수 없음', 500 : '서버 에러'})
     def get(self, request):
@@ -332,6 +383,7 @@ class ExpiredPasswordChage(APIView):
             return Response({"message":"비밀번호 만료일이 지났습니다. 비밀번호를 변경해주세요."}, status=status.HTTP_200_OK)
         return Response({"message":"접근 권한 없음"}, status=status.HTTP_403_FORBIDDEN)
 
+    # 비밀번호 다음에 변경
     @swagger_auto_schema(operation_summary="비밀번호 다음에 변경",
                     responses={200 : '성공' , 401 : '인증에러', 404 : '찾을 수 없음', 500 : '서버 에러'})
     def post(self, request):
@@ -341,6 +393,7 @@ class ExpiredPasswordChage(APIView):
         user.save()
         return Response({"message":"비밀번호 다음에 변경하기"}, status=status.HTTP_200_OK)
 
+    # 만료시 비밀번호 변경
     @swagger_auto_schema(request_body=ChangePasswordSerializer, 
                     operation_summary="비밀번호 인증 만료 시 변경", 
                     responses={200 : '성공', 400 : '인풋값 에러', 401 :'인증 에러', 404 : '찾을 수 없음', 500 : '서버 에러'})
@@ -409,6 +462,8 @@ class KakaoLoginView(APIView):
             try:
                 user = User.objects.get(email=kakao_email)
                 social_user = OauthId.objects.filter(user=user).first()
+                
+                # 소셜로그인 존재하면
                 if social_user:
                     if social_user.provider !="kakao":
                         return Response({"error":"카카오로 가입한 유저가 아닙니다."}, status=status.HTTP_400_BAD_REQUEST)
@@ -416,29 +471,42 @@ class KakaoLoginView(APIView):
                     user.withdraw = False
                     user.save()
                     
+                    # IP 국가코드 차단 확인 
                     user_ip= Util.get_client_ip(request)
-                    LoggedIn.objects.create(user=user, created_at=timezone.now(), update_ip=user_ip)
-                    profile = Profile.objects.get(user=user)
+                    country =  Util.find_ip_country(user_ip)
+                    if BlockedCountryIP.objects.filter(user=self.target_user, country=country).exists():
+                        return Response({"error":"해당 IP를 차단한 계정입니다."}, status=status.HTTP_400_BAD_REQUEST)
                     
+                    # 로그인 로그 저장
+                    LoggedIn.objects.create(user=user, created_at=timezone.now(), updated_ip=user_ip, country=country)
+                    
+                    review_cnt = Profile.objects.get(user=user).review_cnt
                     refresh = RefreshToken.for_user(user)
-                    return Response({'refresh': str(refresh), 'access':str(refresh.access_token), 'nickname':kakao_nickname, 'review_cnt':profile.review_cnt}, status=status.HTTP_200_OK)
+                    return Response({'refresh': str(refresh), 'access':str(refresh.access_token), 'nickname':kakao_nickname, 'review_cnt':review_cnt}, status=status.HTTP_200_OK)
                 
                 if social_user is None:
                     return Response({"error":"이메일이 존재하지만 , 소셜유저가 아닙니다"}, status=status.HTTP_400_BAD_REQUEST)
-                
+            
             except User.DoesNotExist:
+                # 유저 관련 생성
                 new_user = User.objects.create(username=kakao_nickname, email=kakao_email)
                 new_user.set_unusable_password()
                 new_user.save()
                 
                 profile = Profile.objects.create(nickname=kakao_nickname, user=new_user)
                 OauthId.objects.create(provider="kakao", access_token=access_token, user=new_user)
-
+                
                 util_image = Util.profile_image_download(kakao_profile_image)
                 profile.profile_image.save(util_image["file_name"], File(util_image["temp_image"]))
                 
+                # IP 국가코드 차단 확인
                 user_ip= Util.get_client_ip(request)
-                LoggedIn.objects.create(user=new_user, created_at=timezone.now(), update_ip=user_ip)
+                country =  Util.find_ip_country(user_ip)
+                if BlockedCountryIP.objects.filter(user=self.target_user, country=country).exists():
+                    return Response({"error":"해당 IP를 차단한 계정입니다."}, status=status.HTTP_400_BAD_REQUEST)
+                
+                # 로그인 로그 저장
+                LoggedIn.objects.create(user=user, created_at=timezone.now(), updated_ip=user_ip, country=country)
                 
                 refresh = RefreshToken.for_user(new_user)
                 return Response({'refresh': str(refresh), 'access': str(refresh.access_token), 'nickname':kakao_nickname, 'review_cnt':profile.review_cnt}, status=status.HTTP_200_OK)
