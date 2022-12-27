@@ -13,10 +13,6 @@ from notification import routing
 application = ProtocolTypeRouter(
     {
         "http": django_asgi_app,
-        "websocket" : AuthMiddlewareStack(
-            URLRouter(
-                routing.websocket_urlpatterns
-            )
-        )
+        "websocket": AuthMiddlewareStack(URLRouter(routing.websocket_urlpatterns)),
     }
 )

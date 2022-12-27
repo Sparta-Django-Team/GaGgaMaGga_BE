@@ -9,6 +9,7 @@ from .views import CHOICE_CATEGORY
 
 import random
 
+
 #### 장소 ####
 class PlaceSelectAPIViewTestCase(APITestCase):
     @classmethod
@@ -34,6 +35,7 @@ class PlaceSelectAPIViewTestCase(APITestCase):
         response = self.client.get(
             path=reverse("place_select_view", kwargs={'choice_no':category_no2}))
         self.assertEqual(response.status_code, 200)
+
 
 # 3/4. [비로그인] 장소 리스트 불러오기(place_list.html, index에서 음식/장소 선택 > 선호도 선택)
 class PlaceListNewUserAPIViewTestCase(APITestCase):
@@ -147,6 +149,7 @@ class PlaceListNewUserAPIViewTestCase(APITestCase):
             path=reverse("new_user_place_list_view", kwargs={'place_id':place_id, 'category':category}))
         self.assertEqual(response.status_code, 200)
 
+
 # 5/6. [로그인] 장소 리스트 불러오기(place_list.html, index에서 음식/장소 선택)
 class PlaceListUserAPIViewTestCase(APITestCase):
     @classmethod
@@ -227,9 +230,6 @@ class PlaceListUserAPIViewTestCase(APITestCase):
         self.assertEqual(response.status_code, 200)
 
 
-
-
-
 class PlaceDetailAPIViewTestCase(APITestCase):
     @classmethod
     def setUpTestData(cls):
@@ -292,6 +292,7 @@ class PlaceBookmarkAPIViewTestCase(APITestCase):
             path=reverse("place_bookmark_view", kwargs={'place_id':1}), 
             HTTP_AUTHORIZATION=f"Bearer {self.access_token}")
         self.assertEqual(response_cancel.status_code, 200)
+
 
 # 10. 장소 검색
 class PlaceSearchAPIViewTestCase(APITestCase):

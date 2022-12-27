@@ -5,6 +5,7 @@ from django.urls import reverse
 from users.models import User, Profile
 from .models import Notification
 
+
 # 로그인한 사용자가 읽지 않은 알람 불러오기
 class NotificationViewTest(APITestCase):
     @classmethod
@@ -29,6 +30,7 @@ class NotificationViewTest(APITestCase):
             HTTP_AUTHORIZATION=f"Bearer {self.access_token}"
             )
         self.assertEqual(response.status_code, 200)
+
 
 class NotificationDetailView(APITestCase):
     def setUp(self):

@@ -10,12 +10,14 @@ from .models import Review, Comment, Recomment, Report
 from PIL import Image
 import tempfile
 
+
 def get_temporary_image(temp_file):
     size = (200,200)
     color = (255, 0, 0, 0)
     image = Image.new("RGBA", size, color)
     image.save(temp_file, 'png')
     return temp_file
+
 
 #### 리뷰 ####
 # 전체 리뷰 조회
@@ -36,6 +38,7 @@ class ReviewRankAPIViewTest(APITestCase):
             path=reverse("reveiw_rank_view"),
             HTTP_AUTHORIZATION=f"Bearer {self.access_token}")
         self.assertEqual(response.status_code, 200)
+
 
 # 리뷰 조회/작성
 class ReviewAPIViewTest(APITestCase):
@@ -68,18 +71,19 @@ class ReviewAPIViewTest(APITestCase):
     # 이미지 포함 리뷰 작성 성공
     def test_create_review_with_image(self):
         # 첫번째 이미지
-        # 임시 이미지 파일 생성
         temp_file = tempfile.NamedTemporaryFile()
         temp_file.name = "image.png"
         image_file = get_temporary_image(temp_file)
         image_file.seek(0)  # 첫번째 프레임을 받아옴
         self.review_data["review_image_one"] = image_file
+        
         # 두번째 이미지
         temp_file = tempfile.NamedTemporaryFile()
         temp_file.name = "image.png"
         image_file = get_temporary_image(temp_file)
         image_file.seek(0)  
         self.review_data["review_image_two"] = image_file
+        
         # 세번째 이미지
         temp_file = tempfile.NamedTemporaryFile()
         temp_file.name = "image.png"
@@ -118,6 +122,7 @@ class ReviewAPIViewTest(APITestCase):
             HTTP_AUTHORIZATION=f"Bearer {self.access_token}",
             data= {'content':'some content', "rating_cnt": ""})
         self.assertEqual(response.status_code, 400)
+
 
 # 리뷰 수정/삭제/신고
 class ReviewDetailViewTest(APITestCase):
@@ -163,18 +168,19 @@ class ReviewDetailViewTest(APITestCase):
     # 이미지 포함 리뷰 수정 성공
     def test_edit_review_with_image(self):
         # 첫번째 이미지
-        # 임시 이미지 파일 생성
         temp_file = tempfile.NamedTemporaryFile()
         temp_file.name = "image.png"
         image_file = get_temporary_image(temp_file)
         image_file.seek(0)  # 첫번째 프레임을 받아옴
         self.edit_review_data["review_image_one"] = image_file
+        
         # 두번째 이미지
         temp_file = tempfile.NamedTemporaryFile()
         temp_file.name = "image.png"
         image_file = get_temporary_image(temp_file)
         image_file.seek(0)  
         self.edit_review_data["review_image_two"] = image_file
+        
         # 세번째 이미지
         temp_file = tempfile.NamedTemporaryFile()
         temp_file.name = "image.png"
@@ -292,6 +298,7 @@ class ReviewDetailViewTest(APITestCase):
             data={'content':'report content', "category": ''})
         self.assertEqual(response.status_code, 400)
 
+
 # 리뷰 좋아요
 class ReviewLikeAPIViewTest(APITestCase):
     @classmethod
@@ -320,6 +327,7 @@ class ReviewLikeAPIViewTest(APITestCase):
             path=reverse("review_like_view", kwargs={'review_id':1}),
             data=self.review_data)
         self.assertEqual(response.status_code, 401)
+
 
 #### 댓글 ####
 # 댓글 조회/작성
@@ -365,6 +373,7 @@ class CommentAPIViewTestCase(APITestCase):
                 HTTP_AUTHORIZATION=f"Bearer {self.access_token}",
                 data={'content':''})
         self.assertEqual(response.status_code, 400)
+
 
 # 댓글 수정/삭제
 class CommentDetailViewTest(APITestCase):
@@ -494,6 +503,7 @@ class CommentDetailViewTest(APITestCase):
             data={'content':'report content', "category": ''})
         self.assertEqual(response.status_code, 400)
 
+
 # 댓글 좋아요
 class CommentLikeAPIViewTest(APITestCase):
     @classmethod
@@ -524,6 +534,7 @@ class CommentLikeAPIViewTest(APITestCase):
             data=self.comment_data)
         self.assertEqual(response.status_code, 401)
 
+
 #### 대댓글 ####
 # 대댓글 조회/작성
 class RecommentAPIViewTestCase(APITestCase):
@@ -539,7 +550,6 @@ class RecommentAPIViewTestCase(APITestCase):
 
     def setUp(self):
         self.access_token = self.client.post(reverse('token_obtain_pair_view'), self.user_data).data['access']
-
 
     # 해당 댓글의 대댓글 조회 성공
     def test_recommnet_list_success(self):  
@@ -570,6 +580,7 @@ class RecommentAPIViewTestCase(APITestCase):
                 HTTP_AUTHORIZATION=f"Bearer {self.access_token}",
                 data={'content':''})
         self.assertEqual(response.status_code, 400)
+
 
 # 대댓글 수정/삭제
 class RecommentDetailViewTest(APITestCase):
@@ -698,6 +709,7 @@ class RecommentDetailViewTest(APITestCase):
             HTTP_AUTHORIZATION=f"Bearer {self.access_token_1}",
             data={'content':'report content', "category": ''})
         self.assertEqual(response.status_code, 400)
+
 
 # 대댓글 좋아요
 class RecommentLikeAPIViewTest(APITestCase):

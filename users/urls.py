@@ -1,4 +1,4 @@
-from rest_framework_simplejwt.views import TokenRefreshView
+from rest_framework_simplejwt.views import TokenRefreshView, TokenVerifyView
 
 from django.urls import path
 
@@ -9,6 +9,7 @@ urlpatterns = [
     path('', views.UserView.as_view(), name='user_view'),
     path('api/token/', views.CustomTokenObtainPairView.as_view(), name='token_obtain_pair_view'),
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh_view'),
+    path('api/token/verify/', TokenVerifyView.as_view(), name='token_verify'),
     path('logout/', views.LogoutView.as_view(), name='logout_view'),
     path('bulk-logout/', views.BulkLogoutView.as_view(), name='bulk_logout_view'),
     path("kakao/", views.KakaoLoginView.as_view(), name='kakao_login_view'),

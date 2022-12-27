@@ -2,16 +2,22 @@ from rest_framework import serializers
 
 from .models import Notification
 
-#알람 리스트 serializer
+
+# 알람 리스트 serializer
 class NotificationSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = Notification
-        fields = ('id', 'user', 'content', 'created_at', 'is_seen', )
+        fields = (
+            "id",
+            "user",
+            "content",
+            "created_at",
+            "is_seen",
+        )
 
-#알람 상세페이지 serializer
+
+# 알람 상세페이지 serializer
 class NotificationDetailSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = Notification
-        fields = ('is_seen',)
+        fields = ("is_seen",)

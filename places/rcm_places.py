@@ -9,14 +9,15 @@ import django
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(BASE_DIR)
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'gaggamagga.settings')
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "gaggamagga.settings")
 django.setup()
+
 
 # 유사한 유저 정보 조회 및 추천(기존 사용이력이 없는 사용자)
 def rcm_place_new_user(review_user, place_id):
 
     # 유저 데이터 데이터 프레임 생성
-    new_idx = int(review_user.iloc[len(review_user)-1].name)+1
+    new_idx = int(review_user.iloc[len(review_user) - 1].name) + 1
     review_user.loc[new_idx] = np.nan
     review_user.loc[new_idx, place_id] = 5
     review_user = review_user.fillna(0)

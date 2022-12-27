@@ -7,10 +7,11 @@ from django.utils.encoding import smart_bytes
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from django.test.client import MULTIPART_CONTENT, encode_multipart, BOUNDARY
 
-from .models import User, ConfirmPhoneNumber, Profile, BlockedCountryIP
-
 from PIL import Image
 import tempfile
+
+from .models import User, ConfirmPhoneNumber, Profile, BlockedCountryIP
+
 
 def get_temporary_image(temp_file):
     size = (200,200)
@@ -18,6 +19,7 @@ def get_temporary_image(temp_file):
     image = Image.new("RGBA", size, color)
     image.save(temp_file, 'png')
     return temp_file
+
 
 class UserSignupAPIViewTestCase(APITestCase):
     
@@ -220,6 +222,7 @@ class UserSignupAPIViewTestCase(APITestCase):
         response = self.client.post(url, user_data)
         self.assertEqual(response.status_code, 400)
 
+
 class UserUpdateAPIViewTestCase(APITestCase):
     def setUp(self):
         self.data = {"username": "test1234", "password":"Test1234!"}
@@ -277,7 +280,8 @@ class UserUpdateAPIViewTestCase(APITestCase):
             data={"email":"test2@test.com","phone_number":"01012351234"}
         )
         self.assertEqual(response.status_code, 400)
-    
+
+
 class UserDeleteAPIViewTestCase(APITestCase):
     def setUp(self):
         self.data = {"username": "test1234", "password":"Test1234!"}
@@ -383,6 +387,42 @@ class UserLoginLogoutAPIViewTestCase(APITestCase):
             data={"refresh":access_token}
         )
         self.assertEqual(response.status_code, 400)
+    
+    # access_token 유효한지
+    def test_access_token_verify_success(self):
+        access_token = self.client.post(reverse('token_obtain_pair_view'), self.success_data).data['access']
+        response = self.client.post(
+            path=reverse("token_verify"),
+            HTTP_AUTHORIZATION=f"Bearer {access_token}",
+            data={"token":access_token}
+        )
+        print(response.data)
+        self.assertEqual(response.status_code, 200)
+        
+    # refresh_token 유효
+    def test_refresh_token_verify_success(self):
+        token = self.client.post(reverse('token_obtain_pair_view'), self.success_data)
+        access_token = token.data['access']
+        refresh_token = token.data['refresh']
+        response = self.client.post(
+            path=reverse("token_verify"),
+            HTTP_AUTHORIZATION=f"Bearer {access_token}",
+            data={"token":refresh_token}
+        )
+        print(response.data)
+        self.assertEqual(response.status_code, 200)
+        
+    # token 유효하지 않음
+    def test_token_verify_fail(self):
+        access_token = self.client.post(reverse('token_obtain_pair_view'), self.success_data).data['access']
+        response = self.client.post(
+            path=reverse("token_verify"),
+            HTTP_AUTHORIZATION=f"Bearer {access_token}",
+            data={"token": f"{access_token}123"}
+        )
+        print(response.data)
+        self.assertEqual(response.status_code, 401)
+    
         
     # 일괄 로그아웃 성공
     def test_bulk_logout_success(self):
@@ -392,6 +432,7 @@ class UserLoginLogoutAPIViewTestCase(APITestCase):
             HTTP_AUTHORIZATION=f"Bearer {access_token}",
         )
         self.assertEqual(response.status_code, 200)
+
 
 class UserConfirmEmailAPIViewTest(APITestCase):
     def setUp(self):
@@ -433,7 +474,8 @@ class UserResendEmailAPIViewTest(APITestCase):
             path=reverse("resend_email_view"),
         )
         self.assertEqual(response.status_code, 401)
-        
+
+
 class SendPhoneNumberAPIViewTest(APITestCase):
     def setUp(self):
         User.objects.create_user("test1234","test@test.com", "01012341234","Test1234!")
@@ -453,6 +495,7 @@ class SendPhoneNumberAPIViewTest(APITestCase):
             data={"phone_number":"01012341235"}
         )
         self.assertEqual(response.status_code, 400)
+
 
 class UserConfirmPhoneNumberAPIViewTest(APITestCase):
     def setUp(self):
@@ -476,6 +519,7 @@ class UserConfirmPhoneNumberAPIViewTest(APITestCase):
                 "auth_number":1234}
         )
         self.assertEqual(response.status_code, 400)
+
 
 class PrivateProfileAPIViewTestCase(APITestCase):
     def setUp(self):
@@ -530,6 +574,7 @@ class PrivateProfileAPIViewTestCase(APITestCase):
         )
         self.assertEqual(response.status_code, 400)
 
+
 class PublicProfileAPIViewTestCase(APITestCase):
     def setUp(self):
         self.data = {"username": "test1234", "password":"Test1234!"}
@@ -547,6 +592,7 @@ class PublicProfileAPIViewTestCase(APITestCase):
             HTTP_AUTHORIZATION=f"Bearer {access_token}",
         )
         self.assertEqual(response.status_code, 200)
+
 
 class CountyIPBlockAPIViewTestCase(APITestCase):
     def setUp(self):
@@ -603,6 +649,7 @@ class CountyIPBlockAPIViewTestCase(APITestCase):
             HTTP_AUTHORIZATION=f"Bearer {access_token}",
         )
         self.assertEqual(response.status_code, 200)
+
 
 class LoginLogListAPIViewTestCase(APITestCase):
     def setUp(self):
@@ -716,6 +763,7 @@ class ChangePasswordAPIViewTestCase(APITestCase):
         )
         self.assertEqual(response.status_code, 400)
 
+
 class PasswordResetAPIViewTestCase(APITestCase):
     def setUp(self):
         User.objects.create_user("test12341","test1@test.com", "01012351234","Test1234!")
@@ -752,6 +800,7 @@ class PasswordResetAPIViewTestCase(APITestCase):
         )
         self.assertEqual(response.status_code, 400)
 
+
 class PasswordTokenCheckAPIViewTestCase(APITestCase):
     def setUp(self):
         self.user = User.objects.create_user("test12341","test1@test.com", "01012351234","Test1234!")
@@ -771,6 +820,7 @@ class PasswordTokenCheckAPIViewTestCase(APITestCase):
             path=reverse("password_reset_confirm_view", kwargs={'uidb64':"11", 'token':"11"})
         )
         self.assertEqual(response.status_code, 401)
+
 
 class SetPasswordAPIViewTestCase(APITestCase):
     def setUp(self):
@@ -833,6 +883,7 @@ class SetPasswordAPIViewTestCase(APITestCase):
             data={"password":"Test1234!!", "repassword":"Test1234!!", "uidb64":self.uidb64, "token": "1234"} 
         )
         self.assertEqual(response.status_code, 401)
+
 
 class ExpiredPasswordChageAPIView(APITestCase):
     def setUp(self):
@@ -941,6 +992,7 @@ class ExpiredPasswordChageAPIView(APITestCase):
             data={"password":"Test1234!!", "repassword":"Test1234!", "confirm_password":"Test1234"} 
         )
         self.assertEqual(response.status_code, 400)
+
 
 class FollowAPIViewTestCase(APITestCase):
     def setUp(self):
