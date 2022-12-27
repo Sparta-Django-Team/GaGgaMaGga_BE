@@ -99,6 +99,7 @@ class CustomTokenObtainPairView(TokenViewBase):
         serializer = self.get_serializer(data=request.data, context={'request': request})
         try:
             serializer.is_valid(raise_exception=True)
+            
             # 로그인 로그 저장
             user_ip= Util.get_client_ip(request)
             country =  Util.find_ip_country(user_ip)
@@ -440,7 +441,7 @@ class KakaoLoginView(APIView):
                 data={
                     "grant_type": "authorization_code",
                     "client_id": get_secret("SOCIAL_AUTH_KAKAO_CLIENT_ID"),
-                    "redirect_uri": "https://www.gaggamagga.shop/index.html",
+                    "redirect_uri": "http://127.0.0.1:5500/index.html",
                     "code": code,
                 },
             )
@@ -474,9 +475,9 @@ class KakaoLoginView(APIView):
                     # IP 국가코드 차단 확인 
                     user_ip= Util.get_client_ip(request)
                     country =  Util.find_ip_country(user_ip)
-                    if BlockedCountryIP.objects.filter(user=self.target_user, country=country).exists():
+                    if BlockedCountryIP.objects.filter(user=user, country=country).exists():
                         return Response({"error":"해당 IP를 차단한 계정입니다."}, status=status.HTTP_400_BAD_REQUEST)
-                    
+
                     # 로그인 로그 저장
                     LoggedIn.objects.create(user=user, created_at=timezone.now(), updated_ip=user_ip, country=country)
                     
@@ -502,11 +503,11 @@ class KakaoLoginView(APIView):
                 # IP 국가코드 차단 확인
                 user_ip= Util.get_client_ip(request)
                 country =  Util.find_ip_country(user_ip)
-                if BlockedCountryIP.objects.filter(user=self.target_user, country=country).exists():
+                if BlockedCountryIP.objects.filter(user=new_user, country=country).exists():
                     return Response({"error":"해당 IP를 차단한 계정입니다."}, status=status.HTTP_400_BAD_REQUEST)
-                
+
                 # 로그인 로그 저장
-                LoggedIn.objects.create(user=user, created_at=timezone.now(), updated_ip=user_ip, country=country)
+                LoggedIn.objects.create(user=new_user, created_at=timezone.now(), updated_ip=user_ip, country=country)
                 
                 refresh = RefreshToken.for_user(new_user)
                 return Response({'refresh': str(refresh), 'access': str(refresh.access_token), 'nickname':kakao_nickname, 'review_cnt':profile.review_cnt}, status=status.HTTP_200_OK)
