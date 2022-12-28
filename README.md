@@ -441,5 +441,5 @@
 
 ## 🔗 ****Link**** 
 ### [Front-end Repository](https://github.com/1TEAM12/GaGgaMaGga_FE)
-### [Notion 현황판](https://www.notion.so/11-30-12-29-482dc47b71d44e968cf32283bb422238)
+### [Notion 현황판 & 트러블 슈팅](https://liberating-engineer-32d.notion.site/11-30-12-29-482dc47b71d44e968cf32283bb422238)
 ### [배포 사이트](http://gaggamagga.shop/)
