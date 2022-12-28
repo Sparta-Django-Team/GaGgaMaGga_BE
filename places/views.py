@@ -110,7 +110,7 @@ class PlaceSelectView(APIView):
                 else:               # pick이 선택되지 않았을 경우
                     pass
 
-            # for문에서 생성된 리스트에 해당하는 데이터 생성 후 Front-end 전달
+            # for문에서 생성된 리스트에 해당하는 데이터 생성 후 json 전달
             preserved = Case(*[When(pk=pk, then=pos) for pos, pk in enumerate(place_list)])
             place = Place.objects.filter(id__in=place_list).order_by(preserved)
             serializer = PlaceSerializer(place, many=True)
@@ -128,7 +128,7 @@ class PlaceSelectView(APIView):
                 pick2 = Place.objects.filter(category=CHOICE_CATEGORY[choice_no - 2])[load_no - 1 : load_no + 2]
                 pick3 = Place.objects.filter(category=CHOICE_CATEGORY[choice_no - 3])[load_no - 1 : load_no + 2]
 
-                # 호출한 맛집 리스트 병합 후 Front-end 전달
+                # 호출한 맛집 리스트 병합 후 json 전달
                 pick = pick1 | pick2 | pick3
                 serializer = PlaceSerializer(pick, many=True)
                 return Response(serializer.data, status=status.HTTP_200_OK)
@@ -137,7 +137,7 @@ class PlaceSelectView(APIView):
             else:
                 place_list = []
 
-                # 카테고리에 해당하는 맛집 9개 호출 후 Front-end 전달
+                # 카테고리에 해당하는 맛집 9개 호출 후 json 전달
                 pick = Place.objects.filter(category=CHOICE_CATEGORY[choice_no - 1])[0:9]
                 serializer = PlaceSerializer(pick, many=True)
                 return Response(serializer.data, status=status.HTTP_200_OK)
@@ -202,7 +202,7 @@ class NewUserPlaceListView(PaginationHandlerMixin, APIView):
         preserved = Case(*[When(pk=pk, then=pos) for pos, pk in enumerate(place_list)])
         place = Place.objects.filter(id__in=place_list).order_by(preserved)
 
-        # 페이지네이션으로 구분하여 Front-end 전달
+        # 페이지네이션으로 구분하여 json 전달
         page = self.paginate_queryset(place)
         serializer = self.get_paginated_response(PlaceSerializer(page, many=True).data)
         return Response(serializer.data, status=status.HTTP_200_OK)
@@ -273,7 +273,7 @@ class UserPlaceListView(PaginationHandlerMixin, APIView):
         preserved = Case(*[When(pk=pk, then=pos) for pos, pk in enumerate(place_list)])
         place = Place.objects.filter(id__in=place_list).order_by(preserved)
 
-        # 페이지네이션으로 구분하여 Front-end 전달
+        # 페이지네이션으로 구분하여 json 전달
         page = self.paginate_queryset(place)
         serializer = self.get_paginated_response(PlaceSerializer(page, many=True).data)
         return Response(serializer.data, status=status.HTTP_200_OK)
