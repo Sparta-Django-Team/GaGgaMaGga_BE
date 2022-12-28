@@ -18,7 +18,7 @@ class PlaceSelectAPIViewTestCase(APITestCase):
             j = round(i / 2)
             cls.place = Place.objects.create(
                 place_name=f"장소{i}",
-                category=CHOICE_CATEGORY[j][1],
+                category=CHOICE_CATEGORY[j],
                 rating=random.randint(1, 5),
                 place_address=random.choice(["제주시", "서귀포시"]),
                 place_time="영업시간",
@@ -61,7 +61,7 @@ class PlaceListNewUserAPIViewTestCase(APITestCase):
             j = round(i / 2)
             cls.place = Place.objects.create(
                 place_name=f"장소{i}",
-                category=CHOICE_CATEGORY[j][1],
+                category=CHOICE_CATEGORY[j],
                 rating=random.randint(1, 5),
                 place_address=random.choice(["제주시", "서귀포시"]),
                 place_time="영업시간",
@@ -82,7 +82,7 @@ class PlaceListNewUserAPIViewTestCase(APITestCase):
     # 음식 선택(1~12)
     def test_place_list_1(self):  # 분식
         place_id = 1
-        category = CHOICE_CATEGORY[0][1]
+        category = CHOICE_CATEGORY[0]
         response = self.client.get(
             path=reverse(
                 "new_user_place_list_view",
@@ -93,7 +93,7 @@ class PlaceListNewUserAPIViewTestCase(APITestCase):
 
     def test_place_list_2(self):  # 한식
         place_id = 2
-        category = CHOICE_CATEGORY[1][1]
+        category = CHOICE_CATEGORY[1]
         response = self.client.get(
             path=reverse(
                 "new_user_place_list_view",
@@ -104,7 +104,7 @@ class PlaceListNewUserAPIViewTestCase(APITestCase):
 
     def test_place_list_3(self):  # 돼지고기구이
         place_id = 3
-        category = CHOICE_CATEGORY[2][1]
+        category = CHOICE_CATEGORY[2]
         response = self.client.get(
             path=reverse(
                 "new_user_place_list_view",
@@ -115,7 +115,7 @@ class PlaceListNewUserAPIViewTestCase(APITestCase):
 
     def test_place_list_4(self):  # 치킨,닭강정
         place_id = 4
-        category = CHOICE_CATEGORY[3][1]
+        category = CHOICE_CATEGORY[3]
         response = self.client.get(
             path=reverse(
                 "new_user_place_list_view",
@@ -126,7 +126,7 @@ class PlaceListNewUserAPIViewTestCase(APITestCase):
 
     def test_place_list_5(self):  # 햄버거
         place_id = 5
-        category = CHOICE_CATEGORY[4][1]
+        category = CHOICE_CATEGORY[4]
         response = self.client.get(
             path=reverse(
                 "new_user_place_list_view",
@@ -137,7 +137,7 @@ class PlaceListNewUserAPIViewTestCase(APITestCase):
 
     def test_place_list_6(self):  # 피자
         place_id = 6
-        category = CHOICE_CATEGORY[5][1]
+        category = CHOICE_CATEGORY[5]
         response = self.client.get(
             path=reverse(
                 "new_user_place_list_view",
@@ -148,7 +148,7 @@ class PlaceListNewUserAPIViewTestCase(APITestCase):
 
     def test_place_list_7(self):  # 중식
         place_id = 7
-        category = CHOICE_CATEGORY[6][1]
+        category = CHOICE_CATEGORY[6]
         response = self.client.get(
             path=reverse(
                 "new_user_place_list_view",
@@ -159,7 +159,7 @@ class PlaceListNewUserAPIViewTestCase(APITestCase):
 
     def test_place_list_8(self):  # 일식
         place_id = 8
-        category = CHOICE_CATEGORY[7][1]
+        category = CHOICE_CATEGORY[7]
         response = self.client.get(
             path=reverse(
                 "new_user_place_list_view",
@@ -170,7 +170,7 @@ class PlaceListNewUserAPIViewTestCase(APITestCase):
 
     def test_place_list_9(self):  # 양식
         place_id = 9
-        category = CHOICE_CATEGORY[8][1]
+        category = CHOICE_CATEGORY[8]
         response = self.client.get(
             path=reverse(
                 "new_user_place_list_view",
@@ -181,7 +181,7 @@ class PlaceListNewUserAPIViewTestCase(APITestCase):
 
     def test_place_list_10(self):  # 태국음식
         place_id = 10
-        category = CHOICE_CATEGORY[9][1]
+        category = CHOICE_CATEGORY[9]
         response = self.client.get(
             path=reverse(
                 "new_user_place_list_view",
@@ -192,7 +192,7 @@ class PlaceListNewUserAPIViewTestCase(APITestCase):
 
     def test_place_list_11(self):  # 인도음식
         place_id = 11
-        category = CHOICE_CATEGORY[10][1]
+        category = CHOICE_CATEGORY[10]
         response = self.client.get(
             path=reverse(
                 "new_user_place_list_view",
@@ -203,7 +203,7 @@ class PlaceListNewUserAPIViewTestCase(APITestCase):
 
     def test_place_list_12(self):  # 베트남음식
         place_id = 12
-        category = CHOICE_CATEGORY[11][1]
+        category = CHOICE_CATEGORY[11]
         response = self.client.get(
             path=reverse(
                 "new_user_place_list_view",
@@ -215,7 +215,7 @@ class PlaceListNewUserAPIViewTestCase(APITestCase):
     # 장소 선택(13~14)
     def test_place_list_13(self):  # 제주시
         place_id = 13
-        category = CHOICE_CATEGORY[12][1]
+        category = CHOICE_CATEGORY[12]
         response = self.client.get(
             path=reverse(
                 "new_user_place_list_view",
@@ -226,7 +226,7 @@ class PlaceListNewUserAPIViewTestCase(APITestCase):
 
     def test_place_list_14(self):  # 서귀포시
         place_id = 14
-        category = CHOICE_CATEGORY[13][1]
+        category = CHOICE_CATEGORY[13]
         response = self.client.get(
             path=reverse(
                 "new_user_place_list_view",
@@ -244,7 +244,7 @@ class PlaceListUserAPIViewTestCase(APITestCase):
             j = round(i / 2)
             cls.place = Place.objects.create(
                 place_name=f"장소{i}",
-                category=CHOICE_CATEGORY[j][1],
+                category=CHOICE_CATEGORY[j],
                 rating=random.randint(1, 5),
                 place_address=random.choice(["제주시", "서귀포시"]),
                 place_time="영업시간",
