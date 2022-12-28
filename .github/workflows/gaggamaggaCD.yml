@@ -25,5 +25,4 @@ jobs:
             cd ${{ secrets.EC2_PATH }}
             git pull origin main
             cd ../../
-            sudo docker compose stop backend
             sudo docker compose restart backend
