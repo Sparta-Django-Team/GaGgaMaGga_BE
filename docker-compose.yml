@@ -10,16 +10,14 @@ services:
     volumes:
       - postgres:/var/lib/postgresql/data/
     environment:
-      - POSTGRES_USER=user
-      - POSTGRES_PASSWORD=P@ssw0rd
-      - POSTGRES_DB=django
+      - POSTGRES_USER
+      - POSTGRES_PASSWORD
+      - POSTGRES_DB
     restart: always
 
   redis:
-    restart: always
     image: redis:alpine
-    ports:
-      - 6379:6379
+    restart: always
 
   backend:
     container_name: backend
@@ -31,38 +29,33 @@ services:
       - django_media:/app/media/
       - django_static:/app/static/
     environment:
-      - DEBUG=1
-      - POSTGRES_DB=django
-      - POSTGRES_USER=user
-      - POSTGRES_PASSWORD=P@ssw0rd
-      - POSTGRES_HOST=postgres
-      - POSTGRES_PORT=5432
+      - DEBUG
+      - POSTGRES_DB
+      - POSTGRES_USER
+      - POSTGRES_PASSWORD
+      - POSTGRES_HOST
+      - POSTGRES_PORT
     depends_on:
       - postgres
     restart: always
-
+    
   channels:
     container_name: channels
     build: ./backend/
-    command: uvicorn gaggamagga.asgi:application --host 0.0.0.0 --port 8001 --reload --ws websockets
+    command: daphne -b 0.0.0.0 -p 8001 gaggamagga.asgi:application
     volumes:
       - ./backend/django/:/app/
     environment:
       - DEBUG=1
-      - POSTGRES_DB=django
-      - POSTGRES_USER=user
-      - POSTGRES_PASSWORD=P@ssw0rd
-      - POSTGRES_HOST=postgres
-      - POSTGRES_PORT=5432
+      - POSTGRES_DB
+      - POSTGRES_USER
+      - POSTGRES_PASSWORD
+      - POSTGRES_HOST
+      - POSTGRES_PORT
     depends_on:
       - backend
       - postgres
     restart: always
-    hostname: channels
-    links:
-      - redis
-    ports:
-      - 8001:8001
 
   nginx:
     container_name : nginx
