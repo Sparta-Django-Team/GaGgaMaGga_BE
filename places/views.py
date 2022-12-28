@@ -21,7 +21,7 @@ import random
 import pandas as pd
 import numpy as np
 
-CHOICE_ONE = [
+CHOICE_CATEGORY = [
     "분식",
     "한식",
     "돼지고기구이",
@@ -38,27 +38,10 @@ CHOICE_ONE = [
     "서귀포시",
 ]
 
-CHOICE_CATEGORY = (
-    ("1", "분식"),
-    ("2", "한식"),
-    ("3", "돼지고기구이"),
-    ("4", "치킨,닭강정"),
-    ("5", "햄버거"),
-    ("6", "피자"),
-    ("7", "중식"),
-    ("8", "일식"),
-    ("9", "양식"),
-    ("10", "태국음식"),
-    ("11", "인도음식"),
-    ("12", "베트남음식"),
-    ("13", "제주시"),
-    ("14", "서귀포시"),
-)
 
 
 class PlaceListPagination(PageNumberPagination):
     page_size = 10
-
 
 ##### 맛집 #####
 class PlaceDetailView(APIView):
@@ -85,7 +68,6 @@ class PlaceDetailView(APIView):
         place.delete()
         return Response({"message": "맛집 삭제 완료"}, status=status.HTTP_200_OK)
 
-
 class PlaceBookmarkView(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -103,7 +85,6 @@ class PlaceBookmarkView(APIView):
             place.place_bookmark.add(request.user)
             return Response({"message": "북마크를 했습니다."}, status=status.HTTP_200_OK)
 
-
 ##### 취향 선택 #####
 class PlaceSelectView(APIView):
     permission_classes = [AllowAny]
@@ -119,7 +100,7 @@ class PlaceSelectView(APIView):
         if choice_no > 12:
             place_list = []
             for i in range(0, 12):
-                pick = Place.objects.filter(place_address__contains=CHOICE_CATEGORY[choice_no - 1][1],category=CHOICE_CATEGORY[i][1],).first()
+                pick = Place.objects.filter(place_address__contains=CHOICE_CATEGORY[choice_no - 1],category=CHOICE_CATEGORY[i]).first()
                 if pick == None:
                     pass
                 else:
@@ -136,15 +117,15 @@ class PlaceSelectView(APIView):
             if (choice_no == 3) | (choice_no == 6) | (choice_no == 12):
                 # Merge queryset for 3categories
                 place_list = []
-                pick1 = Place.objects.filter(category=CHOICE_CATEGORY[choice_no - 1][1])[load_no - 1 : load_no + 2]
-                pick2 = Place.objects.filter(category=CHOICE_CATEGORY[choice_no - 2][1])[load_no - 1 : load_no + 2]
-                pick3 = Place.objects.filter(category=CHOICE_CATEGORY[choice_no - 3][1])[load_no - 1 : load_no + 2]
+                pick1 = Place.objects.filter(category=CHOICE_CATEGORY[choice_no - 1])[load_no - 1 : load_no + 2]
+                pick2 = Place.objects.filter(category=CHOICE_CATEGORY[choice_no - 2])[load_no - 1 : load_no + 2]
+                pick3 = Place.objects.filter(category=CHOICE_CATEGORY[choice_no - 3])[load_no - 1 : load_no + 2]
                 pick = pick1 | pick2 | pick3
                 serializer = PlaceSerializer(pick, many=True)
                 return Response(serializer.data, status=status.HTTP_200_OK)
             else:
                 place_list = []
-                pick = Place.objects.filter(category=CHOICE_CATEGORY[choice_no - 1][1])[0:9]
+                pick = Place.objects.filter(category=CHOICE_CATEGORY[choice_no - 1])[0:9]
                 serializer = PlaceSerializer(pick, many=True)
                 return Response(serializer.data, status=status.HTTP_200_OK)
 
@@ -160,22 +141,22 @@ class NewUserPlaceListView(PaginationHandlerMixin, APIView):
     )
     def get(self, request, place_id, category):
         places = pd.DataFrame(list(Place.objects.values()))
-        cate_id = CHOICE_ONE.index(category) + 1
+        cate_id = CHOICE_CATEGORY.index(category) + 1
         if cate_id <= 12:  # Case1: choice food group
             if (cate_id == 3) | (cate_id == 6) | (cate_id == 12):
-                category1 = CHOICE_CATEGORY[cate_id - 1][1]
-                category2 = CHOICE_CATEGORY[cate_id - 2][1]
-                category3 = CHOICE_CATEGORY[cate_id - 3][1]
+                category1 = CHOICE_CATEGORY[cate_id - 1]
+                category2 = CHOICE_CATEGORY[cate_id - 2]
+                category3 = CHOICE_CATEGORY[cate_id - 3]
                 place1 = places[places["category"].str.contains(category1)]
                 place2 = places[places["category"].str.contains(category2)]
                 place3 = places[places["category"].str.contains(category3)]
                 place_list = [place1, place2, place3]
                 places = pd.concat(place_list, ignore_index=True)
             else:
-                cate = CHOICE_CATEGORY[cate_id - 1][1]
+                cate = CHOICE_CATEGORY[cate_id - 1]
                 places = places[places["category"].str.contains(cate)]
         else:  # Case2: choice place location
-            cate = CHOICE_CATEGORY[cate_id - 1][1]
+            cate = CHOICE_CATEGORY[cate_id - 1]
             places = places[places["place_address"].str.contains(cate)]
 
         # Create dataframe
@@ -206,19 +187,19 @@ class UserPlaceListView(PaginationHandlerMixin, APIView):
         places = pd.DataFrame(list(Place.objects.values()))
         if cate_id <= 12:  # Case1: choice food group
             if (cate_id == 3) | (cate_id == 6) | (cate_id == 12):
-                category1 = CHOICE_CATEGORY[cate_id - 1][1]
-                category2 = CHOICE_CATEGORY[cate_id - 2][1]
-                category3 = CHOICE_CATEGORY[cate_id - 3][1]
+                category1 = CHOICE_CATEGORY[cate_id - 1]
+                category2 = CHOICE_CATEGORY[cate_id - 2]
+                category3 = CHOICE_CATEGORY[cate_id - 3]
                 place1 = places[places["category"].str.contains(category1)]
                 place2 = places[places["category"].str.contains(category2)]
                 place3 = places[places["category"].str.contains(category3)]
                 place_list = [place1, place2, place3]
                 places = pd.concat(place_list, ignore_index=True)
             else:
-                category = CHOICE_CATEGORY[cate_id - 1][1]
+                category = CHOICE_CATEGORY[cate_id - 1]
                 places = places[places["category"].str.contains(category)]
         else:  # Case2: choice place location
-            category = CHOICE_CATEGORY[cate_id - 1][1]
+            category = CHOICE_CATEGORY[cate_id - 1]
             places = places[places["place_address"].str.contains(category)]
 
         # Create dataframe
@@ -238,7 +219,6 @@ class UserPlaceListView(PaginationHandlerMixin, APIView):
         page = self.paginate_queryset(place)
         serializer = self.get_paginated_response(PlaceSerializer(page, many=True).data)
         return Response(serializer.data, status=status.HTTP_200_OK)
-
 
 ##### 검색 #####
 class SearchListView(APIView):
