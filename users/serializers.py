@@ -83,9 +83,7 @@ class SignupSerializer(serializers.ModelSerializer):
 
         # 아이디 유효성 검사
         if username_validator(username):
-            raise serializers.ValidationError(
-                detail={"username": "아이디는 6자 이상 20자 이하의 숫자, 영문 대/소문자 이어야 합니다."}
-            )
+            raise serializers.ValidationError(detail={"username": "아이디는 6자 이상 20자 이하의 숫자, 영문 대/소문자 이어야 합니다."})
 
         # 비밀번호 일치
         if password != repassword:
@@ -93,24 +91,15 @@ class SignupSerializer(serializers.ModelSerializer):
 
         # 비밀번호 유효성 검사
         if password_validator(password):
-            raise serializers.ValidationError(
-                detail={"password": "비밀번호는 8자 이상 16자이하의 영문 대/소문자, 숫자, 특수문자 조합이어야 합니다. "}
-            )
+            raise serializers.ValidationError(detail={"password": "비밀번호는 8자 이상 16자이하의 영문 대/소문자, 숫자, 특수문자 조합이어야 합니다. "})
 
         # 비밀번호 동일여부 검사
         if password_pattern(password):
-            raise serializers.ValidationError(
-                detail={"password": "비밀번호는 3자리 이상 동일한 영문,숫자,특수문자 사용 불가합니다. "}
-            )
+            raise serializers.ValidationError(detail={"password": "비밀번호는 3자리 이상 동일한 영문,숫자,특수문자 사용 불가합니다. "})
 
         # 휴대폰 번호 존재여부와 blank 허용
-        if (
-            User.objects.filter(phone_number=phone_number).exists()
-            and not phone_number == ""
-        ):
-            raise serializers.ValidationError(
-                detail={"phone_number": "이미 사용중인 휴대폰 번호 이거나 탈퇴한 휴대폰 번호입니다."}
-            )
+        if (User.objects.filter(phone_number=phone_number).exists() and not phone_number == ""):
+            raise serializers.ValidationError(detail={"phone_number": "이미 사용중인 휴대폰 번호 이거나 탈퇴한 휴대폰 번호입니다."})
 
         # 이용약관 확인 검사
         if term_check == False:
@@ -160,27 +149,17 @@ class UserUpdateSerializer(serializers.ModelSerializer):
 
     def validate(self, data):
         phone_number = data.get("phone_number")
-
         current_phone_number = self.context.get("request").user.phone_number
 
         # 휴대폰 번호 존재여부와 blank 허용
-        if (
-            User.objects.filter(phone_number=phone_number)
-            .exclude(phone_number=current_phone_number)
-            .exists()
-            and not phone_number == ""
-        ):
-            raise serializers.ValidationError(
-                detail={"phone_number": "이미 사용중인 휴대폰 번호 이거나 탈퇴한 휴대폰 번호입니다."}
-            )
+        if (User.objects.filter(phone_number=phone_number).exclude(phone_number=current_phone_number).exists() and not phone_number == ""):
+            raise serializers.ValidationError(detail={"phone_number": "이미 사용중인 휴대폰 번호 이거나 탈퇴한 휴대폰 번호입니다."})
 
         return data
 
     def update(self, instance, validated_data):
         instance.email = validated_data.get("email", instance.email)
-        instance.phone_number = validated_data.get(
-            "phone_number", instance.phone_number
-        )
+        instance.phone_number = validated_data.get("phone_number", instance.phone_number)
         instance.save()
 
         return instance
@@ -290,17 +269,13 @@ class ProfileUpdateSerializer(serializers.ModelSerializer):
 
         # 닉네임 유효성 검사
         if nickname_validator(nickname):
-            raise serializers.ValidationError(
-                detail={"nickname": "닉네임은 3자이상 10자 이하로 작성해야하며 특수문자는 포함할 수 없습니다."}
-            )
+            raise serializers.ValidationError(detail={"nickname": "닉네임은 3자이상 10자 이하로 작성해야하며 특수문자는 포함할 수 없습니다."})
 
         return data
 
     def update(self, instance, validated_data):
         instance.nickname = validated_data.get("nickname", instance.nickname)
-        instance.profile_image = validated_data.get(
-            "profile_image", instance.profile_image
-        )
+        instance.profile_image = validated_data.get("profile_image", instance.profile_image)
         instance.intro = validated_data.get("intro", instance.intro)
         instance.save()
 
@@ -385,15 +360,11 @@ class ChangePasswordSerializer(serializers.ModelSerializer):
 
         # 현재 비밀번호 예외 처리
         if not check_password(confirm_password, current_password):
-            raise serializers.ValidationError(
-                detail={"password": "현재 비밀번호가 일치하지 않습니다."}
-            )
+            raise serializers.ValidationError(detail={"password": "현재 비밀번호가 일치하지 않습니다."})
 
         # 현재 비밀번호와 바꿀 비밀번호 비교
         if check_password(password, current_password):
-            raise serializers.ValidationError(
-                detail={"password": "현재 사용중인 비밀번호와 동일한 비밀번호는 입력할 수 없습니다."}
-            )
+            raise serializers.ValidationError(detail={"password": "현재 사용중인 비밀번호와 동일한 비밀번호는 입력할 수 없습니다."})
 
         # 비밀번호 일치
         if password != repassword:
@@ -401,15 +372,11 @@ class ChangePasswordSerializer(serializers.ModelSerializer):
 
         # 비밀번호 유효성 검사
         if password_validator(password):
-            raise serializers.ValidationError(
-                detail={"password": "비밀번호는 8자 이상 16자이하의 영문 대/소문자, 숫자, 특수문자 조합이어야 합니다. "}
-            )
+            raise serializers.ValidationError(detail={"password": "비밀번호는 8자 이상 16자이하의 영문 대/소문자, 숫자, 특수문자 조합이어야 합니다. "})
 
         # 비밀번호 문자열 동일여부 검사
         if password_pattern(password):
-            raise serializers.ValidationError(
-                detail={"password": "비밀번호는 3자리 이상 동일한 영문/사용 사용 불가합니다. "}
-            )
+            raise serializers.ValidationError(detail={"password": "비밀번호는 3자리 이상 동일한 영문/사용 사용 불가합니다. "})
 
         return data
 
@@ -440,12 +407,11 @@ class PasswordResetSerializer(serializers.Serializer):
         if User.objects.filter(email=email).exists():
             user = User.objects.get(email=email)
             uidb64 = urlsafe_base64_encode(smart_bytes(user.id))
-            token = PasswordResetTokenGenerator().make_token(user)  # 토큰 생성
+            token = PasswordResetTokenGenerator().make_token(user)  
 
             frontend_site = "www.gaggamagga.shop"
-            absurl = f"https://{frontend_site}/set_password.html?/{uidb64}/{token}/"  # 확인된 토큰 주소 생성
-
-            email_body = "안녕하세요? \n 비밀번호 재설정 주소입니다.\n" + absurl  # 이메일 내용
+            absurl = f"https://{frontend_site}/set_password.html?/{uidb64}/{token}/"  
+            email_body = "안녕하세요? \n 비밀번호 재설정 주소입니다.\n" + absurl  
             message = {
                 "email_body": email_body,
                 "to_email": user.email,
@@ -503,15 +469,11 @@ class SetNewPasswordSerializer(serializers.Serializer):
 
         # 비밀번호 유효성 검사
         if password_validator(password):
-            raise serializers.ValidationError(
-                detail={"password": "비밀번호는 8자 이상 16자이하의 영문 대/소문자, 숫자, 특수문자 조합이어야 합니다."}
-            )
+            raise serializers.ValidationError(detail={"password": "비밀번호는 8자 이상 16자이하의 영문 대/소문자, 숫자, 특수문자 조합이어야 합니다."})
 
         # 비밀번호 문자열 동일여부 검사
         if password_pattern(password):
-            raise serializers.ValidationError(
-                detail={"password": "비밀번호는 3자리 이상 동일한 영문/사용 사용 불가합니다."}
-            )
+            raise serializers.ValidationError(detail={"password": "비밀번호는 3자리 이상 동일한 영문/사용 사용 불가합니다."})
 
         user.set_password(password)
         user.save()

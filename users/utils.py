@@ -68,5 +68,3 @@ class Util:
                 "email_subject": "이메일 인증",
             }
         Util.send_email(message)
-
-
