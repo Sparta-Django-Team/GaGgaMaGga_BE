@@ -18,7 +18,7 @@ class NotificationViewTest(APITestCase):
     def setUp(self):
         self.access_token = self.client.post(reverse("token_obtain_pair_view"), self.user_data).data["access"]
 
-    # 전체 리뷰 조회 성공
+    # 알람 리스트 조회 성공
     def test_notification_list_success(self):
         profile_response = self.client.get(
             path=reverse("private_profile_view"),

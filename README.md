@@ -1,8 +1,4 @@
-# 가까?마까?(GaggaMagga) 프로젝트
-
-### [Front-end Page](https://github.com/1TEAM12/GaGgaMaGga_FE)
-### [Swagger API Docs](https://www.back-gaggamagga.tk/)
-### [노션 진행 상황](https://www.notion.so/11-30-12-29-482dc47b71d44e968cf32283bb422238)
+# 가까?마까?(GaggaMagga) 프로젝트 
 
 ![ex_screenshot](./img/main.png)
 
@@ -10,37 +6,38 @@
 
 ## ****📌 프로젝트 개요****
 
-  - **기획 의도**
+<details>
+    <summary style="font-weight:bold;">기획 의도</summary>
+    <div markdown="1"></div>
+  
     - 누구나 여행을 떠나서 음식점을 가거나, 점심 식사 메뉴를 정할 때 고민이 있었던 경험이 있을 것 입니다.
     - 본 서비스는 '제주도' 라는 특정 지역에서 먹고자 하는 음식의 종류나 장소를 선택하면 사용자에게 맛집을 추천하고 있습니다.
     - 추천 기능은 머신러닝 유저기반 추천 기능을 활용하여 사용자와 가장 유사한 경험을 갖고 있는 사용자의 데이터들를 통해 음식점을 추천합니다.
     - 방문한 맛집은 다른 사용자와 후기를 공유하고, 후기에는 별점을 넣어 장소별 평가점수를 관리할 수 있습니다.
     - 각 후기에는 댓글과 대댓글 기능으로 유저간 경험을 공유할 수 있는 플랫폼을 제공합니다.
     - 마음에 드는 장소는 북마크하여 저장하고, 성향이 잘 맞는 유저는 팔로우하여 해당 유저의 경험을 공유받을 수 있는 서비스를 구성하였습니다.
-  - **개발기간** : '22.11.30 ~ 12.29
+  </details>
+  
+  <details>
+    <summary style="font-weight:bold;">개발기간 : '22.11.30 ~ 12.29'</summary>
+  </details>
+
 <br>
 
-## 🐾 ****Main Character****
 
-![ex_screenshot](./img/character.png)
+## 🥘 ****서비스 시연 영상****
 
-<br>
-
-
-## 🥘 ****주요 페이지****
-
-![ex_screenshot](./img/apps.jpg)
+[![영상](http://img.youtube.com/vi/hTdLnu0ECPQ/0.jpg)](https://www.youtube.com/watch?v=hTdLnu0ECPQ) 
 
 <br>
 
 ## ⚙ ****기능 명세서****
 
-  - 사용자 환경(회원가입, 로그인, 회원정보 관리, 팔로우, 비활성화, 아이디/비밀번호 찾기)
+  - 사용자 환경(회원가입, 로그인, 회원정보 관리, 팔로우, 비활성화, 아이디/비밀번호 찾기 등등)
   - 맛집 후기(리뷰) 작성/수정/삭제, 조회수 카운트, 좋아요, 검색 기능  
   - 후기 댓글 작성/수정/삭제
   - 후기 댓글의 대댓글 작성/수정/삭제 기능
-  - 유저간 댓글, 후기의 좋아요 알림 기능
-  - HTML/CSS/Javascript를 활용한 반응형 모바일 프론트엔드 페이지 구성
+  - 유저간 댓글 알림 기능
 
 <br>
 
@@ -100,10 +97,10 @@
 
 ## ****⛓ Tech Stack****  
 
-### Backend : <img src="https://img.shields.io/badge/python-3776AB?style=for-the-badge&logo=python&logoColor=white"> <img src="https://img.shields.io/badge/django-092E20?style=for-the-badge&logo=django&logoColor=white"> <img src="https://img.shields.io/badge/django rest framework-092E20?style=for-the-badge&logo=django&logoColor=white">
-### Frontend : <img src="https://img.shields.io/badge/html5-E34F26?style=for-the-badge&logo=html5&logoColor=white"> <img src="https://img.shields.io/badge/css-1572B6?style=for-the-badge&logo=css3&logoColor=white"> <img src="https://img.shields.io/badge/javascript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black"> 
-### Server : <img src="https://img.shields.io/badge/AMAZON EC2-FFE900?style=for-the-badge&logo=amazon&logoColor=black"> <img src="https://img.shields.io/badge/DOCKER-3D97FF?style=for-the-badge&logo=docker&logoColor=white"> <img src="https://img.shields.io/badge/GUNICORN-2BB530?style=for-the-badge&logo=gunicorn&logoColor=white"> <img src="https://img.shields.io/badge/NGINX-2F9624?style=for-the-badge&logo=nginx&logoColor=white">
-### Management : <img src="https://img.shields.io/badge/github-181717?style=for-the-badge&logo=github&logoColor=white"> <img src="https://img.shields.io/badge/git-F05032?style=for-the-badge&logo=git&logoColor=white">
+### Backend : <img src="https://img.shields.io/badge/python 3.10.8-3776AB?style=for-the-badge&logo=python&logoColor=white"> <img src="https://img.shields.io/badge/django 4.1.3-092E20?style=for-the-badge&logo=django&logoColor=white"> <img src="https://img.shields.io/badge/django rest framework 3.14.0-092E20?style=for-the-badge&logo=django&logoColor=white">
+### Server : <img src="https://img.shields.io/badge/AMAZON EC2-FFE900?style=for-the-badge&logo=amazon&logoColor=black"> <img src="https://img.shields.io/badge/DOCKER 20.10.12-3D97FF?style=for-the-badge&logo=docker&logoColor=white"> <img src="https://img.shields.io/badge/DOCKER COMPOSE 2.11.2-3D97FF?style=for-the-badge&logo=docker&logoColor=white"> <img src="https://img.shields.io/badge/GUNICORN-2BB530?style=for-the-badge&logo=gunicorn&logoColor=white"> <img src="https://img.shields.io/badge/NGINX 1.23.2 -2F9624?style=for-the-badge&logo=nginx&logoColor=white"> <img src="https://img.shields.io/badge/daphne-303030?style=for-the-badge&logo=daphne&logoColor=white"> <img src="https://img.shields.io/badge/redis 7.0.7-FF1F1F?style=for-the-badge&logo=redis&logoColor=white">
+### Management : <img src="https://img.shields.io/badge/github-181717?style=for-the-badge&logo=github&logoColor=white"> <img src="https://img.shields.io/badge/git-F05032?style=for-the-badge&logo=git&logoColor=white"> <img src="https://img.shields.io/badge/github action-3399FF?style=for-the-badge&logo=github&logoColor=white">
+### Database : <img src="https://img.shields.io/badge/postgresql 14.5-0000FF?style=for-the-badge&logo=postgresql&logoColor=white">
 
 <br>
 
@@ -112,7 +109,9 @@
   - **계정 찾기** : NAVER Cloud SMS API
   - **지도 App** : NAVER Web Dynamic Map API
   - **검색 App** : ALGOLIA API
+  - **IP 정보 확인** : Whois API
   - **맛집 Data** : NAVER Map v5.0 crawling Data
+  
 
 <br>
 
@@ -134,11 +133,11 @@
 
 <br>
 
-## 🎯 ****[API](https://bolder-starburst-a73.notion.site/API-101c8f2002fb4257a34b6fb6a81798d2)****
+## 🎯 ****Notion API**** | ****[Swagger API Docs](https://www.gaggamagga.tk)****
 
 
 <details>
-<summary>USER API</summary>
+<summary style="font-size: 18px;">USER API</summary>
 <div markdown="1">
 
 ![ex_screenshot](./img/user_api.png)
@@ -148,7 +147,7 @@
 
 
 <details>
-<summary>PLACE API</summary>
+<summary style="font-size: 18px;">PLACE API</summary>
 <div markdown="1">
 
 ![ex_screenshot](./img/place_api.png)
@@ -157,7 +156,7 @@
 </details>
 
 <details>
-<summary>REVIEW API</summary>
+<summary style="font-size: 18px;">REVIEW API</summary> 
 <div markdown="1">
 
 ![ex_screenshot](./img/review_api.png)
@@ -167,7 +166,7 @@
 
 
 <details>
-<summary>NOTIFICATION API</summary>
+<summary style="font-size: 18px;">NOTIFICATION API</summary>
 <div markdown="1">
 
 ![ex_screenshot](./img/notification_api.png)
@@ -430,7 +429,15 @@
 <summary style="font-size: 18px;">NOTIFICATION TEST CODE</summary>
 <div markdown="4">
 
-
-
+## 알람 기능
+1. 알람 리스트 조회
+2. 알람 읽음 처리
 </div>
 </details>
+
+<br>
+
+## 🔗 ****Link**** 
+### [Front-end Repository](https://github.com/1TEAM12/GaGgaMaGga_FE)
+### [Notion 현황판](https://www.notion.so/11-30-12-29-482dc47b71d44e968cf32283bb422238)
+### [배포 사이트](http://gaggamagga.shop/)
