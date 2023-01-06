@@ -32,7 +32,7 @@ class UserStatusChange:
                     "to_email": i["email"],
                     "email_subject": inactivate_email_subject,
                 }
-                send_email(message)
+                send_email.delay(message)
             user.update(withdraw=True)
 
     # 비활성화가 되고 60일이 지나면 삭제
@@ -49,7 +49,7 @@ class UserStatusChange:
                     "to_email": i["email"],
                     "email_subject": delete_email_subject,
                 }
-                send_email(message)
+                send_email.delay(message)
             user.delete()
 
     # 로그인 비밀번호 변경이 60일이 지났을 경우 password_expired를 True로 바꿈

@@ -26,9 +26,9 @@ def get_secret(setting, secrets=secrets):
 SECRET_KEY = get_secret("SECRET_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
 
-DEBUG = True
+DEBUG = os.environ.get('DEBUG', '0') == '1'
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['backend','https://gaggamagga.tk','https://www.gaggamagga.tk','www.gaggamagga.tk']
 
 # Application definition
 INSTALLED_APPS = [
@@ -39,24 +39,24 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    
+
     # third party api services
     'algoliasearch_django',
-    
+
     # thrid party packages
     'rest_framework',
     'rest_framework_simplejwt.token_blacklist',
     'drf_yasg',
     'corsheaders',
     'channels',
-    'debug_toolbar',
-    
+
     # internal apps
     'notification',
     'places',
     'reviews',
     'users',
 ]
+
 # RestFramework
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
@@ -75,7 +75,6 @@ SWAGGER_SETTINGS = {
 }
 
 MIDDLEWARE = [
-    'debug_toolbar.middleware.DebugToolbarMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'corsheaders.middleware.CorsMiddleware',
@@ -112,21 +111,36 @@ CHANNEL_LAYERS = {
     "default": {
         "BACKEND": "channels_redis.core.RedisChannelLayer",
         "CONFIG": {
-            "hosts": [("127.0.0.1", 6379)],
+            "hosts": [("redis", 6379)],
         },
     },
 }
 
-
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
-
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
+POSTGRES_DB = os.environ.get('POSTGRES_DB', '')
+if POSTGRES_DB:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': POSTGRES_DB,
+            'USER': os.environ.get('POSTGRES_USER', ''),
+            'PASSWORD': os.environ.get('POSTGRES_PASSWORD', ''),
+            'HOST': os.environ.get('POSTGRES_HOST', ''),
+            'PORT': os.environ.get('POSTGRES_PORT', ''),
+        }
 }
+
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+            'TEST' : {
+            'NAME' : BASE_DIR / "db.sqlite3",
+            },
+        }
+    }
 
 # Password validation
 # https://docs.djangoproject.com/en/4.1/ref/settings/#auth-password-validators
@@ -178,7 +192,7 @@ AUTH_USER_MODEL = 'users.User'
 PASSWORD_RESET_TIMEOUT = 3600
 
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=720),
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=30),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
     'ROTATE_REFRESH_TOKENS': False,
     'BLACKLIST_AFTER_ROTATION': False,
@@ -213,8 +227,12 @@ EMAIL_HOST_PASSWORD = get_secret("EMAIL_PASSWORD")
 EMAIL_USE_TLS = True
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
-#CORS settings
+# CORS settings
 CORS_ALLOW_ALL_ORIGINS = True
+CORS_ORIGIN_WHITELIST = ['https://www.gaggamagga.tk','https://gaggamagga.tk','https://www.gaggamagga.shop','https://gaggamagga.shop', ]
+
+# CSRF settings
+CSRF_TRUSTED_ORIGINS = CORS_ORIGIN_WHITELIST
 
 # Search Engine ALGOLIA settings
 ALGOLIA = {
