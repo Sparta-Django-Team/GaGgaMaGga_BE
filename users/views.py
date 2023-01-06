@@ -67,8 +67,6 @@ class UserView(APIView):
         serializer = SignupSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
-            user = get_object_or_404(User, email=request.data["email"])
-            Util.email_authentication_send(user)
             return Response({"message": "회원가입이 되었습니다."}, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -202,9 +200,9 @@ class ConfirmEmailView(APIView):
 class ReSendEmailView(APIView):
     permission_classes = [IsAuthenticated]
 
-    # 이메일 재발송
+    # 인증 이메일 발송
     @swagger_auto_schema(
-        operation_summary="이메일 재발송",
+        operation_summary="인증 이메일 발송",
         responses={200: "성공", 401: "인증 에러", 404: "찾을 수 없음", 500: "서버 에러"},
     )
     def post(self, request):
