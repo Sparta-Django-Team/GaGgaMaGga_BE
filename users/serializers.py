@@ -7,7 +7,7 @@ from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.encoding import smart_bytes, force_str
 
 from .models import User, Profile, LoggedIn, BlockedCountryIP
-from .utils import Util
+from .tasks import send_email
 from .validators import (
     password_validator,
     password_pattern,
@@ -417,7 +417,7 @@ class PasswordResetSerializer(serializers.Serializer):
                 "to_email": user.email,
                 "email_subject": "비밀번호 재설정",
             }
-            Util.send_email(message)
+            send_email.delay(message)
 
             return super().validate(attrs)
         raise serializers.ValidationError(detail={"email": "잘못된 이메일입니다. 다시 입력해주세요."})

@@ -1,33 +1,16 @@
 from rest_framework_simplejwt.tokens import RefreshToken
 
-from django.core.mail import EmailMessage
-
 import urllib.request
 import requests
 import tempfile
-import threading
 from datetime import datetime
 
 from gaggamagga.settings import get_secret
 from .models import ConfirmEmail
-
-
-class EmailThread(threading.Thread):
-    
-    def __init__(self, email):
-        self.email = email
-        threading.Thread.__init__(self)
-        
-    def run(self):
-        self.email.send()
+from .tasks import send_email
 
 
 class Util:
-
-    @staticmethod
-    def send_email(message):
-        email = EmailMessage(subject=message["email_subject"], body=message["email_body"], to=[message["to_email"]])
-        EmailThread(email).start()
 
     def get_client_ip(request):
         x_forwarded_for = request.META.get("HTTP_X_FORWARDED_FOR")
@@ -50,8 +33,13 @@ class Util:
     def find_ip_country(user_ip):
         serviceKey = get_secret("WHOIS_KEY")
         url = "http://apis.data.go.kr/B551505/whois/ip_address?serviceKey=" + serviceKey + "&query=" + user_ip + "&answer=json"
-        request = urllib.request.urlopen(url).read().decode("utf-8")
-        return dict(eval(request))["response"]["whois"]["countryCode"]
+
+        try: 
+            request = urllib.request.urlopen(url).read().decode("utf-8")
+            return dict(eval(request))["response"]["whois"]["countryCode"]
+        
+        except :
+            return None
     
     def email_authentication_send(user):
         secured_key = RefreshToken.for_user(user).access_token
@@ -67,4 +55,4 @@ class Util:
                 "to_email": user.email,
                 "email_subject": "이메일 인증",
             }
-        Util.send_email(message)
+        send_email.delay(message)
