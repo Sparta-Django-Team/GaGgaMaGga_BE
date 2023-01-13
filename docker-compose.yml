@@ -57,6 +57,14 @@ services:
     image: redis:alpine
     restart: always
   
+  rabbitmq:
+    container_name: rabbitmq
+    image: rabbitmq:3.11-alpine
+    ports:
+      - "5672:5672"
+    depends_on:
+      - backend
+
   celery_work:
     container_name: celery_worker
     build: ./backend
@@ -71,7 +79,7 @@ services:
       - POSTGRES_HOST
       - POSTGRES_PORT
     depends_on:
-      - redis
+      - rabbitmq
 
   nginx:
     container_name: nginx
