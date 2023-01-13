@@ -5,8 +5,9 @@ ENV PYTHONUNBUFFERED 1
 
 RUN mkdir /app/
 WORKDIR /app/
-COPY ./django/requirements.txt .
 
 RUN apt update && apt install libpq-dev gcc -y
+
+COPY ./django/requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 RUN pip install gunicorn psycopg2
