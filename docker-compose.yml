@@ -15,10 +15,6 @@ services:
       - POSTGRES_DB
     restart: always
 
-  redis:
-    image: redis:alpine
-    restart: always
-
   backend:
     container_name: backend
     build: ./backend/
@@ -39,14 +35,14 @@ services:
       - postgres
     restart: always
     
-  channels:
-    container_name: channels
+  daphne:
+    container_name: daphne
     build: ./backend/
-    command: daphne -b 0.0.0.0 -p 8001 gaggamagga.asgi:application
+    command: daphne -b 0.0.0.0 -p 8080 gaggamagga.asgi:application
     volumes:
       - ./backend/django/:/app/
     environment:
-      - DEBUG=1
+      - DEBUG
       - POSTGRES_DB
       - POSTGRES_USER
       - POSTGRES_PASSWORD
@@ -57,8 +53,28 @@ services:
       - postgres
     restart: always
 
+  redis:
+    image: redis:alpine
+    restart: always
+  
+  celery_work:
+    container_name: celery_worker
+    build: ./backend
+    command: celery -A gaggamagga worker -l info
+    volumes:
+      - ./backend/django/:/app/
+    environment:
+      - DEBUG
+      - POSTGRES_DB
+      - POSTGRES_USER
+      - POSTGRES_PASSWORD
+      - POSTGRES_HOST
+      - POSTGRES_PORT
+    depends_on:
+      - redis
+
   nginx:
-    container_name : nginx
+    container_name: nginx
     image: nginx:1.23.2-alpine
     ports:
       - "80:80"
@@ -69,5 +85,5 @@ services:
       - django_media:/media/
       - django_static:/static/
     depends_on:
-      - channels
+      - daphne
     restart: always
